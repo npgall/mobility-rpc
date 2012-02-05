@@ -1,0 +1,13 @@
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_request_identifier.proto";
+
+message ClassData {
+    required string class_name = 1;
+    required bytes byte_code = 2;
+}
+message ByteCodeResponse {
+    repeated ClassData class_data = 1;
+
+    // The request identifier, copied from the corresponding byte code request originally sent by the client
+    required RequestIdentifier request_identifier = 4;
+}

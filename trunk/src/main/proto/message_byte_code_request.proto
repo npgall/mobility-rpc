@@ -1,0 +1,10 @@
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_request_identifier.proto";
+
+message ByteCodeRequest {
+    repeated string class_name = 1;
+
+    // Request identifier, indicates relevant session and identifies the relevant request to the client when
+    // response messages are returned
+    required RequestIdentifier request_identifier = 2;
+}
