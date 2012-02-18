@@ -15,9 +15,9 @@
  */
 package com.googlecode.mobilityrpc.protocol.processors.impl;
 
-import com.googlecode.mobilityrpc.execution.impl.MessageHandlingExecutionCoordinator;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
 import com.googlecode.mobilityrpc.protocol.pojo.Pong;
 import com.googlecode.mobilityrpc.protocol.processors.DeserializedMessageProcessor;
 
@@ -32,7 +32,7 @@ public class PongMessageProcessor implements DeserializedMessageProcessor<Pong> 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     @Override
-    public void process(MessageHandlingExecutionCoordinator executionCoordinator, ConnectionController connectionController, ConnectionIdentifier connectionIdentifier, Pong pong) {
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionIdentifier connectionIdentifier, Pong pong) {
         if (logger.isLoggable(Level.INFO)) {
             logger.log(Level.INFO, "Received Pong message from connection '" + connectionIdentifier + "': " + pong);
         }

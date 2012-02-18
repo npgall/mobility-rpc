@@ -15,9 +15,9 @@
  */
 package com.googlecode.mobilityrpc.protocol.processors.impl;
 
-import com.googlecode.mobilityrpc.execution.impl.MessageHandlingExecutionCoordinator;
-import com.googlecode.mobilityrpc.session.impl.MessageHandlingSession;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
+import com.googlecode.mobilityrpc.session.impl.MobilitySessionInternal;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionResponse;
 import com.googlecode.mobilityrpc.protocol.pojo.RequestIdentifier;
@@ -31,11 +31,11 @@ import java.util.UUID;
 public class ExecutionResponseMessageProcessor implements DeserializedMessageProcessor<ExecutionResponse> {
 
     @Override
-    public void process(MessageHandlingExecutionCoordinator executionCoordinator, ConnectionController connectionController, ConnectionIdentifier connectionIdentifier, ExecutionResponse executionResponse) {
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionIdentifier connectionIdentifier, ExecutionResponse executionResponse) {
         try {
             RequestIdentifier requestIdentifier = executionResponse.getRequestIdentifier();
             UUID sessionId = requestIdentifier.getSessionId();
-            MessageHandlingSession session = executionCoordinator.getMessageHandlingSession(sessionId);
+            MobilitySessionInternal session = mobilityController.getMessageHandlingSession(sessionId);
             // No need to pass ConnectionIdentifier to session, since calling thread will be blocked with the same
             // ConnectionIdentifier on its stack...
             session.receiveExecutionResponse(executionResponse);

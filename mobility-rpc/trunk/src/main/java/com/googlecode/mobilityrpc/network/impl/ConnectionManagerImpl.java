@@ -15,8 +15,10 @@
  */
 package com.googlecode.mobilityrpc.network.impl;
 
-import com.googlecode.mobilityrpc.execution.impl.ExecutionCoordinatorImpl;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 import com.googlecode.mobilityrpc.network.*;
+import com.googlecode.mobilityrpc.network.impl.tcp.TCPConnection;
+import com.googlecode.mobilityrpc.network.impl.tcp.TCPConnectionListener;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -31,21 +33,21 @@ import java.util.logging.Logger;
 /**
  * @author Niall Gallagher
  */
-public class ConnectionControllerImpl implements ManagedConnectionController, ConnectionStateListener {
+public class ConnectionManagerImpl implements ConnectionManagerInternal, ConnectionStateListener {
 
-    private final ConcurrentMap<ConnectionIdentifier, ManagedConnection> connections = new ConcurrentHashMap<ConnectionIdentifier, ManagedConnection>();
-    private final ConcurrentMap<ConnectionIdentifier, ManagedConnectionListener> incomingConnectionListeners = new ConcurrentHashMap<ConnectionIdentifier, ManagedConnectionListener>();
+    private final ConcurrentMap<ConnectionIdentifier, ConnectionInternal> connections = new ConcurrentHashMap<ConnectionIdentifier, ConnectionInternal>();
+    private final ConcurrentMap<ConnectionIdentifier, ConnectionListenerInternal> incomingConnectionListeners = new ConcurrentHashMap<ConnectionIdentifier, ConnectionListenerInternal>();
 
-    private final ExecutionCoordinatorImpl executionCoordinator;
+    private final MobilityControllerImpl mobilityController;
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    public ConnectionControllerImpl(ExecutionCoordinatorImpl executionCoordinator) {
-        this.executionCoordinator = executionCoordinator;
+    public ConnectionManagerImpl(MobilityControllerImpl mobilityController) {
+        this.mobilityController = mobilityController;
     }
 
     @Override
     public Connection getConnection(ConnectionIdentifier identifier) {
-        ManagedConnection connection = connections.get(identifier);
+        ConnectionInternal connection = connections.get(identifier);
         // Double-checked lock for thread safety, to establish an outgoing connection only if necessary.
         // Note ideally we would use ConcurrentMap semantics alone without additional synchronization here,
         // but creating a new connection prior to calling putIfAbsent would be expensive in the the case the
@@ -62,7 +64,7 @@ public class ConnectionControllerImpl implements ManagedConnectionController, Co
         return connection;
     }
 
-    ManagedConnection createOutgoingConnection(ConnectionIdentifier identifier) {
+    ConnectionInternal createOutgoingConnection(ConnectionIdentifier identifier) {
         synchronized (connections) {
             final int auxiliaryConnectionId = identifier.getAuxiliaryConnectionId();
             if (auxiliaryConnectionId < 0) {
@@ -72,7 +74,7 @@ public class ConnectionControllerImpl implements ManagedConnectionController, Co
             }
             else if (auxiliaryConnectionId > 0 && !connections.containsKey(new ConnectionIdentifier(identifier.getAddress(), identifier.getPort(), 0))) {
                 // We cannot create outgoing auxiliary connections while the primary connection is down.
-                // See documentation in ConnectionControllerImpl#auxiliaryConnectionIdProvider...
+                // See documentation in ConnectionManagerImpl#auxiliaryConnectionIdProvider...
                 throw new IllegalStateException("Cannot establish an outgoing auxiliary connection, because the primary connection is down: " + identifier);
             }
             // At this point, we are about to establish either:
@@ -88,10 +90,10 @@ public class ConnectionControllerImpl implements ManagedConnectionController, Co
                 throw new IllegalStateException("Failed to establish outgoing connection to: " + identifier, e);
             }
             // Wrap the socket in a TCPConnection object which will manage the sockets incoming and outgoing streams...
-            ManagedConnection connection = new TCPConnection(
+            ConnectionInternal connection = new TCPConnection(
                     socket,
                     auxiliaryConnectionId,
-                    executionCoordinator,
+                    mobilityController,
                     this
             );
             connection.init();
@@ -103,8 +105,8 @@ public class ConnectionControllerImpl implements ManagedConnectionController, Co
         }
     }
 
-    public void notifyConnectionOpened(ManagedConnection connection) {
-        ManagedConnection existing = connections.putIfAbsent(connection.getConnectionIdentifier(), connection);
+    public void notifyConnectionOpened(ConnectionInternal connection) {
+        ConnectionInternal existing = connections.putIfAbsent(connection.getConnectionIdentifier(), connection);
         if (existing != null) {
             // Very unlikely scenario.
             // We must be dealing with a new incoming connection, where the client had previously been connected
@@ -117,7 +119,7 @@ public class ConnectionControllerImpl implements ManagedConnectionController, Co
         }
     }
 
-    public void notifyConnectionClosed(ManagedConnection connection) {
+    public void notifyConnectionClosed(ConnectionInternal connection) {
         connections.remove(connection.getConnectionIdentifier());
     }
 
@@ -131,8 +133,8 @@ public class ConnectionControllerImpl implements ManagedConnectionController, Co
     @Override
     public void bindConnectionListener(ConnectionIdentifier localEndpointIdentifier) {
         synchronized (incomingConnectionListeners) {
-            ManagedConnectionListener newListener = new TCPConnectionListener(localEndpointIdentifier, executionCoordinator, this);
-            ManagedConnectionListener existingListener = incomingConnectionListeners.putIfAbsent(localEndpointIdentifier, newListener);
+            ConnectionListenerInternal newListener = new TCPConnectionListener(localEndpointIdentifier, mobilityController, this);
+            ConnectionListenerInternal existingListener = incomingConnectionListeners.putIfAbsent(localEndpointIdentifier, newListener);
             if (existingListener != null) {
                 throw new IllegalStateException("A listener is already registered for connection identifier: " + localEndpointIdentifier);
             }
@@ -151,7 +153,7 @@ public class ConnectionControllerImpl implements ManagedConnectionController, Co
 
     public void unbindConnectionListener(ConnectionIdentifier localEndpointIdentifier) {
         synchronized (incomingConnectionListeners) {
-            ManagedConnectionListener existing = incomingConnectionListeners.remove(localEndpointIdentifier);
+            ConnectionListenerInternal existing = incomingConnectionListeners.remove(localEndpointIdentifier);
             if (existing == null) {
                 throw new IllegalStateException("No such listener is registered for connection identifier: " + localEndpointIdentifier);
             }
@@ -186,7 +188,7 @@ public class ConnectionControllerImpl implements ManagedConnectionController, Co
             unbindConnectionListener(listenerIdentifier);
         }
         // Close all existing connections (note: Connections will unregister themselves automatically)...
-        for (ManagedConnection connection : connections.values()) {
+        for (ConnectionInternal connection : connections.values()) {
             connection.destroy();
         }
     }

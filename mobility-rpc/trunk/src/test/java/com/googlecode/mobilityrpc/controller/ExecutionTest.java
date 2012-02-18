@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.mobilityrpc.execution;
+package com.googlecode.mobilityrpc.controller;
 
-import com.googlecode.mobilityrpc.execution.impl.ExecutionCoordinatorImpl;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
-import com.googlecode.mobilityrpc.session.Session;
+import com.googlecode.mobilityrpc.session.MobilitySession;
 import com.googlecode.mobilityrpc.util.LoggingUtil;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -74,14 +74,14 @@ public class ExecutionTest {
     // Run this for manual testing in its own JUnit process (right-click in IDE),
     // and simultaneously run testStartClientAndSubmitExecutionRequest in a separate JUnit process...
     public void testStartListener() {
-        final ExecutionCoordinator executionCoordinator = new ExecutionCoordinatorImpl();
-        final ConnectionController connectionController = executionCoordinator.getConnectionController();
+        final MobilityController mobilityController = new MobilityControllerImpl();
+        final ConnectionManager connectionManager = mobilityController.getConnectionManager();
 
         final ConnectionIdentifier localEndpointIdentifier = new ConnectionIdentifier("127.0.0.1", 5739);
 
-        connectionController.bindConnectionListener(localEndpointIdentifier);
+        connectionManager.bindConnectionListener(localEndpointIdentifier);
         sleep(10);
-        connectionController.unbindConnectionListener(localEndpointIdentifier);
+        connectionManager.unbindConnectionListener(localEndpointIdentifier);
     }
 
     @Test
@@ -89,9 +89,9 @@ public class ExecutionTest {
     // Run this for manual testing in its own JUnit process (right-click in IDE),
     // and simultaneously run testStartListener in a separate JUnit process...
     public void testStartClientAndSubmitRunnable() {
-        final ExecutionCoordinator executionCoordinator = new ExecutionCoordinatorImpl();
+        final MobilityController mobilityController = new MobilityControllerImpl();
 
-        Session session = executionCoordinator.getSession(UUID.fromString("1dc91c11-79f3-47fe-a77f-37277c73a929"));
+        MobilitySession session = mobilityController.getSession(UUID.fromString("1dc91c11-79f3-47fe-a77f-37277c73a929"));
 
         logger.log(Level.INFO, "Created session: " + session);
 
@@ -110,9 +110,9 @@ public class ExecutionTest {
     // Run this for manual testing in its own JUnit process (right-click in IDE),
     // and simultaneously run testStartListener in a separate JUnit process...
     public void testStartClientAndSubmitCallable() {
-        final ExecutionCoordinator executionCoordinator = new ExecutionCoordinatorImpl();
+        final MobilityController mobilityController = new MobilityControllerImpl();
 
-        Session session = executionCoordinator.getSession(UUID.randomUUID());
+        MobilitySession session = mobilityController.getSession(UUID.randomUUID());
 
         logger.log(Level.INFO, "Created session: " + session);
         final int numOne = 5;
@@ -134,10 +134,10 @@ public class ExecutionTest {
     // Run this for manual testing in its own JUnit process (right-click in IDE),
     // and simultaneously run testStartListener in a separate JUnit process...
     public void testStartClientAndSubmitRunnable_External() {
-        final ExecutionCoordinator executionCoordinator = new ExecutionCoordinatorImpl();
+        final MobilityController mobilityController = new MobilityControllerImpl();
 
-//        Session session = executionCoordinator.getSession(UUID.fromString("1dc91c11-79f3-47fe-a77f-37277c73a929"));
-        Session session = executionCoordinator.getSession(UUID.randomUUID());
+//        MobilitySession session = mobilityController.getSession(UUID.fromString("1dc91c11-79f3-47fe-a77f-37277c73a929"));
+        MobilitySession session = mobilityController.getSession(UUID.randomUUID());
 
         logger.log(Level.INFO, "Created session: " + session);
 

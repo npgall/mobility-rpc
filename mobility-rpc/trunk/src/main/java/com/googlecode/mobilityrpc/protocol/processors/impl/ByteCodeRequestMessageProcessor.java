@@ -15,10 +15,10 @@
  */
 package com.googlecode.mobilityrpc.protocol.processors.impl;
 
-import com.googlecode.mobilityrpc.execution.impl.MessageHandlingExecutionCoordinator;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
-import com.googlecode.mobilityrpc.session.Session;
+import com.googlecode.mobilityrpc.session.MobilitySession;
 import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeRequest;
 import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeResponse;
 import com.googlecode.mobilityrpc.protocol.pojo.RequestIdentifier;
@@ -39,9 +39,9 @@ public class ByteCodeRequestMessageProcessor implements DeserializedMessageProce
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     @Override
-    public void process(MessageHandlingExecutionCoordinator executionCoordinator, ConnectionController connectionController, ConnectionIdentifier connectionIdentifier, ByteCodeRequest byteCodeRequest) {
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionIdentifier connectionIdentifier, ByteCodeRequest byteCodeRequest) {
         RequestIdentifier requestIdentifier = byteCodeRequest.getRequestIdentifier();
-        Session session = executionCoordinator.getSession(requestIdentifier.getSessionId());
+        MobilitySession session = mobilityController.getSession(requestIdentifier.getSessionId());
         if (byteCodeRequest.getClassNames().size() != 1) {
             // Note: although the protocol supports returning multiple classes,
             // implementing this optimization is reserved for future work.
@@ -69,7 +69,7 @@ public class ByteCodeRequestMessageProcessor implements DeserializedMessageProce
                 classDataListToReturn,
                 requestIdentifier
         );
-        executionCoordinator.sendOutgoingMessage(connectionIdentifier, byteCodeResponse);
+        mobilityController.sendOutgoingMessage(connectionIdentifier, byteCodeResponse);
         if (logger.isLoggable(Level.FINER)) {
             if (byteCodeResponse.getByteCodeResponses().isEmpty()) {
                 logger.log(Level.FINER, "Failed to locate bytecode for class '" + requestedClassName + "', returned response: " + byteCodeResponse);

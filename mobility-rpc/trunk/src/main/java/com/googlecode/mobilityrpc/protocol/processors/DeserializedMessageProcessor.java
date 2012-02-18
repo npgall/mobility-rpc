@@ -15,8 +15,8 @@
  */
 package com.googlecode.mobilityrpc.protocol.processors;
 
-import com.googlecode.mobilityrpc.execution.impl.MessageHandlingExecutionCoordinator;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 
 /**
@@ -24,5 +24,5 @@ import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
  */
 public interface DeserializedMessageProcessor<T> {
 
-    public void process(MessageHandlingExecutionCoordinator executionCoordinator, ConnectionController connectionController, ConnectionIdentifier connectionIdentifier, T deserializedMessage);
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionIdentifier connectionIdentifier, T deserializedMessage);
 }

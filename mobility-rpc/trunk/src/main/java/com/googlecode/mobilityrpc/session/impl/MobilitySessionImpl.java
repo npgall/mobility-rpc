@@ -15,7 +15,8 @@
  */
 package com.googlecode.mobilityrpc.session.impl;
 
-import com.googlecode.mobilityrpc.execution.impl.MessageHandlingExecutionCoordinator;
+import com.googlecode.mobilityrpc.controller.MobilityController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.pojo.*;
 import com.googlecode.mobilityrpc.quickstart.MobilityContext;
@@ -30,7 +31,7 @@ import java.util.logging.Logger;
 /**
  * @author Niall Gallagher
  */
-public class SessionImpl implements MessageHandlingSession {
+public class MobilitySessionImpl implements MobilitySessionInternal {
 
     /**
      * How long in millis threads waiting for an execution response to arrive should wait before giving up.
@@ -40,17 +41,17 @@ public class SessionImpl implements MessageHandlingSession {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     private final UUID sessionId;
-    private final MessageHandlingExecutionCoordinator executionCoordinator;
+    private final MobilityControllerInternal mobilityController;
     private final SessionClassLoader sessionClassLoader;
     private final Serializer defaultSerializer;
     private final SerializationFormat defaultSerializationFormat;
 
     private final ConcurrentMap<RequestIdentifier, FutureExecutionResponse> futureExecutionResponses = new ConcurrentHashMap<RequestIdentifier, FutureExecutionResponse>();
 
-    public SessionImpl(UUID sessionId, MessageHandlingExecutionCoordinator executionCoordinator) {
+    public MobilitySessionImpl(UUID sessionId, MobilityControllerInternal mobilityController) {
         this.sessionId = sessionId;
-        this.executionCoordinator = executionCoordinator;
-        this.sessionClassLoader = new SessionClassLoader(executionCoordinator, sessionId);
+        this.mobilityController = mobilityController;
+        this.sessionClassLoader = new SessionClassLoader(mobilityController, sessionId);
         this.defaultSerializer = new KryoSerializer(sessionClassLoader);
         this.defaultSerializationFormat = SerializationFormat.KRYO;
     }
@@ -58,6 +59,11 @@ public class SessionImpl implements MessageHandlingSession {
     @Override
     public UUID getSessionId() {
         return sessionId;
+    }
+
+    @Override
+    public void execute(ConnectionIdentifier connectionIdentifier, Runnable runnable) {
+        execute(connectionIdentifier, ExecutionMode.RETURN_RESPONSE, runnable);
     }
 
     @Override
@@ -79,7 +85,7 @@ public class SessionImpl implements MessageHandlingSession {
 
                 // Send execution request to remote machine, and then return without blocking...
                 try {
-                    executionCoordinator.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
+                    mobilityController.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
                 }
                 catch (Exception e) {
                     // This exception is unlikely, should only occur if our outgoing queue to machine specified is full...
@@ -97,7 +103,7 @@ public class SessionImpl implements MessageHandlingSession {
                     futureExecutionResponses.put(requestIdentifier, futureExecutionResponse);
 
                     // Send the execution request to the remote machine...
-                    executionCoordinator.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
+                    mobilityController.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
 
                     // Now block this thread until we get a response, or we time out...
                     executionResponse = futureExecutionResponse.getResponse(EXECUTION_RESPONSE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
@@ -145,6 +151,11 @@ public class SessionImpl implements MessageHandlingSession {
     }
 
     @Override
+    public <T> T execute(ConnectionIdentifier connectionIdentifier, Callable<T> callable) {
+        return execute(connectionIdentifier, ExecutionMode.RETURN_RESPONSE, callable);
+    }
+
+    @Override
     public <T> T execute(ConnectionIdentifier connectionIdentifier, ExecutionMode executionMode, Callable<T> callable) {
         // Serialize the object...
         final byte[] serializedExecutableObject = serialize(callable, defaultSerializationFormat);
@@ -163,7 +174,7 @@ public class SessionImpl implements MessageHandlingSession {
 
                 // Send execution request to remote machine, and then return without blocking...
                 try {
-                    executionCoordinator.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
+                    mobilityController.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
                 }
                 catch (Exception e) {
                     // This exception is unlikely, should only occur if our outgoing queue to machine specified is full...
@@ -181,7 +192,7 @@ public class SessionImpl implements MessageHandlingSession {
                     futureExecutionResponses.put(requestIdentifier, futureExecutionResponse);
 
                     // Send the execution request to the remote machine...
-                    executionCoordinator.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
+                    mobilityController.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
 
                     // Now block this thread until we get a response, or we time out...
                     executionResponse = futureExecutionResponse.getResponse(EXECUTION_RESPONSE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
@@ -311,7 +322,7 @@ public class SessionImpl implements MessageHandlingSession {
                                     executionRequest.getRequestIdentifier()
                             );
                         }
-                        executionCoordinator.sendOutgoingMessage(connectionIdentifier, executionResponse);
+                        mobilityController.sendOutgoingMessage(connectionIdentifier, executionResponse);
                         if (logger.isLoggable(Level.FINER)) {
                             logger.log(Level.FINER, "Processed execution task and sent response to client, for connection identifier: " + connectionIdentifier + ", execution request: " + executionRequest);
                         }
@@ -405,6 +416,16 @@ public class SessionImpl implements MessageHandlingSession {
         return sessionClassLoader;
     }
 
+    @Override
+    public MobilityController getMobilityController() {
+        return this.mobilityController;
+    }
+
+    @Override
+    public void release() {
+        mobilityController.removeSession(this.sessionId);
+    }
+
     private Object deserialize(byte[] serializedObject, SerializationFormat serializationFormat) {
         try {
             switch (serializationFormat) {
@@ -437,7 +458,7 @@ public class SessionImpl implements MessageHandlingSession {
 
     @Override
     public String toString() {
-        return "Session{" +
+        return "MobilitySession{" +
                 "sessionId=" + sessionId +
                 '}';
     }

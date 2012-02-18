@@ -30,7 +30,7 @@ import java.util.Collection;
  *
  * @author Niall Gallagher
  */
-public interface ConnectionController {
+public interface ConnectionManager {
 
     /**
      * Returns a connection to the destination specified.

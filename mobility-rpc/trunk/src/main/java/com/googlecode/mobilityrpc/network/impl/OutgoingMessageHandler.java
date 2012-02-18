@@ -18,8 +18,8 @@ package com.googlecode.mobilityrpc.network.impl;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 
 /**
- * An internal interface used by the framework - implemented by objects which can accept and process a serialized
- * protocol message received from a remote machine.
+ * An internal interface, implemented by objects which can accept a Java object representation of a protocol
+ * message, and submit it for serialization and sending to a remote machine.
  *
  * @author Niall Gallagher
  */

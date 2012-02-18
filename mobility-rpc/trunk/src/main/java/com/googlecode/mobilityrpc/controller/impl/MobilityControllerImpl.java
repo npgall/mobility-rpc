@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.mobilityrpc.execution.impl;
+package com.googlecode.mobilityrpc.controller.impl;
 
-import com.googlecode.mobilityrpc.network.impl.ManagedConnectionController;
-import com.googlecode.mobilityrpc.session.impl.MessageHandlingSession;
-import com.googlecode.mobilityrpc.session.Session;
-import com.googlecode.mobilityrpc.session.impl.SessionImpl;
+import com.googlecode.mobilityrpc.network.impl.ConnectionManagerInternal;
+import com.googlecode.mobilityrpc.session.MobilitySession;
+import com.googlecode.mobilityrpc.session.impl.MobilitySessionInternal;
+import com.googlecode.mobilityrpc.session.impl.MobilitySessionImpl;
 import com.googlecode.mobilityrpc.protocol.converters.MasterMessageConverter;
 import com.googlecode.mobilityrpc.protocol.processors.DeserializedMessageProcessor;
 import com.googlecode.mobilityrpc.protocol.processors.DeserializedMessageProcessorRegistry;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
-import com.googlecode.mobilityrpc.network.impl.ConnectionControllerImpl;
+import com.googlecode.mobilityrpc.network.impl.ConnectionManagerImpl;
 import com.googlecode.mobilityrpc.protocol.converters.MessageConverter;
 import com.googlecode.mobilityrpc.protocol.converters.MessageConverterRegistry;
 import com.googlecode.mobilityrpc.protocol.converters.MessageTypeRegistry;
@@ -41,11 +41,11 @@ import java.util.logging.Logger;
 /**
  * @author Niall Gallagher
  */
-public class ExecutionCoordinatorImpl implements MessageHandlingExecutionCoordinator {
+public class MobilityControllerImpl implements MobilityControllerInternal {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    private final ManagedConnectionController connectionController;
+    private final ConnectionManagerInternal connectionManager;
 
     private final ExecutorService messageProcessorService = Executors.newCachedThreadPool();
 
@@ -54,12 +54,12 @@ public class ExecutionCoordinatorImpl implements MessageHandlingExecutionCoordin
     private final DeserializedMessageProcessorRegistry deserializedMessageProcessorRegistry = new DeserializedMessageProcessorRegistry();
     private final MasterMessageConverter masterMessageConverter = new MasterMessageConverter();
 
-    private final ConcurrentMap<UUID, MessageHandlingSession> sessionRegistry = new ConcurrentHashMap<UUID, MessageHandlingSession>();
+    private final ConcurrentMap<UUID, MobilitySessionInternal> sessionRegistry = new ConcurrentHashMap<UUID, MobilitySessionInternal>();
 
 
-    public ExecutionCoordinatorImpl() {
-        this.connectionController = new ConnectionControllerImpl(this);
-        connectionController.init();
+    public MobilityControllerImpl() {
+        this.connectionManager = new ConnectionManagerImpl(this);
+        connectionManager.init();
     }
 
     @Override
@@ -69,13 +69,14 @@ public class ExecutionCoordinatorImpl implements MessageHandlingExecutionCoordin
 
     @Override
     public void sendOutgoingMessage(ConnectionIdentifier identifier, Object message) {
+        // TODO: offload serialization to the queue/background thread?..
         byte[] messageDataInEnvelope = masterMessageConverter.convertToProtobuf(message);
-        connectionController.getConnection(identifier).enqueueOutgoingMessage(messageDataInEnvelope);
+        connectionManager.getConnection(identifier).enqueueOutgoingMessage(messageDataInEnvelope);
     }
 
     @Override
-    public ConnectionController getConnectionController() {
-        return connectionController;
+    public ConnectionManager getConnectionManager() {
+        return connectionManager;
     }
 
     /**
@@ -84,8 +85,9 @@ public class ExecutionCoordinatorImpl implements MessageHandlingExecutionCoordin
      */
     @Override
     public void destroy() {
-        connectionController.destroy();
+        connectionManager.destroy();
         messageProcessorService.shutdown();
+        sessionRegistry.clear();
     }
 
     class MessageProcessorTask implements Runnable {
@@ -120,7 +122,7 @@ public class ExecutionCoordinatorImpl implements MessageHandlingExecutionCoordin
                 if (logger.isLoggable(Level.FINE)) {
                     logger.log(Level.FINE, "Received message and submitting for processing, " + messageData.length + " bytes from " + connectionIdentifier + ": " + message);
                 }
-                deserializedMessageProcessor.process(ExecutionCoordinatorImpl.this, connectionController, connectionIdentifier, message);
+                deserializedMessageProcessor.process(MobilityControllerImpl.this, connectionManager, connectionIdentifier, message);
             }
             catch (Exception e) {
                 logger.log(Level.WARNING, "Failed to process incoming message: " + messageData.length + " bytes from " + connectionIdentifier, e);
@@ -132,14 +134,23 @@ public class ExecutionCoordinatorImpl implements MessageHandlingExecutionCoordin
 
 
     @Override
-    public Session getSession(UUID sessionId) {
+    public MobilitySession getSession(UUID sessionId) {
         return getMessageHandlingSession(sessionId);
     }
 
     @Override
-    public MessageHandlingSession getMessageHandlingSession(UUID sessionId) {
+    public void removeSession(UUID sessionId) {
+        MobilitySession session = sessionRegistry.get(sessionId);
+        if (session == null) {
+            return;
+        }
+        sessionRegistry.remove(sessionId);
+    }
+
+    @Override
+    public MobilitySessionInternal getMessageHandlingSession(UUID sessionId) {
         // Retrieve existing session with the specified session id...
-        MessageHandlingSession session = sessionRegistry.get(sessionId);
+        MobilitySessionInternal session = sessionRegistry.get(sessionId);
         if (session != null) {
             // A session with this id was found, return it...
             logger.log(Level.FINER, "Found and returning existing session: {0}", session);
@@ -149,13 +160,13 @@ public class ExecutionCoordinatorImpl implements MessageHandlingExecutionCoordin
         // No session with the id was found.
 
         // Create a new session with the same specified id...
-        MessageHandlingSession newSession = new SessionImpl(sessionId, this);
+        MobilitySessionInternal newSession = new MobilitySessionImpl(sessionId, this);
 
         // Try to add the new session to the session registry atomically...
         // If we succeed in adding to the registry, existingSession will be initialised to null.
         // If we fail to add to the registry, another thread will have succeeded just before this thread,
         // and existingSession will be initialised to the session added by the other thread.
-        MessageHandlingSession existingSession = sessionRegistry.putIfAbsent(sessionId, newSession);
+        MobilitySessionInternal existingSession = sessionRegistry.putIfAbsent(sessionId, newSession);
 
         if (existingSession == null) {
             logger.log(Level.FINER, "No existing session found, created registered and returning now a new session: {0}", newSession);

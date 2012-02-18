@@ -15,9 +15,9 @@
  */
 package com.googlecode.mobilityrpc.protocol.processors.impl;
 
-import com.googlecode.mobilityrpc.execution.impl.MessageHandlingExecutionCoordinator;
-import com.googlecode.mobilityrpc.session.impl.MessageHandlingSession;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
+import com.googlecode.mobilityrpc.session.impl.MobilitySessionInternal;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionRequest;
 import com.googlecode.mobilityrpc.protocol.pojo.RequestIdentifier;
@@ -31,11 +31,11 @@ import java.util.UUID;
 public class ExecutionRequestMessageProcessor implements DeserializedMessageProcessor<ExecutionRequest> {
 
     @Override
-    public void process(MessageHandlingExecutionCoordinator executionCoordinator, ConnectionController connectionController, ConnectionIdentifier connectionIdentifier, ExecutionRequest executionRequest) {
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionIdentifier connectionIdentifier, ExecutionRequest executionRequest) {
         try {
             RequestIdentifier requestIdentifier = executionRequest.getRequestIdentifier();
             UUID sessionId = requestIdentifier.getSessionId();
-            MessageHandlingSession session = executionCoordinator.getMessageHandlingSession(sessionId);
+            MobilitySessionInternal session = mobilityController.getMessageHandlingSession(sessionId);
             session.receiveIncomingExecutionRequest(connectionIdentifier, executionRequest);
         }
         catch (Exception e) {

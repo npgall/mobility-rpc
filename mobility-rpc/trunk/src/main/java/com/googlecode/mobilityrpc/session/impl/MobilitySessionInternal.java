@@ -18,12 +18,12 @@ package com.googlecode.mobilityrpc.session.impl;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionRequest;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionResponse;
-import com.googlecode.mobilityrpc.session.Session;
+import com.googlecode.mobilityrpc.session.MobilitySession;
 
 /**
  * @author Niall Gallagher
  */
-public interface MessageHandlingSession extends Session {
+public interface MobilitySessionInternal extends MobilitySession {
 
 
     /**
@@ -48,4 +48,5 @@ public interface MessageHandlingSession extends Session {
      * machine
      */
     public void receiveExecutionResponse(ExecutionResponse executionResponse);
+
 }

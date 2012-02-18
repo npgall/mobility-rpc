@@ -15,8 +15,8 @@
  */
 package com.googlecode.mobilityrpc.quickstart;
 
-import com.googlecode.mobilityrpc.execution.ExecutionCoordinator;
-import com.googlecode.mobilityrpc.execution.impl.ExecutionCoordinatorImpl;
+import com.googlecode.mobilityrpc.controller.MobilityController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.quickstart.util.NetworkUtil;
 import com.googlecode.mobilityrpc.quickstart.util.StandaloneLoggingUtil;
@@ -30,17 +30,17 @@ import java.util.logging.*;
  */
 public class StandaloneServer {
 
-    private volatile ExecutionCoordinator executionCoordinator = null;
+    private volatile MobilityController mobilityController = null;
 
     public void startServer(Iterable<ConnectionIdentifier> bindAddresses) {
-        this.executionCoordinator = new ExecutionCoordinatorImpl();
+        this.mobilityController = new MobilityControllerImpl();
         for (ConnectionIdentifier bindAddress : bindAddresses) {
-            executionCoordinator.getConnectionController().bindConnectionListener(bindAddress);
+            mobilityController.getConnectionManager().bindConnectionListener(bindAddress);
         }
     }
 
     public void stopServer() {
-        executionCoordinator.destroy();
+        mobilityController.destroy();
     }
 
     /**

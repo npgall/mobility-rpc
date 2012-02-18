@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.mobilityrpc.network.impl;
+package com.googlecode.mobilityrpc.network.impl.tcp;
 
 import com.googlecode.mobilityrpc.common.util.IOUtil;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.impl.ConnectionErrorHandler;
+import com.googlecode.mobilityrpc.network.impl.MessageProvider;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;

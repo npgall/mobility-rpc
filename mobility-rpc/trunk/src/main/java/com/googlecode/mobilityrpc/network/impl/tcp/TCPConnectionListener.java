@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.mobilityrpc.network.impl;
+package com.googlecode.mobilityrpc.network.impl.tcp;
 
 import com.googlecode.mobilityrpc.common.util.IOUtil;
 import com.googlecode.mobilityrpc.network.*;
+import com.googlecode.mobilityrpc.network.impl.ConnectionInternal;
+import com.googlecode.mobilityrpc.network.impl.ConnectionListenerInternal;
+import com.googlecode.mobilityrpc.network.impl.ConnectionStateListener;
+import com.googlecode.mobilityrpc.network.impl.IncomingMessageHandler;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -36,7 +40,7 @@ import java.util.logging.Logger;
  * <p/>
  * @author Niall Gallagher
  */
-public class TCPConnectionListener implements ManagedConnectionListener {
+public class TCPConnectionListener implements ConnectionListenerInternal {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -148,7 +152,7 @@ public class TCPConnectionListener implements ManagedConnectionListener {
                     }
                     logger.log(Level.FINER, "Waiting for connections to local endpoint: {0}", localEndpointIdentifier);
                     Socket socket = serverSocket.accept();
-                    // Create a TCPConnection object to maintain this connection, and pass the ConnectionController to
+                    // Create a TCPConnection object to maintain this connection, and pass the ConnectionManager to
                     // it so that it can register itself when we call init() and unregister itself when the connection
                     // is closed...
 
@@ -162,11 +166,11 @@ public class TCPConnectionListener implements ManagedConnectionListener {
                         // A primary connection is already established, register this as an auxiliary connection...
                         auxiliaryConnectionId = auxiliaryConnectionIdProvider.decrementAndGet();
                     }
-                    ManagedConnection connection = new TCPConnection(socket, auxiliaryConnectionId, incomingMessageHandler, connectionStateListener);
+                    ConnectionInternal connection = new TCPConnection(socket, auxiliaryConnectionId, incomingMessageHandler, connectionStateListener);
                     if (logger.isLoggable(Level.FINER)) {
                         logger.log(Level.FINER, "Received connection on local endpoint " + localEndpointIdentifier + " from " + connection.getConnectionIdentifier());
                     }
-                    // Initialise the connection, and register it with the ConnectionController...
+                    // Initialise the connection, and register it with the ConnectionManager...
                     connection.init();
                     connectionStateListener.notifyConnectionOpened(connection);
                 }
