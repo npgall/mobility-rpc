@@ -15,15 +15,15 @@
  */
 package com.googlecode.mobilityrpc.network.impl;
 
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 
 /**
  * The public interface of an object which listens for incoming connections on an endpoint (address + port)
- * identified by a {@link com.googlecode.mobilityrpc.network.ConnectionIdentifier}.
+ * identified by a {@link ConnectionId}.
  *
  * @author Niall Gallagher
  */
 public interface ConnectionListener {
 
-    public ConnectionIdentifier getConnectionIdentifier();
+    public ConnectionId getConnectionId();
 }

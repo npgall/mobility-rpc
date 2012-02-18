@@ -35,8 +35,8 @@ import java.util.logging.Logger;
  */
 public class ConnectionManagerImpl implements ConnectionManagerInternal, ConnectionStateListener {
 
-    private final ConcurrentMap<ConnectionIdentifier, ConnectionInternal> connections = new ConcurrentHashMap<ConnectionIdentifier, ConnectionInternal>();
-    private final ConcurrentMap<ConnectionIdentifier, ConnectionListenerInternal> incomingConnectionListeners = new ConcurrentHashMap<ConnectionIdentifier, ConnectionListenerInternal>();
+    private final ConcurrentMap<ConnectionId, ConnectionInternal> connections = new ConcurrentHashMap<ConnectionId, ConnectionInternal>();
+    private final ConcurrentMap<ConnectionId, ConnectionListenerInternal> incomingConnectionListeners = new ConcurrentHashMap<ConnectionId, ConnectionListenerInternal>();
 
     private final MobilityControllerImpl mobilityController;
     private final Logger logger = Logger.getLogger(getClass().getName());
@@ -46,7 +46,7 @@ public class ConnectionManagerImpl implements ConnectionManagerInternal, Connect
     }
 
     @Override
-    public Connection getConnection(ConnectionIdentifier identifier) {
+    public Connection getConnection(ConnectionId identifier) {
         ConnectionInternal connection = connections.get(identifier);
         // Double-checked lock for thread safety, to establish an outgoing connection only if necessary.
         // Note ideally we would use ConcurrentMap semantics alone without additional synchronization here,
@@ -64,7 +64,7 @@ public class ConnectionManagerImpl implements ConnectionManagerInternal, Connect
         return connection;
     }
 
-    ConnectionInternal createOutgoingConnection(ConnectionIdentifier identifier) {
+    ConnectionInternal createOutgoingConnection(ConnectionId identifier) {
         synchronized (connections) {
             final int auxiliaryConnectionId = identifier.getAuxiliaryConnectionId();
             if (auxiliaryConnectionId < 0) {
@@ -72,7 +72,7 @@ public class ConnectionManagerImpl implements ConnectionManagerInternal, Connect
                 // do so for incoming auxiliary connections.
                 throw new IllegalArgumentException("Cannot establish an outgoing connection with the auxiliary connection id specified: " + identifier);
             }
-            else if (auxiliaryConnectionId > 0 && !connections.containsKey(new ConnectionIdentifier(identifier.getAddress(), identifier.getPort(), 0))) {
+            else if (auxiliaryConnectionId > 0 && !connections.containsKey(new ConnectionId(identifier.getAddress(), identifier.getPort(), 0))) {
                 // We cannot create outgoing auxiliary connections while the primary connection is down.
                 // See documentation in ConnectionManagerImpl#auxiliaryConnectionIdProvider...
                 throw new IllegalStateException("Cannot establish an outgoing auxiliary connection, because the primary connection is down: " + identifier);
@@ -106,7 +106,7 @@ public class ConnectionManagerImpl implements ConnectionManagerInternal, Connect
     }
 
     public void notifyConnectionOpened(ConnectionInternal connection) {
-        ConnectionInternal existing = connections.putIfAbsent(connection.getConnectionIdentifier(), connection);
+        ConnectionInternal existing = connections.putIfAbsent(connection.getConnectionId(), connection);
         if (existing != null) {
             // Very unlikely scenario.
             // We must be dealing with a new incoming connection, where the client had previously been connected
@@ -115,28 +115,28 @@ public class ConnectionManagerImpl implements ConnectionManagerInternal, Connect
             // to us again from the same client-side port.
             // Outgoing connections from clients should use ephemeral ports, hence repeat connections from the
             // same client port should be incredibly unlikely...
-            throw new IllegalStateException("Duplicate connection detected, a connection is already registered for identifier: " + connection.getConnectionIdentifier());
+            throw new IllegalStateException("Duplicate connection detected, a connection is already registered for identifier: " + connection.getConnectionId());
         }
     }
 
     public void notifyConnectionClosed(ConnectionInternal connection) {
-        connections.remove(connection.getConnectionIdentifier());
+        connections.remove(connection.getConnectionId());
     }
 
     @Override
-    public boolean isConnectionRegistered(ConnectionIdentifier connectionIdentifier) {
+    public boolean isConnectionRegistered(ConnectionId connectionId) {
         synchronized (connections) {
-            return connections.containsKey(connectionIdentifier);
+            return connections.containsKey(connectionId);
         }
     }
 
     @Override
-    public void bindConnectionListener(ConnectionIdentifier localEndpointIdentifier) {
+    public void bindConnectionListener(ConnectionId localEndpointIdentifier) {
         synchronized (incomingConnectionListeners) {
             ConnectionListenerInternal newListener = new TCPConnectionListener(localEndpointIdentifier, mobilityController, this);
             ConnectionListenerInternal existingListener = incomingConnectionListeners.putIfAbsent(localEndpointIdentifier, newListener);
             if (existingListener != null) {
-                throw new IllegalStateException("A listener is already registered for connection identifier: " + localEndpointIdentifier);
+                throw new IllegalStateException("A listener is already registered for connection id: " + localEndpointIdentifier);
             }
             try {
                 newListener.init();
@@ -151,11 +151,11 @@ public class ConnectionManagerImpl implements ConnectionManagerInternal, Connect
         }
     }
 
-    public void unbindConnectionListener(ConnectionIdentifier localEndpointIdentifier) {
+    public void unbindConnectionListener(ConnectionId localEndpointIdentifier) {
         synchronized (incomingConnectionListeners) {
             ConnectionListenerInternal existing = incomingConnectionListeners.remove(localEndpointIdentifier);
             if (existing == null) {
-                throw new IllegalStateException("No such listener is registered for connection identifier: " + localEndpointIdentifier);
+                throw new IllegalStateException("No such listener is registered for connection id: " + localEndpointIdentifier);
             }
             existing.destroy();
             if (logger.isLoggable(Level.FINE)) {
@@ -165,11 +165,11 @@ public class ConnectionManagerImpl implements ConnectionManagerInternal, Connect
     }
 
     @Override
-    public Collection<ConnectionIdentifier> getConnectionListenerIdentifiers() {
+    public Collection<ConnectionId> getConnectionListenerIdentifiers() {
         return Collections.unmodifiableSet(incomingConnectionListeners.keySet());
     }
 
-    public Collection<ConnectionIdentifier> getConnectionIdentifiers() {
+    public Collection<ConnectionId> getConnectionIds() {
         return Collections.unmodifiableSet(connections.keySet());
     }
 
@@ -184,7 +184,7 @@ public class ConnectionManagerImpl implements ConnectionManagerInternal, Connect
     @Override
     public void destroy() {
         // Close all connection listeners...
-        for (ConnectionIdentifier listenerIdentifier : incomingConnectionListeners.keySet()) {
+        for (ConnectionId listenerIdentifier : incomingConnectionListeners.keySet()) {
             unbindConnectionListener(listenerIdentifier);
         }
         // Close all existing connections (note: Connections will unregister themselves automatically)...

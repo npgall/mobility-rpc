@@ -15,7 +15,7 @@
  */
 package com.googlecode.mobilityrpc.examples;
 
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.quickstart.AdHocTask;
 import com.googlecode.mobilityrpc.util.LoggingUtil;
 
@@ -30,7 +30,7 @@ public class SetRemoteLoggingLevel {
     private static final String remoteAddress = "192.168.56.102";
 
     public static void main(String[] args) {
-        AdHocTask.execute(new ConnectionIdentifier(remoteAddress, 5739), new Runnable() {
+        AdHocTask.execute(new ConnectionId(remoteAddress, 5739), new Runnable() {
             public void run() {
                 LoggingUtil.setAppLoggingLevel(Level.FINEST);
             }

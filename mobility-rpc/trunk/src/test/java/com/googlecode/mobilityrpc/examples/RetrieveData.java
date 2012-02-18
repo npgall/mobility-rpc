@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.googlecode.mobilityrpc.examples;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.quickstart.AdHocTask;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -28,7 +28,7 @@ public class RetrieveData {
 
     public static void main(String[] args) {
         Properties data = AdHocTask.execute(
-            new ConnectionIdentifier(remoteAddress, 5739),
+            new ConnectionId(remoteAddress, 5739),
             new Callable<Properties>() {
                 public Properties call() throws Exception {
                     return System.getProperties();

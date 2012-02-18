@@ -38,7 +38,7 @@ public interface Connection {
     /**
      * @return An object which identifies the endpoint (socket and port) of the connection.
      */
-    public ConnectionIdentifier getConnectionIdentifier();
+    public ConnectionId getConnectionId();
 
     /**
      * Submits the specified message to the connection's outgoing message queue, such that it will be

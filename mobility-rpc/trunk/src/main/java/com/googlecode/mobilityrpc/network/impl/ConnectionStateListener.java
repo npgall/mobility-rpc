@@ -15,13 +15,13 @@
  */
 package com.googlecode.mobilityrpc.network.impl;
 
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 
 /**
  * An internal interface used by the framework - implemented by an object which can be notified when connections are
  * opened or closed.
  * <p/>
- * Note: in practice this is implemented by the {@link com.googlecode.mobilityrpc.network.ConnectionManager} as a means to be notified of connection
+ * Note: in practice this is implemented by the {@link ConnectionManager} as a means to be notified of connection
  * events, and this interface is invoked by {@link ConnectionListener}s when incoming connections are received and by
  * {@link com.googlecode.mobilityrpc.network.Connection} objects when connections are closed.
  * <p/>
@@ -48,5 +48,5 @@ public interface ConnectionStateListener {
      * @return Allows the sender of notifications to query the destination
      * to see if a specific connection is registered (typically used to check if primary connection is up)
      */
-    public boolean isConnectionRegistered(ConnectionIdentifier connectionIdentifier);
+    public boolean isConnectionRegistered(ConnectionId connectionId);
 }

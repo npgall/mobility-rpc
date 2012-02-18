@@ -18,7 +18,7 @@ package com.googlecode.mobilityrpc.protocol.processors.impl;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
 import com.googlecode.mobilityrpc.network.ConnectionManager;
 import com.googlecode.mobilityrpc.session.impl.MobilitySessionInternal;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionResponse;
 import com.googlecode.mobilityrpc.protocol.pojo.RequestIdentifier;
 import com.googlecode.mobilityrpc.protocol.processors.DeserializedMessageProcessor;
@@ -31,13 +31,13 @@ import java.util.UUID;
 public class ExecutionResponseMessageProcessor implements DeserializedMessageProcessor<ExecutionResponse> {
 
     @Override
-    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionIdentifier connectionIdentifier, ExecutionResponse executionResponse) {
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionId connectionId, ExecutionResponse executionResponse) {
         try {
             RequestIdentifier requestIdentifier = executionResponse.getRequestIdentifier();
             UUID sessionId = requestIdentifier.getSessionId();
             MobilitySessionInternal session = mobilityController.getMessageHandlingSession(sessionId);
-            // No need to pass ConnectionIdentifier to session, since calling thread will be blocked with the same
-            // ConnectionIdentifier on its stack...
+            // No need to pass ConnectionId to session, since calling thread will be blocked with the same
+            // ConnectionId on its stack...
             session.receiveExecutionResponse(executionResponse);
         }
         catch (Exception e) {

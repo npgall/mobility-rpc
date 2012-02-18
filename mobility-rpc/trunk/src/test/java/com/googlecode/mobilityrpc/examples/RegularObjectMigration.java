@@ -15,7 +15,7 @@
  */
 package com.googlecode.mobilityrpc.examples;
 
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.quickstart.AdHocTask;
 
 /**
@@ -35,7 +35,7 @@ public class RegularObjectMigration {
     }
 
     public static void migrateRegularObject(final RegularObject regularObject) {
-        AdHocTask.execute(new ConnectionIdentifier("192.168.56.102", 5739),
+        AdHocTask.execute(new ConnectionId("192.168.56.102", 5739),
             new Runnable() {
                 public void run() {
                     regularObject.printDetails();

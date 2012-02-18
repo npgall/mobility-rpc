@@ -19,16 +19,16 @@ package com.googlecode.mobilityrpc.network;
  * Identifies the endpoint (address + port) of a connection. Conceptually very similar to
  * {@link java.net.InetSocketAddress}.
  * <p/>
- * Connection identifiers can be supplied to the {@link ConnectionManager} to request a connection to a specific
+ * Connection ids can be supplied to the {@link ConnectionManager} to request a connection to a specific
  * port on a remote machine, or they can be supplied to the <code>execute</code> methods in
  * {@link com.googlecode.mobilityrpc.session.MobilitySession} which will create an outgoing connection automatically.
  * <p/>
- * Connection identifiers are also often used in the framework itself, passed between components in
- * {@code ConnectionIdentifier}-message pairs, to indicate the connection from which a message was received or to which
+ * Connection ids are also often used in the framework itself, passed between components in
+ * {@code ConnectionId}-message pairs, to indicate the connection from which a message was received or to which
  * is addressed.
  * <p/>
  * <b>Auxiliary Connections</b><br/>
- * In addition to encapsulating an address + port combination, connection identifiers <i>optionally</i> also encapsulate
+ * In addition to encapsulating an address + port combination, connection ids <i>optionally</i> also encapsulate
  * an "auxiliary connection id", which is a number greater than zero chosen by the application to allow it to establish
  * and distinguish between potentially multiple <i>auxiliary</i> connections to a remote machine.
  * <p/>
@@ -38,9 +38,9 @@ package com.googlecode.mobilityrpc.network;
  * connections is unlikely to improve bandwidth utilisation, except on very high latency connections (connections with
  * high BDP, bandwidth-delay product).
  * <p/>
- * To create an auxiliary connection, the application may create a connection identifier referring to a remote
+ * To create an auxiliary connection, the application may create a connection id referring to a remote
  * machine as normal, but additionally supply an auxiliary connection id greater than zero to the constructor. It
- * can then send objects to the remote machine using this connection identifier as normal; the library
+ * can then send objects to the remote machine using this connection id as normal; the library
  * ({@link ConnectionManager}) will create or reuse the auxiliary connection indicated automatically.
  * <p/>
  * Note that auxiliary connection ids are not transmitted to the remote machine. They are useful within the local
@@ -50,7 +50,7 @@ package com.googlecode.mobilityrpc.network;
  *
  * @author Niall Gallagher
  */
-public class ConnectionIdentifier {
+public class ConnectionId {
 
     private final String address;
     private final int port;
@@ -58,22 +58,22 @@ public class ConnectionIdentifier {
 
 
     /**
-     * Creates a connection identifier which uses the primary connection to the address and port specified.
+     * Creates a connection id which uses the primary connection to the address and port specified.
      * @param address The ip address or name of the machine to connect to
      * @param port The port on which the machine is running a connection listener
      */
-    public ConnectionIdentifier(String address, int port) {
+    public ConnectionId(String address, int port) {
         this(address, port, 0);
     }
 
     /**
-     * Creates a connection identifier which uses an auxiliary connection to the address and port specified.
+     * Creates a connection id which uses an auxiliary connection to the address and port specified.
      * @param address The ip address or name of the machine to connect to
      * @param port The port on which the machine is running a connection listener
      * @param auxiliaryConnectionId A number greater than zero chosen by the application to allow it to distinguish
      * between potentially multiple auxiliary connections
      */
-    public ConnectionIdentifier(String address, int port, int auxiliaryConnectionId) {
+    public ConnectionId(String address, int port, int auxiliaryConnectionId) {
         this.address = address;
         this.port = port;
         this.auxiliaryConnectionId = auxiliaryConnectionId;
@@ -96,7 +96,7 @@ public class ConnectionIdentifier {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ConnectionIdentifier that = (ConnectionIdentifier) o;
+        ConnectionId that = (ConnectionId) o;
 
         if (auxiliaryConnectionId != that.auxiliaryConnectionId) return false;
         if (port != that.port) return false;
@@ -114,7 +114,7 @@ public class ConnectionIdentifier {
 
     @Override
     public String toString() {
-        return "ConnectionIdentifier{" +
+        return "ConnectionId{" +
                 "address='" + address + '\'' +
                 ", port=" + port +
                 ", auxiliaryConnectionId=" + auxiliaryConnectionId +

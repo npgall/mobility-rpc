@@ -16,7 +16,7 @@
 package com.googlecode.mobilityrpc.network.impl.tcp;
 
 import com.googlecode.mobilityrpc.common.util.IOUtil;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.network.impl.ConnectionErrorHandler;
 import com.googlecode.mobilityrpc.network.impl.IncomingMessageHandler;
 
@@ -42,7 +42,7 @@ public class IncomingByteStreamReader extends Thread {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    private final ConnectionIdentifier connectionIdentifier;
+    private final ConnectionId connectionId;
     private final InputStream inputStream;
     private final IncomingMessageHandler incomingMessageHandler;
     private final ConnectionErrorHandler connectionErrorHandler;
@@ -50,44 +50,44 @@ public class IncomingByteStreamReader extends Thread {
     private volatile boolean shutdown = false;
 
     /**
-     * @param connectionIdentifier Identifies the connection to which the stream belongs
+     * @param connectionId Identifies the connection to which the stream belongs
      * @param inputStream An input stream from which the reader will read messages
      * @param incomingMessageHandler An object to which the reader will supply messages extracted from the stream
      * @param connectionErrorHandler An object which the reader will notify when any exceptions occur
      */
-    public IncomingByteStreamReader(ConnectionIdentifier connectionIdentifier, InputStream inputStream, IncomingMessageHandler incomingMessageHandler, ConnectionErrorHandler connectionErrorHandler) {
-        this.connectionIdentifier = connectionIdentifier;
+    public IncomingByteStreamReader(ConnectionId connectionId, InputStream inputStream, IncomingMessageHandler incomingMessageHandler, ConnectionErrorHandler connectionErrorHandler) {
+        this.connectionId = connectionId;
         this.connectionErrorHandler = connectionErrorHandler;
         this.inputStream = new BufferedInputStream(inputStream, 16384);
         this.incomingMessageHandler = incomingMessageHandler;
-        this.setName("IncomingByteStreamReader for " + connectionIdentifier);
+        this.setName("IncomingByteStreamReader for " + connectionId);
     }
 
     @Override
     public void run() {
-        logger.log(Level.FINE, "IncomingByteStreamReader started for {0}", connectionIdentifier);
+        logger.log(Level.FINE, "IncomingByteStreamReader started for {0}", connectionId);
         while (!shutdown) {
             try {
-                logger.log(Level.FINER, "Waiting for incoming messages for {0}", connectionIdentifier);
+                logger.log(Level.FINER, "Waiting for incoming messages for {0}", connectionId);
                 byte[] messageSizeHeader = readBytesFromStream(inputStream, 4);
                 int nextMessageSize = byteArrayToInt(messageSizeHeader);
                 if (logger.isLoggable(Level.FINER)) {
-                    logger.log(Level.FINER, "Receiving incoming message: " + nextMessageSize + " bytes from " + connectionIdentifier);
+                    logger.log(Level.FINER, "Receiving incoming message: " + nextMessageSize + " bytes from " + connectionId);
                 }
                 byte[] messageBytes = readBytesFromStream(inputStream, nextMessageSize);
-                incomingMessageHandler.receiveIncomingMessage(connectionIdentifier, messageBytes);
+                incomingMessageHandler.receiveIncomingMessage(connectionId, messageBytes);
                 if (logger.isLoggable(Level.FINER)) {
-                    logger.log(Level.FINER, "Received and submitted for processing incoming message: " + nextMessageSize + " bytes from " + connectionIdentifier);
+                    logger.log(Level.FINER, "Received and submitted for processing incoming message: " + nextMessageSize + " bytes from " + connectionId);
                 }
             }
             catch (Exception e) {
                 if (!shutdown) {
                     if (e instanceof StreamClosedException) {
-                        connectionErrorHandler.handle(new StreamClosedException("The connection was closed by the remote side on " + connectionIdentifier, e));
+                        connectionErrorHandler.handle(new StreamClosedException("The connection was closed by the remote side on " + connectionId, e));
                     }
                     else {
                         connectionErrorHandler.handle(
-                                new IllegalStateException("Failed to receive incoming message from " + connectionIdentifier, e)
+                                new IllegalStateException("Failed to receive incoming message from " + connectionId, e)
 
                         );
                     }
@@ -96,7 +96,7 @@ public class IncomingByteStreamReader extends Thread {
         }
         this.shutdown = true;
         IOUtil.closeQuietly(inputStream);
-        logger.log(Level.FINE, "IncomingByteStreamReader stopped for {0}", connectionIdentifier);
+        logger.log(Level.FINE, "IncomingByteStreamReader stopped for {0}", connectionId);
     }
 
     /**

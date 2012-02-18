@@ -26,7 +26,7 @@ import java.util.UUID;
  * <p/>
  * Provides access to Sessions, which are the gateway through which the application can send objects to remote machines.
  * <p/>
- * Provides access to a {@link com.googlecode.mobilityrpc.network.ConnectionManager} object responsible for managing incoming and outgoing connections
+ * Provides access to a {@link ConnectionManager} object responsible for managing incoming and outgoing connections
  * to other instances of the library, and providing an API to the application to have the library bind/unbind from
  * certain ports/network interfaces to listen for incoming connections.
  *
@@ -35,7 +35,7 @@ import java.util.UUID;
 public interface MobilityController extends Destroyable {
 
     /**
-     * @return The {@link com.googlecode.mobilityrpc.network.ConnectionManager} which manages connections for this controller
+     * @return The {@link ConnectionManager} which manages connections for this controller
      */
     public ConnectionManager getConnectionManager();
 

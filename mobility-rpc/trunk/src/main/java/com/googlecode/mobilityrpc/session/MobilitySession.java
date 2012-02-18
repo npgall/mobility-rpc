@@ -16,9 +16,9 @@
 package com.googlecode.mobilityrpc.session;
 
 import com.googlecode.mobilityrpc.controller.MobilityController;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
 import com.googlecode.mobilityrpc.session.impl.SessionClassLoader;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -30,7 +30,7 @@ import java.util.concurrent.Callable;
  * <p/>
  * Sessions provide two methods for sending objects to remote machines:
  * <p/>
- * <b>{@code void execute(ConnectionIdentifier, ExecutionMode, Runnable)}</b>
+ * <b>{@code void execute(ConnectionId, ExecutionMode, Runnable)}</b>
  * <ul>
  *     <li>Sends an object referenced by a {@link Runnable} object, or just a Runnable object on its own</li>
  *     <li>On the remote machine, the {@code run()} method of the Runnable object will be called, which can call any
@@ -39,7 +39,7 @@ import java.util.concurrent.Callable;
  *     local application is not interested in returning any data from the remote machine</li>
  * </ul>
  * <p/>
- * <b>{@code T execute(ConnectionIdentifier, ExecutionMode, Callable&lt;T&gt;)}</b>
+ * <b>{@code T execute(ConnectionId, ExecutionMode, Callable&lt;T&gt;)}</b>
  * <ul>
  *     <li>Sends a {@link Callable} object (which, similarly, can reference objects to be sent with it)</li>
  *     <li>On the remote machine, the {@code call()} method of the Callable object will be called, which can call any
@@ -57,7 +57,7 @@ import java.util.concurrent.Callable;
  * </ul>
  * <p/>
  * The methods above take the following arguments:
- * <b>{@link ConnectionIdentifier}</b><br/>
+ * <b>{@link ConnectionId}</b><br/>
  * This is a simple object which contains the ip address (or name) and port of the remote machine to which
  * the object should be sent.
  * <p/>
@@ -85,50 +85,50 @@ public interface MobilitySession {
      * Transfers the given <code>Runnable</code> object, and any objects it references, to the given remote machine,
      * and executes it (calls the {@link Runnable#run()} method) on the remote machine.
      * <p/>
-     * This is a convenience method for calling {@link #execute(ConnectionIdentifier, ExecutionMode, Runnable)}
+     * This is a convenience method for calling {@link #execute(com.googlecode.mobilityrpc.network.ConnectionId, ExecutionMode, Runnable)}
      * with {@link ExecutionMode#RETURN_RESPONSE}.
      *
-     * @param connectionIdentifier The address/port of the remote machine
+     * @param connectionId The address/port of the remote machine
      * @param runnable The object to send and execute on the remote machine
      */
-    void execute(ConnectionIdentifier connectionIdentifier, Runnable runnable);
+    void execute(ConnectionId connectionId, Runnable runnable);
 
     /**
      * Transfers the given <code>Runnable</code> object, and any objects it references, to the given remote machine,
      * and executes it (calls the {@link Runnable#run()} method) on the remote machine.
      *
-     * @param connectionIdentifier The address/port of the remote machine
+     * @param connectionId The address/port of the remote machine
      * @param executionMode Either {@link ExecutionMode#RETURN_RESPONSE} or {@link ExecutionMode#FIRE_AND_FORGET}
      * @param runnable The object to send to the remote machine
      */
-    void execute(ConnectionIdentifier connectionIdentifier, ExecutionMode executionMode, Runnable runnable);
+    void execute(ConnectionId connectionId, ExecutionMode executionMode, Runnable runnable);
 
     /**
      * Transfers the given <code>Callable</code> object, and any objects it references, to the given remote machine,
      * and executes it (calls the {@link Callable#call()} method) on the remote machine. Transfers the object returned
      * by the <code>call</code> method on the remote machine, and any objects it references, back to the local machine.
      * <p/>
-     * This is a convenience method for calling {@link #execute(ConnectionIdentifier, ExecutionMode, Runnable)}
+     * This is a convenience method for calling {@link #execute(com.googlecode.mobilityrpc.network.ConnectionId, ExecutionMode, Runnable)}
      * with {@link ExecutionMode#RETURN_RESPONSE}.
      *
-     * @param connectionIdentifier The address/port of the remote machine
+     * @param connectionId The address/port of the remote machine
      * @param callable The object to send to the remote machine
      * @return The object returned by the {@link Callable#call()} method on the remote machine (transferred back to
      * this machine)
      */
-    <T> T execute(ConnectionIdentifier connectionIdentifier, Callable<T> callable);
+    <T> T execute(ConnectionId connectionId, Callable<T> callable);
     /**
      * Transfers the given <code>Callable</code> object, and any objects it references, to the given remote machine,
      * and executes it (calls the {@link Callable#call()} method) on the remote machine. Transfers the object returned
      * by the <code>call</code> method on the remote machine, and any objects it references, back to the local machine.
      *
-     * @param connectionIdentifier The address/port of the remote machine
+     * @param connectionId The address/port of the remote machine
      * @param executionMode Either {@link ExecutionMode#RETURN_RESPONSE} or {@link ExecutionMode#FIRE_AND_FORGET}
      * @param callable The object to send to the remote machine
      * @return The object returned by the {@link Callable#call()} method on the remote machine (transferred back to
      * this machine)
      */
-    <T> T execute(ConnectionIdentifier connectionIdentifier, ExecutionMode executionMode, Callable<T> callable);
+    <T> T execute(ConnectionId connectionId, ExecutionMode executionMode, Callable<T> callable);
 
     /**
      * @return The class loader associated with this session

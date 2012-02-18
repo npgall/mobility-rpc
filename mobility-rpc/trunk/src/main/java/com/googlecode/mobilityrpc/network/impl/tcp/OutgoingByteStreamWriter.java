@@ -16,7 +16,7 @@
 package com.googlecode.mobilityrpc.network.impl.tcp;
 
 import com.googlecode.mobilityrpc.common.util.IOUtil;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.network.impl.ConnectionErrorHandler;
 import com.googlecode.mobilityrpc.network.impl.MessageProvider;
 
@@ -32,57 +32,57 @@ public class OutgoingByteStreamWriter extends Thread {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    private final ConnectionIdentifier connectionIdentifier;
+    private final ConnectionId connectionId;
     private final OutputStream outputStream;
     private final MessageProvider<byte[]> outgoingMessageProvider;
     private final ConnectionErrorHandler connectionErrorHandler;
 
     /**
-     * @param connectionIdentifier Identifies the connection to which the stream belongs
+     * @param connectionId Identifies the connection to which the stream belongs
      * @param outputStream An output stream to which the writer will write messages
      * @param outgoingMessageProvider An object from which the reader will obtain messages to write
      * @param connectionErrorHandler An object which the writer will notify when any exceptions occur
      */
-    public OutgoingByteStreamWriter(ConnectionIdentifier connectionIdentifier, OutputStream outputStream, MessageProvider<byte[]> outgoingMessageProvider, ConnectionErrorHandler connectionErrorHandler) {
-        this.connectionIdentifier = connectionIdentifier;
+    public OutgoingByteStreamWriter(ConnectionId connectionId, OutputStream outputStream, MessageProvider<byte[]> outgoingMessageProvider, ConnectionErrorHandler connectionErrorHandler) {
+        this.connectionId = connectionId;
         this.outputStream = new BufferedOutputStream(outputStream, 16384);
         this.outgoingMessageProvider = outgoingMessageProvider;
         this.connectionErrorHandler = connectionErrorHandler;
-        this.setName("OutgoingByteStreamWriter for " + connectionIdentifier);
+        this.setName("OutgoingByteStreamWriter for " + connectionId);
     }
 
     private volatile boolean shutdown = false;
 
     @Override
     public void run() {
-        logger.log(Level.FINE, "OutgoingByteStreamWriter started for {0}", connectionIdentifier);
+        logger.log(Level.FINE, "OutgoingByteStreamWriter started for {0}", connectionId);
         while (!shutdown) {
             try {
-                logger.log(Level.FINER, "Waiting for outgoing messages for {0}", connectionIdentifier);
+                logger.log(Level.FINER, "Waiting for outgoing messages for {0}", connectionId);
                 byte[] nextMessage = outgoingMessageProvider.getNextMessage();
                 int nextMessageSize = nextMessage.length;
                 if (logger.isLoggable(Level.FINER)) {
-                    logger.log(Level.FINER, "Sending outgoing message: " + nextMessageSize + " bytes to " + connectionIdentifier);
+                    logger.log(Level.FINER, "Sending outgoing message: " + nextMessageSize + " bytes to " + connectionId);
                 }
 
                 writeNextMessageSize(outputStream, nextMessageSize);
                 outputStream.write(nextMessage);
                 outputStream.flush();
                 if (logger.isLoggable(Level.FINER)) {
-                    logger.log(Level.FINER, "Sent outgoing message: " + nextMessageSize + " bytes to " + connectionIdentifier);
+                    logger.log(Level.FINER, "Sent outgoing message: " + nextMessageSize + " bytes to " + connectionId);
                 }
             }
             catch (Exception e) {
                 if (!shutdown) {
                     connectionErrorHandler.handle(
-                            new IllegalStateException("Failed to send outgoing message to " + connectionIdentifier, e)
+                            new IllegalStateException("Failed to send outgoing message to " + connectionId, e)
                     );
                 }
             }
         }
         this.shutdown = true;
         IOUtil.closeQuietly(outputStream);
-        logger.log(Level.FINE, "OutgoingByteStreamWriter stopped for {0}", connectionIdentifier);
+        logger.log(Level.FINE, "OutgoingByteStreamWriter stopped for {0}", connectionId);
     }
 
     void writeNextMessageSize(OutputStream outputStream, int nextMessageSize) {

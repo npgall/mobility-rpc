@@ -17,12 +17,12 @@ package com.googlecode.mobilityrpc.protocol.processors;
 
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
 import com.googlecode.mobilityrpc.network.ConnectionManager;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 
 /**
  * @author Niall Gallagher
  */
 public interface DeserializedMessageProcessor<T> {
 
-    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionIdentifier connectionIdentifier, T deserializedMessage);
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionId connectionId, T deserializedMessage);
 }

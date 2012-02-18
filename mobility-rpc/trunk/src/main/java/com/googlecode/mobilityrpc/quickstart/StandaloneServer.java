@@ -17,7 +17,7 @@ package com.googlecode.mobilityrpc.quickstart;
 
 import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.quickstart.util.NetworkUtil;
 import com.googlecode.mobilityrpc.quickstart.util.StandaloneLoggingUtil;
 
@@ -32,9 +32,9 @@ public class StandaloneServer {
 
     private volatile MobilityController mobilityController = null;
 
-    public void startServer(Iterable<ConnectionIdentifier> bindAddresses) {
+    public void startServer(Iterable<ConnectionId> bindAddresses) {
         this.mobilityController = new MobilityControllerImpl();
-        for (ConnectionIdentifier bindAddress : bindAddresses) {
+        for (ConnectionId bindAddress : bindAddresses) {
             mobilityController.getConnectionManager().bindConnectionListener(bindAddress);
         }
     }
@@ -60,9 +60,9 @@ public class StandaloneServer {
 
         // Determine the IP addresses on the local machine that we should bind to...
         List<String> networkInterfaceAddresses = NetworkUtil.getAllNetworkInterfaceAddresses();
-        List<ConnectionIdentifier> bindAddresses = new ArrayList<ConnectionIdentifier>();
+        List<ConnectionId> bindAddresses = new ArrayList<ConnectionId>();
         for (String networkAddress : networkInterfaceAddresses) {
-            bindAddresses.add(new ConnectionIdentifier(networkAddress, port));
+            bindAddresses.add(new ConnectionId(networkAddress, port));
         }
 
         // Start the server...

@@ -17,7 +17,7 @@ package com.googlecode.mobilityrpc.session.impl;
 
 import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.protocol.pojo.*;
 import com.googlecode.mobilityrpc.quickstart.MobilityContext;
 import com.googlecode.mobilityrpc.serialization.Serializer;
@@ -62,12 +62,12 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
     }
 
     @Override
-    public void execute(ConnectionIdentifier connectionIdentifier, Runnable runnable) {
-        execute(connectionIdentifier, ExecutionMode.RETURN_RESPONSE, runnable);
+    public void execute(ConnectionId connectionId, Runnable runnable) {
+        execute(connectionId, ExecutionMode.RETURN_RESPONSE, runnable);
     }
 
     @Override
-    public void execute(ConnectionIdentifier connectionIdentifier, ExecutionMode executionMode, Runnable runnable) {
+    public void execute(ConnectionId connectionId, ExecutionMode executionMode, Runnable runnable) {
         // Serialize the object...
         final byte[] serializedExecutableObject = serialize(runnable, defaultSerializationFormat);
 
@@ -85,11 +85,11 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
 
                 // Send execution request to remote machine, and then return without blocking...
                 try {
-                    mobilityController.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
+                    mobilityController.sendOutgoingMessage(connectionId, outgoingRequest);
                 }
                 catch (Exception e) {
                     // This exception is unlikely, should only occur if our outgoing queue to machine specified is full...
-                    throw new IllegalStateException("Failed to submit Runnable object in FIRE_AND_FORGET mode for execution on remote machine: " + connectionIdentifier, e);
+                    throw new IllegalStateException("Failed to submit Runnable object in FIRE_AND_FORGET mode for execution on remote machine: " + connectionId, e);
                 }
                 break;
             case RETURN_RESPONSE:
@@ -103,13 +103,13 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                     futureExecutionResponses.put(requestIdentifier, futureExecutionResponse);
 
                     // Send the execution request to the remote machine...
-                    mobilityController.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
+                    mobilityController.sendOutgoingMessage(connectionId, outgoingRequest);
 
                     // Now block this thread until we get a response, or we time out...
                     executionResponse = futureExecutionResponse.getResponse(EXECUTION_RESPONSE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
                 }
                 catch (Exception e) {
-                    throw new IllegalStateException("Failed to receive response for execution request sent to remote machine in RETURN_RESPONSE mode for request identifier: " + requestIdentifier + ", connection identifier: " + connectionIdentifier, e);
+                    throw new IllegalStateException("Failed to receive response for execution request sent to remote machine in RETURN_RESPONSE mode for request identifier: " + requestIdentifier + ", connection id: " + connectionId, e);
                 }
 
                 // Decipher the execution response and return control normally to the client,
@@ -118,7 +118,7 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
 
                 // Indicate to the class loader that should this thread require classes when deserializing
                 // the response that they can be obtained from this remote machine...
-                sessionClassLoader.setThreadLocalConnectionIdentifier(connectionIdentifier);
+                sessionClassLoader.setThreadLocalConnectionId(connectionId);
                 try {
                     switch (executionOutcome) {
                         case VOID_RETURNED:
@@ -132,7 +132,7 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                             if (!(responseObject instanceof Throwable)) {
                                 throw new IllegalStateException("Unexpected response object returned for execution outcome FAILURE: " + responseObject);
                             }
-                            throw new IllegalStateException("An exception was thrown by the Runnable object when executed on the remote machine: " + connectionIdentifier, (Throwable)responseObject);
+                            throw new IllegalStateException("An exception was thrown by the Runnable object when executed on the remote machine: " + connectionId, (Throwable)responseObject);
                         case VALUE_RETURNED:
                             // A Runnable does not return a value, this would indicate a problem with the framework...
                             throw new IllegalStateException("Unexpected ExecutionOutcome returned: " + executionMode);
@@ -141,9 +141,9 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                     }
                 }
                 finally {
-                    // Null-out the connection identifier for this calling thread,
+                    // Null-out the connection id for this calling thread,
                     // now that response has been deserialized...
-                    sessionClassLoader.setThreadLocalConnectionIdentifier(null);
+                    sessionClassLoader.setThreadLocalConnectionId(null);
                 }
             default:
                 throw new IllegalStateException("Unexpected ExecutionMode specified: " + executionMode);
@@ -151,12 +151,12 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
     }
 
     @Override
-    public <T> T execute(ConnectionIdentifier connectionIdentifier, Callable<T> callable) {
-        return execute(connectionIdentifier, ExecutionMode.RETURN_RESPONSE, callable);
+    public <T> T execute(ConnectionId connectionId, Callable<T> callable) {
+        return execute(connectionId, ExecutionMode.RETURN_RESPONSE, callable);
     }
 
     @Override
-    public <T> T execute(ConnectionIdentifier connectionIdentifier, ExecutionMode executionMode, Callable<T> callable) {
+    public <T> T execute(ConnectionId connectionId, ExecutionMode executionMode, Callable<T> callable) {
         // Serialize the object...
         final byte[] serializedExecutableObject = serialize(callable, defaultSerializationFormat);
 
@@ -174,11 +174,11 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
 
                 // Send execution request to remote machine, and then return without blocking...
                 try {
-                    mobilityController.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
+                    mobilityController.sendOutgoingMessage(connectionId, outgoingRequest);
                 }
                 catch (Exception e) {
                     // This exception is unlikely, should only occur if our outgoing queue to machine specified is full...
-                    throw new IllegalStateException("Failed to submit Callable object in FIRE_AND_FORGET mode for execution on remote machine: " + connectionIdentifier, e);
+                    throw new IllegalStateException("Failed to submit Callable object in FIRE_AND_FORGET mode for execution on remote machine: " + connectionId, e);
                 }
                 return null;
             case RETURN_RESPONSE:
@@ -192,13 +192,13 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                     futureExecutionResponses.put(requestIdentifier, futureExecutionResponse);
 
                     // Send the execution request to the remote machine...
-                    mobilityController.sendOutgoingMessage(connectionIdentifier, outgoingRequest);
+                    mobilityController.sendOutgoingMessage(connectionId, outgoingRequest);
 
                     // Now block this thread until we get a response, or we time out...
                     executionResponse = futureExecutionResponse.getResponse(EXECUTION_RESPONSE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
                 }
                 catch (Exception e) {
-                    throw new IllegalStateException("Failed to receive response for execution request sent to remote machine in RETURN_RESPONSE mode for request identifier: " + requestIdentifier + ", connection identifier: " + connectionIdentifier, e);
+                    throw new IllegalStateException("Failed to receive response for execution request sent to remote machine in RETURN_RESPONSE mode for request identifier: " + requestIdentifier + ", connection id: " + connectionId, e);
                 }
 
                 // Decipher the execution response and return control normally to the client,
@@ -207,7 +207,7 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
 
                 // Indicate to the class loader that should this thread require classes when deserializing
                 // the response that they can be obtained from this remote machine...
-                sessionClassLoader.setThreadLocalConnectionIdentifier(connectionIdentifier);
+                sessionClassLoader.setThreadLocalConnectionId(connectionId);
                 try {
                     switch (executionOutcome) {
                         case VOID_RETURNED:
@@ -221,7 +221,7 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                             if (!(throwable instanceof Throwable)) {
                                 throw new IllegalStateException("Unexpected response object returned for execution outcome FAILURE: " + throwable);
                             }
-                            throw new IllegalStateException("An exception was thrown by the Callable object when executed on the remote machine: " + connectionIdentifier, (Throwable)throwable);
+                            throw new IllegalStateException("An exception was thrown by the Callable object when executed on the remote machine: " + connectionId, (Throwable)throwable);
                         case VALUE_RETURNED:
                             // The callable returned an object when executed on the remote machine, return it to
                             // the caller of this method...
@@ -233,19 +233,19 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                     }
                 }
                 finally {
-                    // Null-out the connection identifier for this calling thread,
+                    // Null-out the connection id for this calling thread,
                     // now that response has been deserialized...
-                    sessionClassLoader.setThreadLocalConnectionIdentifier(null);
+                    sessionClassLoader.setThreadLocalConnectionId(null);
                 }
             default:
                 throw new IllegalStateException("Unexpected ExecutionMode specified: " + executionMode);
         }
     }
 
-    public void receiveIncomingExecutionRequest(ConnectionIdentifier connectionIdentifier, ExecutionRequest executionRequest) {
+    public void receiveIncomingExecutionRequest(ConnectionId connectionId, ExecutionRequest executionRequest) {
         // Indicate to the class loader that should this thread require classes when processing this request
         // that the classes can be requested via the connection from which we received the request...
-        sessionClassLoader.setThreadLocalConnectionIdentifier(connectionIdentifier);
+        sessionClassLoader.setThreadLocalConnectionId(connectionId);
 
         // Outer try-catch to catch and log all exceptions
         // so as not to kill a processing thread on a bad request...
@@ -264,7 +264,7 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                 try {
                     // Set the current session details into a thread-local variable, so code can access its own session...
                     MobilityContext.setCurrentSession(this);
-                    MobilityContext.setConnectionIdentifier(connectionIdentifier);
+                    MobilityContext.setConnectionId(connectionId);
 
                     // Determine if object is Runnable or Callable...
                     if (executableObject instanceof Runnable) {
@@ -287,14 +287,14 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                 finally {
                     // Unset current session details from the thread-local variable...
                     MobilityContext.setCurrentSession(null);
-                    MobilityContext.setConnectionIdentifier(null);
+                    MobilityContext.setConnectionId(null);
                 }
                 final ExecutionResponse executionResponse;
                 switch (executionRequest.getExecutionMode()) {
                     case FIRE_AND_FORGET:
                         // No need to send response to client.
                         if (logger.isLoggable(Level.FINER)) {
-                            logger.log(Level.FINER, "Processed execution task and skipped sending response to client, for connection identifier: " + connectionIdentifier + ", execution request: " + executionRequest);
+                            logger.log(Level.FINER, "Processed execution task and skipped sending response to client, for connection id: " + connectionId + ", execution request: " + executionRequest);
                         }
                         break;
                     case RETURN_RESPONSE:
@@ -322,9 +322,9 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                                     executionRequest.getRequestIdentifier()
                             );
                         }
-                        mobilityController.sendOutgoingMessage(connectionIdentifier, executionResponse);
+                        mobilityController.sendOutgoingMessage(connectionId, executionResponse);
                         if (logger.isLoggable(Level.FINER)) {
-                            logger.log(Level.FINER, "Processed execution task and sent response to client, for connection identifier: " + connectionIdentifier + ", execution request: " + executionRequest);
+                            logger.log(Level.FINER, "Processed execution task and sent response to client, for connection id: " + connectionId + ", execution request: " + executionRequest);
                         }
                         break;
                     default:
@@ -333,7 +333,7 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
             }
             catch (Exception e) {
                 // Catch any exceptions above and simply re-throw them with additional context information...
-                throw new IllegalStateException("Failed to process execution request, for connection identifier: " + connectionIdentifier + ", execution request: " + executionRequest, e);
+                throw new IllegalStateException("Failed to process execution request, for connection id: " + connectionId + ", execution request: " + executionRequest, e);
             }
         }
         catch (Exception e) {
@@ -342,10 +342,10 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
 
             // Exceptions caught here would therefore indicate problems with the framework itself.
             // Log such exceptions at SEVERE level...
-            logger.log(Level.SEVERE, "Unexpected exception processing execution task, for connection identifier: " + connectionIdentifier + ", execution request: " + executionRequest, e);
+            logger.log(Level.SEVERE, "Unexpected exception processing execution task, for connection id: " + connectionId + ", execution request: " + executionRequest, e);
         }
-        // Null-out the connection identifier for this thread, which we set earlier above...
-        sessionClassLoader.setThreadLocalConnectionIdentifier(null);
+        // Null-out the connection id for this thread, which we set earlier above...
+        sessionClassLoader.setThreadLocalConnectionId(null);
     }
 
 

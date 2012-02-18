@@ -15,7 +15,7 @@
  */
 package com.googlecode.mobilityrpc.session.impl;
 
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionRequest;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionResponse;
 import com.googlecode.mobilityrpc.session.MobilitySession;
@@ -33,10 +33,10 @@ public interface MobilitySessionInternal extends MobilitySession {
      * This method will submit this request to the session's thread pool for execution asynchronously. This method
      * will return immediately.
      *
-     * @param connectionIdentifier Indicates the connection from which we received the request
+     * @param connectionId Indicates the connection from which we received the request
      * @param executionRequest A request from a remote machine to execute a serialized object on this machine
      */
-    public void receiveIncomingExecutionRequest(ConnectionIdentifier connectionIdentifier, ExecutionRequest executionRequest);
+    public void receiveIncomingExecutionRequest(ConnectionId connectionId, ExecutionRequest executionRequest);
 
     /**
      * Called when we receive an incoming {@link ExecutionResponse} object from a remote machine addressed to this

@@ -27,8 +27,8 @@ import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 public class MobilityRPC {
 
     /**
-     * @return A new {@link MobilityController} instance. Usually the application will want to cache this instance
-     * so that it can interact with the library via the same controller.
+     * @return A new {@link MobilityController} instance. Usually the application will want to hold on to this instance
+     * so that it can interact with the library via the same controller
      */
     public static MobilityController newController() {
         // Return the default implementation...

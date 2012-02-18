@@ -17,7 +17,7 @@ package com.googlecode.mobilityrpc.quickstart;
 
 import com.googlecode.mobilityrpc.MobilityRPC;
 import com.googlecode.mobilityrpc.controller.MobilityController;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.quickstart.util.NetworkUtil;
 
 /**
@@ -69,7 +69,7 @@ public class EmbeddedServer {
         // Detect and bind to all network interfaces...
         for (String networkAddress : NetworkUtil.getAllNetworkInterfaceAddresses()) {
             mobilityController.getConnectionManager().bindConnectionListener(
-                    new ConnectionIdentifier(networkAddress, DEFAULT_PORT));
+                    new ConnectionId(networkAddress, DEFAULT_PORT));
         }
         // Done...
         instance = mobilityController;

@@ -15,7 +15,7 @@
  */
 package com.googlecode.mobilityrpc.network.impl;
 
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 
 /**
  * An internal interface, implemented by objects which can accept and process a serialized
@@ -28,8 +28,8 @@ public interface IncomingMessageHandler {
     /**
      * Supplies the message to the handler for it to be processed.
      *
-     * @param connectionIdentifier Identifies the connection from which the message was received
+     * @param connectionId Identifies the connection from which the message was received
      * @param serializedMessage The message to supply
      */
-    public void receiveIncomingMessage(ConnectionIdentifier connectionIdentifier, byte[] serializedMessage);
+    public void receiveIncomingMessage(ConnectionId connectionId, byte[] serializedMessage);
 }

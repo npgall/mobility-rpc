@@ -32,7 +32,7 @@ public class TCPConnection implements ConnectionInternal {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     private final Socket socket;
-    private final ConnectionIdentifier connectionIdentifier;
+    private final ConnectionId connectionId;
 
     private final BlockingQueue<byte[]> outgoingMessageQueue = new LinkedBlockingQueue<byte[]>();
     private final IncomingMessageHandler incomingMessageHandler;
@@ -52,7 +52,7 @@ public class TCPConnection implements ConnectionInternal {
     public TCPConnection(Socket socket, int auxiliaryConnectionId, IncomingMessageHandler incomingMessageHandler, ConnectionStateListener connectionStateListener) {
         this.socket = socket;
         this.incomingMessageHandler = incomingMessageHandler;
-        this.connectionIdentifier = new ConnectionIdentifier(
+        this.connectionId = new ConnectionId(
                 socket.getInetAddress().getHostAddress(),
                 socket.getPort(),
                 auxiliaryConnectionId);
@@ -60,15 +60,15 @@ public class TCPConnection implements ConnectionInternal {
     }
 
     @Override
-    public ConnectionIdentifier getConnectionIdentifier() {
-        return connectionIdentifier;
+    public ConnectionId getConnectionId() {
+        return connectionId;
     }
 
     @Override
     public void enqueueOutgoingMessage(byte[] message) {
         outgoingMessageQueue.add(message);
         if (logger.isLoggable(Level.FINER)) {
-            logger.log(Level.FINER, "Enqueued outgoing message for connection identifier '" + connectionIdentifier + "': " + message.length + " bytes");
+            logger.log(Level.FINER, "Enqueued outgoing message for connection id '" + connectionId + "': " + message.length + " bytes");
         }
     }
 
@@ -79,7 +79,7 @@ public class TCPConnection implements ConnectionInternal {
         }
         try {
             incomingByteStreamReader = new IncomingByteStreamReader(
-                    connectionIdentifier,
+                    connectionId,
                 socket.getInputStream(),
                 incomingMessageHandler,
                 new ConnectionErrorHandler() {
@@ -91,19 +91,19 @@ public class TCPConnection implements ConnectionInternal {
                                 // FINEST level logging is enabled
                                 // Log that we are closing our end of the connection and include more detail
                                 // (stack trace of where we were when stream was closed)...
-                                logger.log(Level.FINEST, "Stream closed explicitly by remote side, closing connection: " + connectionIdentifier, e);
+                                logger.log(Level.FINEST, "Stream closed explicitly by remote side, closing connection: " + connectionId, e);
                             } else {
                                 // FINEST level logging is not enabled.
                                 // Log at FINE level with minimal detail that remote side disconnected and that we are
                                 // closing our end of the connection (this will be a common and expected occurrence)...
-                                logger.log(Level.FINE, "Stream closed explicitly by remote side, closing connection (enable finest-level logging for more detail): {0}", connectionIdentifier);
+                                logger.log(Level.FINE, "Stream closed explicitly by remote side, closing connection (enable finest-level logging for more detail): {0}", connectionId);
                             }
                         }
                         else {
                             // Some unexpected exception occurred.
                             // Log at WARNING level details of the exception and that we will close our connection
                             // as a result...
-                            logger.log(Level.WARNING, "Exception in IncomingByteStreamReader, closing connection: " + connectionIdentifier, e);
+                            logger.log(Level.WARNING, "Exception in IncomingByteStreamReader, closing connection: " + connectionId, e);
                         }
                         destroy();
                     }
@@ -111,11 +111,11 @@ public class TCPConnection implements ConnectionInternal {
             );
         }
         catch (Exception e) {
-            throw new IllegalStateException("Failed to initialize IncomingByteStreamReader for: " + connectionIdentifier, e);
+            throw new IllegalStateException("Failed to initialize IncomingByteStreamReader for: " + connectionId, e);
         }
         try {
             outgoingByteStreamWriter = new OutgoingByteStreamWriter(
-                    connectionIdentifier,
+                    connectionId,
                 socket.getOutputStream(),
                 new MessageProvider<byte[]>() {
                     @Override
@@ -131,18 +131,18 @@ public class TCPConnection implements ConnectionInternal {
                 new ConnectionErrorHandler() {
                     @Override
                     public void handle(Exception e) {
-                        logger.log(Level.WARNING, "Exception in OutgoingByteStreamWriter, closing connection: " + connectionIdentifier, e);
+                        logger.log(Level.WARNING, "Exception in OutgoingByteStreamWriter, closing connection: " + connectionId, e);
                         destroy();
                     }
                 }
             );
         }
         catch (Exception e) {
-            throw new IllegalStateException("Failed to initialize OutgoingByteStreamWriter for: " + connectionIdentifier, e);
+            throw new IllegalStateException("Failed to initialize OutgoingByteStreamWriter for: " + connectionId, e);
         }
         incomingByteStreamReader.start();
         outgoingByteStreamWriter.start();
-        logger.log(Level.FINER, "Initialized TCP connection for: {0}", connectionIdentifier);
+        logger.log(Level.FINER, "Initialized TCP connection for: {0}", connectionId);
     }
 
     @Override
