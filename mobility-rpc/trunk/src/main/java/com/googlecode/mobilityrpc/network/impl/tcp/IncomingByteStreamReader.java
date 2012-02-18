@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.mobilityrpc.network.impl;
+package com.googlecode.mobilityrpc.network.impl.tcp;
 
 import com.googlecode.mobilityrpc.common.util.IOUtil;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.impl.ConnectionErrorHandler;
+import com.googlecode.mobilityrpc.network.impl.IncomingMessageHandler;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -29,9 +31,9 @@ import java.util.logging.Logger;
  * <p/>
  * This reader with read continuously until {@link #shutdown()} is called, or an error occurs.
  * <p/>
- * The reader will submit each message extracted to the supplied {@link IncomingMessageHandler}.
+ * The reader will submit each message extracted to the supplied {@link com.googlecode.mobilityrpc.network.impl.IncomingMessageHandler}.
  * <p/>
- * If an error occurs, the reader will notify the supplied {@link ConnectionErrorHandler} and then
+ * If an error occurs, the reader will notify the supplied {@link com.googlecode.mobilityrpc.network.impl.ConnectionErrorHandler} and then
  * will close the input stream and terminate its thread.
  *
  * @author Niall Gallagher

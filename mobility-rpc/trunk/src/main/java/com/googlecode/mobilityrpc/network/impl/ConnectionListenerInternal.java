@@ -18,9 +18,9 @@ package com.googlecode.mobilityrpc.network.impl;
 import com.googlecode.mobilityrpc.common.Managed;
 
 /**
- * An internal interface used by the framework - a connection listener which must be initialized before and after use.
+ * An internal interface combining the public ConnectionListener interface with several internal interfaces.
  *
  * @author Niall Gallagher
  */
-public interface ManagedConnectionListener extends ConnectionListener, Managed {
+public interface ConnectionListenerInternal extends ConnectionListener, Managed {
 }

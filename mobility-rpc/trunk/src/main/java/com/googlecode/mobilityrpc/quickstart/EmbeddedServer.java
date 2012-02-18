@@ -15,8 +15,8 @@
  */
 package com.googlecode.mobilityrpc.quickstart;
 
-import com.googlecode.mobilityrpc.ExecutionFactory;
-import com.googlecode.mobilityrpc.execution.ExecutionCoordinator;
+import com.googlecode.mobilityrpc.MobilityRPC;
+import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.quickstart.util.NetworkUtil;
 
@@ -28,7 +28,7 @@ import com.googlecode.mobilityrpc.quickstart.util.NetworkUtil;
  * <b>Usage</b><br/>
  * Usage of this class is fairly straightforward. The {@link #start()} and {@link #stop()} methods start the
  * library listening for incoming connections, and shut it down, respectively. Once the library has been started, the
- * {@link #getExecutionCoordinator()} method returns the {@link ExecutionCoordinator} object, which is responsible for
+ * {@link #getMobilityController()} method returns the {@link MobilityController} object, which is responsible for
  * managing all aspects of the library, and provides the main API of the library.
  * <p/>
  * Applications which start the library via this class should remember to call {@link #stop()} when the application is
@@ -36,7 +36,7 @@ import com.googlecode.mobilityrpc.quickstart.util.NetworkUtil;
  * network ports.
  * <p/>
  * This class is provided for convenience. Applications needing to override default settings can initialize the library
- * via the library's main API, through {@link com.googlecode.mobilityrpc.ExecutionFactory}, which allows custom settings
+ * via the library's main API, through {@link com.googlecode.mobilityrpc.MobilityRPC}, which allows custom settings
  * to be specified.
  * <p/>
  * @author Niall Gallagher
@@ -47,32 +47,32 @@ public class EmbeddedServer {
 
     private static final int DEFAULT_PORT = 5739;
 
-    private static volatile ExecutionCoordinator instance = null;
+    private static volatile MobilityController instance = null;
 
     /**
      * Starts the mobility-rpc library to listen for incoming connections on port 5739 on all network interfaces
      * detected on the local machine.
      * <p/>
-     * Once this method returns, the library is initialised, and the {@link #getExecutionCoordinator()} method will
-     * return the {@link ExecutionCoordinator} object responsible for managing all aspects of the library, and providing
+     * Once this method returns, the library is initialised, and the {@link #getMobilityController()} method will
+     * return the {@link MobilityController} object responsible for managing all aspects of the library, and providing
      * the main API of the library.
      * @throws IllegalStateException If the library is already started
      */
     public static synchronized void start() {
-        ExecutionCoordinator executionCoordinator = instance;
-        if (executionCoordinator != null) {
+        MobilityController mobilityController = instance;
+        if (mobilityController != null) {
             throw new IllegalStateException("EmbeddedServer is already running");
         }
-        // Create a new ExecutionCoordinator...
-        executionCoordinator = ExecutionFactory.newExecutionCoordinator();
+        // Create a new MobilityController...
+        mobilityController = MobilityRPC.newController();
 
         // Detect and bind to all network interfaces...
         for (String networkAddress : NetworkUtil.getAllNetworkInterfaceAddresses()) {
-            executionCoordinator.getConnectionController().bindConnectionListener(
+            mobilityController.getConnectionManager().bindConnectionListener(
                     new ConnectionIdentifier(networkAddress, DEFAULT_PORT));
         }
         // Done...
-        instance = executionCoordinator;
+        instance = mobilityController;
     }
 
     /**
@@ -80,24 +80,24 @@ public class EmbeddedServer {
      * library was never initialized via that method, this method does nothing.
      */
     public static synchronized void stop() {
-        ExecutionCoordinator executionCoordinator = instance;
-        if (executionCoordinator != null) {
-            executionCoordinator.destroy();
+        MobilityController mobilityController = instance;
+        if (mobilityController != null) {
+            mobilityController.destroy();
             instance = null;
         }
     }
 
     /**
-     * @return the ExecutionCoordinator object responsible for managing all aspects of the library instance started via
+     * @return the MobilityController object responsible for managing all aspects of the library instance started via
      * thev{@link #start()} method, and providing the main API of the library
      * @throws IllegalStateException If the library has not been started via the {@link #start()} method
      */
-    public static ExecutionCoordinator getExecutionCoordinator() {
-        ExecutionCoordinator executionCoordinator = instance;
-        if (executionCoordinator == null) {
+    public static MobilityController getMobilityController() {
+        MobilityController mobilityController = instance;
+        if (mobilityController == null) {
             throw new IllegalStateException("EmbeddedServer has not been started");
         }
-        return executionCoordinator;
+        return mobilityController;
     }
 
 }

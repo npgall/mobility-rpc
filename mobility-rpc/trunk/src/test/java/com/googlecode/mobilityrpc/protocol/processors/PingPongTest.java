@@ -15,10 +15,10 @@
  */
 package com.googlecode.mobilityrpc.protocol.processors;
 
-import com.googlecode.mobilityrpc.execution.ExecutionCoordinator;
-import com.googlecode.mobilityrpc.execution.impl.ExecutionCoordinatorImpl;
+import com.googlecode.mobilityrpc.controller.MobilityController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 import com.googlecode.mobilityrpc.network.Connection;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.converters.messages.EnvelopeMessageConverter;
 import com.googlecode.mobilityrpc.protocol.converters.messages.PingMessageConverter;
@@ -69,13 +69,13 @@ public class PingPongTest {
     // Run this for manual testing in its own JUnit process (right-click in IDE),
     // and simultaneously run testStartClient in a separate JUnit process...
     public void testStartListener() {
-        final ExecutionCoordinator executionCoordinator = new ExecutionCoordinatorImpl();
-        final ConnectionController connectionController = executionCoordinator.getConnectionController();
+        final MobilityController mobilityController = new MobilityControllerImpl();
+        final ConnectionManager connectionManager = mobilityController.getConnectionManager();
 
         final ConnectionIdentifier localEndpointIdentifier = new ConnectionIdentifier("127.0.0.1", 5739);
-        connectionController.bindConnectionListener(localEndpointIdentifier);
+        connectionManager.bindConnectionListener(localEndpointIdentifier);
         sleep(10);
-        connectionController.unbindConnectionListener(localEndpointIdentifier);
+        connectionManager.unbindConnectionListener(localEndpointIdentifier);
     }
 
     @Test
@@ -86,10 +86,10 @@ public class PingPongTest {
         final PingMessageConverter pingMessageConverter = new PingMessageConverter();
         final EnvelopeMessageConverter envelopeMessageConverter = new EnvelopeMessageConverter();
         
-        final ExecutionCoordinator executionCoordinator = new ExecutionCoordinatorImpl();
-        final ConnectionController connectionController = executionCoordinator.getConnectionController();
+        final MobilityController mobilityController = new MobilityControllerImpl();
+        final ConnectionManager connectionManager = mobilityController.getConnectionManager();
 
-        Connection connection = connectionController.getConnection(new ConnectionIdentifier("127.0.0.1", 5739));
+        Connection connection = connectionManager.getConnection(new ConnectionIdentifier("127.0.0.1", 5739));
 
         // Send a Ping message...
         Ping ping = new Ping(UUID.randomUUID(), "Hello World");

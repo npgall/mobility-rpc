@@ -16,10 +16,12 @@
 package com.googlecode.mobilityrpc.network.impl;
 
 import com.googlecode.mobilityrpc.common.Managed;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
 
 /**
+ * An internal interface combining the public ConnectionManager interface with several internal interfaces.
+ *
  * @author Niall Gallagher
  */
-public interface ManagedConnectionController extends ConnectionController, Managed {
+public interface ConnectionManagerInternal extends ConnectionManager, Managed {
 }

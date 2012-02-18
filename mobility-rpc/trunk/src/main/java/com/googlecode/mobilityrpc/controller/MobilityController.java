@@ -13,40 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.mobilityrpc.execution;
+package com.googlecode.mobilityrpc.controller;
 
 import com.googlecode.mobilityrpc.common.Destroyable;
-import com.googlecode.mobilityrpc.session.Session;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
+import com.googlecode.mobilityrpc.session.MobilitySession;
 
 import java.util.UUID;
 
 /**
  * The main interface of the mobility-rpc library.
  * <p/>
- * Provides access to a {@link ConnectionController} object responsible for managing incoming and outgoing connections
- * to other instances of the library, and providing an API to the application to have the library bind/unbind from
- * certain ports/network interfaces to listen for incoming connections.
- * <p/>
  * Provides access to Sessions, which are the gateway through which the application can send objects to remote machines.
  * <p/>
+ * Provides access to a {@link com.googlecode.mobilityrpc.network.ConnectionManager} object responsible for managing incoming and outgoing connections
+ * to other instances of the library, and providing an API to the application to have the library bind/unbind from
+ * certain ports/network interfaces to listen for incoming connections.
+ *
  * @author Niall Gallagher
  */
-public interface ExecutionCoordinator extends Destroyable {
+public interface MobilityController extends Destroyable {
 
     /**
-     * @return The {@link ConnectionController} which manages connections for this execution coordinator
+     * @return The {@link com.googlecode.mobilityrpc.network.ConnectionManager} which manages connections for this controller
      */
-    public ConnectionController getConnectionController();
+    public ConnectionManager getConnectionManager();
 
     /**
      * Returns the existing session with the specified id, or if no such session with the id exists, (re)creates a
      * new session with the same id and adds it to the session registry.
      * <p/>
-     * To create an entirely new session call: <code>ExecutionCoordinator.getSession(UUID.randomUUID())</code>
+     * To create an entirely new session call: <code>MobilityController.getSession(UUID.randomUUID())</code>
      *
      * @param sessionId The session id of the session to return
      * @return The existing session with the specified id, or a new session initialised with this same id
      */
-    public Session getSession(UUID sessionId);
+    public MobilitySession getSession(UUID sessionId);
 }

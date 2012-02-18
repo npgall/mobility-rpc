@@ -15,11 +15,12 @@
  */
 package com.googlecode.mobilityrpc.quickstart;
 
-import com.googlecode.mobilityrpc.execution.ExecutionCoordinator;
-import com.googlecode.mobilityrpc.execution.impl.ExecutionCoordinatorImpl;
+import com.googlecode.mobilityrpc.controller.MobilityController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
-import com.googlecode.mobilityrpc.session.Session;
+import com.googlecode.mobilityrpc.session.MobilitySession;
+
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -30,31 +31,31 @@ public class AdHocTask {
 
     public static void execute(ConnectionIdentifier connectionIdentifier,
                                Runnable runnable) {
-        ExecutionCoordinator executionCoordinator = new ExecutionCoordinatorImpl();
+        MobilityController mobilityController = new MobilityControllerImpl();
         try {
-            Session session = executionCoordinator.getSession(UUID.randomUUID());
+            MobilitySession session = mobilityController.getSession(UUID.randomUUID());
             session.execute(connectionIdentifier,
                     ExecutionMode.RETURN_RESPONSE,
                     runnable
             );
         }
         finally {
-            executionCoordinator.destroy();
+            mobilityController.destroy();
         }
     }
 
     public static <T> T execute(ConnectionIdentifier connectionIdentifier,
                                 Callable<T> callable) {
-        ExecutionCoordinator executionCoordinator = new ExecutionCoordinatorImpl();
+        MobilityController mobilityController = new MobilityControllerImpl();
         try {
-            Session session = executionCoordinator.getSession(UUID.randomUUID());
+            MobilitySession session = mobilityController.getSession(UUID.randomUUID());
             return session.execute(connectionIdentifier,
                     ExecutionMode.RETURN_RESPONSE,
                     callable
             );
         }
         finally {
-            executionCoordinator.destroy();
+            mobilityController.destroy();
         }
     }
 }

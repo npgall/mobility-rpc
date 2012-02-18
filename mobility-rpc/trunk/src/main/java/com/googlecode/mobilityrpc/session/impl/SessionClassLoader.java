@@ -15,7 +15,7 @@
  */
 package com.googlecode.mobilityrpc.session.impl;
 
-import com.googlecode.mobilityrpc.execution.impl.MessageHandlingExecutionCoordinator;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeRequest;
 import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeResponse;
@@ -43,7 +43,7 @@ public class SessionClassLoader extends ClassLoader {
      */
     private static final long BYTE_CODE_REQUEST_TIMEOUT_MILLIS = 10000;
 
-    private final MessageHandlingExecutionCoordinator executionCoordinator;
+    private final MobilityControllerInternal mobilityController;
     private final UUID sessionId;
     private final ThreadLocal<ConnectionIdentifier> threadLocalConnectionIdentifiers = new ThreadLocal<ConnectionIdentifier>();
 
@@ -51,9 +51,9 @@ public class SessionClassLoader extends ClassLoader {
 
     private final Map<String, byte[]> byteCodeResourceCache = new ConcurrentHashMap<String, byte[]>();
 
-    public SessionClassLoader(MessageHandlingExecutionCoordinator executionCoordinator, UUID sessionId) {
+    public SessionClassLoader(MobilityControllerInternal mobilityController, UUID sessionId) {
         super(SessionClassLoader.class.getClassLoader());
-        this.executionCoordinator = executionCoordinator;
+        this.mobilityController = mobilityController;
         this.sessionId = sessionId;
     }
 
@@ -173,7 +173,7 @@ public class SessionClassLoader extends ClassLoader {
 
         // Send a ByteCodeRequest to the remote machine...
         ByteCodeRequest byteCodeRequest = new ByteCodeRequest(requestedClasses, requestIdentifier);
-        executionCoordinator.sendOutgoingMessage(threadLocalConnectionIdentifier, byteCodeRequest);
+        mobilityController.sendOutgoingMessage(threadLocalConnectionIdentifier, byteCodeRequest);
 
         // Return our FutureByteCodeResponse object, which the calling method can block on until response arrives...
         return futureByteCodeResponse;

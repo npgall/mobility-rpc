@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.mobilityrpc.network.impl;
-
-import com.googlecode.mobilityrpc.common.Managed;
-import com.googlecode.mobilityrpc.network.Connection;
+package com.googlecode.mobilityrpc.network.impl.tcp;
 
 /**
- * An internal interface used by the framework - a connection which must be initialized before and after use.
- *
  * @author Niall Gallagher
  */
-public interface ManagedConnection extends Connection, Managed {
+public class StreamClosedException extends RuntimeException {
+
+    public StreamClosedException(String message) {
+        super(message);
+    }
+
+    public StreamClosedException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

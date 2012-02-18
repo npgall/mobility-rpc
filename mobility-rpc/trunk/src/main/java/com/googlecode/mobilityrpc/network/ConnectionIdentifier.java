@@ -16,14 +16,37 @@
 package com.googlecode.mobilityrpc.network;
 
 /**
- * Identifies the endpoint (address + port) of a connection.
+ * Identifies the endpoint (address + port) of a connection. Conceptually very similar to
+ * {@link java.net.InetSocketAddress}.
  * <p/>
- * Connection identifiers can be supplied to the {@link ConnectionController} to request a connection to a specific
- * port on a remote (or local) machine.
+ * Connection identifiers can be supplied to the {@link ConnectionManager} to request a connection to a specific
+ * port on a remote machine, or they can be supplied to the <code>execute</code> methods in
+ * {@link com.googlecode.mobilityrpc.session.MobilitySession} which will create an outgoing connection automatically.
  * <p/>
- * Connection identifiers are also often used in the framework itself, passed between subsystems in
- * {@code ConnectionIdentifier} and message pairs, to indicate the connection from which a message was received or
+ * Connection identifiers are also often used in the framework itself, passed between components in
+ * {@code ConnectionIdentifier}-message pairs, to indicate the connection from which a message was received or to which
  * is addressed.
+ * <p/>
+ * <b>Auxiliary Connections</b><br/>
+ * In addition to encapsulating an address + port combination, connection identifiers <i>optionally</i> also encapsulate
+ * an "auxiliary connection id", which is a number greater than zero chosen by the application to allow it to establish
+ * and distinguish between potentially multiple <i>auxiliary</i> connections to a remote machine.
+ * <p/>
+ * Note that auxiliary connections are not required or recommended for most applications. In fact support for auxiliary
+ * connections exists to work around limitations in TCP connections on some types of networks or specialist applications
+ * only. A single multiplexed connection will normally be established by default, and so establishing multiple
+ * connections is unlikely to improve bandwidth utilisation, except on very high latency connections (connections with
+ * high BDP, bandwidth-delay product).
+ * <p/>
+ * To create an auxiliary connection, the application may create a connection identifier referring to a remote
+ * machine as normal, but additionally supply an auxiliary connection id greater than zero to the constructor. It
+ * can then send objects to the remote machine using this connection identifier as normal; the library
+ * ({@link ConnectionManager}) will create or reuse the auxiliary connection indicated automatically.
+ * <p/>
+ * Note that auxiliary connection ids are not transmitted to the remote machine. They are useful within the local
+ * application only. The default connection to a remote machine will always have auxiliary connection id <code>0</code>
+ * on both sides. On the remote machine, when incoming <i>auxiliary</i> connections are accepted, they will be assigned
+ * unique <i>negative</i> auxiliary connection ids on that machine.
  *
  * @author Niall Gallagher
  */

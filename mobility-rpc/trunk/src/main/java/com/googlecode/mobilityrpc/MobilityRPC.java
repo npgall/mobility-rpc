@@ -15,23 +15,23 @@
  */
 package com.googlecode.mobilityrpc;
 
-import com.googlecode.mobilityrpc.execution.ExecutionCoordinator;
-import com.googlecode.mobilityrpc.execution.impl.ExecutionCoordinatorImpl;
+import com.googlecode.mobilityrpc.controller.MobilityController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 
 /**
- * A static factory which returns a new {@link ExecutionCoordinator} object, which provides the main API of the
+ * A static factory which returns a new {@link MobilityController} object, which provides the main API of the
  * mobility-rpc library.
  *
  * @author Niall Gallagher
  */
-public class ExecutionFactory {
+public class MobilityRPC {
 
     /**
-     * @return A new {@link ExecutionCoordinator} instance. Usually the application will want to cache this instance
-     * so that it can interact with the library via the same {@code ExecutionCoordinator} instance.
+     * @return A new {@link MobilityController} instance. Usually the application will want to cache this instance
+     * so that it can interact with the library via the same controller.
      */
-    public static ExecutionCoordinator newExecutionCoordinator() {
+    public static MobilityController newController() {
         // Return the default implementation...
-        return new ExecutionCoordinatorImpl();
+        return new MobilityControllerImpl();
     }
 }

@@ -16,7 +16,7 @@
 package com.googlecode.mobilityrpc.quickstart;
 
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
-import com.googlecode.mobilityrpc.session.Session;
+import com.googlecode.mobilityrpc.session.MobilitySession;
 
 import java.util.Map;
 import java.util.UUID;
@@ -27,13 +27,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MobilityContext {
 
-    private static final ThreadLocal<Session> threadLocalSessions = new ThreadLocal<Session>();
+    private static final ThreadLocal<MobilitySession> threadLocalSessions = new ThreadLocal<MobilitySession>();
 
-    public static void setCurrentSession(Session session) {
+    public static void setCurrentSession(MobilitySession session) {
         threadLocalSessions.set(session);
     }
-    public static Session getCurrentSession() {
-        Session currentSession = threadLocalSessions.get();
+    public static MobilitySession getCurrentSession() {
+        MobilitySession currentSession = threadLocalSessions.get();
         if (currentSession == null) {
             throw new IllegalStateException("No current session");
         }

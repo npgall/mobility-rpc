@@ -15,16 +15,13 @@
  */
 package com.googlecode.mobilityrpc.network.impl;
 
+import com.googlecode.mobilityrpc.common.Managed;
+import com.googlecode.mobilityrpc.network.Connection;
+
 /**
+ * An internal interface combining the public Connection interface with several internal interfaces.
+ *
  * @author Niall Gallagher
  */
-public class StreamClosedException extends RuntimeException {
-
-    public StreamClosedException(String message) {
-        super(message);
-    }
-
-    public StreamClosedException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public interface ConnectionInternal extends Connection, Managed {
 }

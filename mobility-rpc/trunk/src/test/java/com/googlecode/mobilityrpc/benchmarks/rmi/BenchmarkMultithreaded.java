@@ -15,11 +15,11 @@
  */
 package com.googlecode.mobilityrpc.benchmarks.rmi;
 
-import com.googlecode.mobilityrpc.execution.ExecutionCoordinator;
-import com.googlecode.mobilityrpc.execution.impl.ExecutionCoordinatorImpl;
+import com.googlecode.mobilityrpc.controller.MobilityController;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
-import com.googlecode.mobilityrpc.session.Session;
+import com.googlecode.mobilityrpc.session.MobilitySession;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -102,8 +102,8 @@ public class BenchmarkMultithreaded {
         public static void main(String[] args) {
             try {
                 // Set up Mobility connection...
-                final ExecutionCoordinator executionCoordinator = new ExecutionCoordinatorImpl();
-                final Session session = executionCoordinator.getSession(UUID.randomUUID());
+                final MobilityController mobilityController = new MobilityControllerImpl();
+                final MobilitySession session = mobilityController.getSession(UUID.randomUUID());
                 final ConnectionIdentifier connectionIdentifier = new ConnectionIdentifier("127.0.0.1", 5739);
 
                 final AtomicLong numIterations = new AtomicLong();
@@ -148,7 +148,7 @@ public class BenchmarkMultithreaded {
 
                 executorService.shutdown();
                 executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-                executionCoordinator.destroy();
+                mobilityController.destroy();
 
                 System.out.println("Finished. Final result was: " + ((result == null) ? null : result.get()));
                 System.out.println("Mobility Num Threads\tMobility Request Size\tMobility Requests per sec\tMobility Latency Per Request(ns)");
@@ -171,7 +171,7 @@ public class BenchmarkMultithreaded {
     }
 
     @SuppressWarnings("unchecked")
-    static <T extends Comparable> Collection<T> processRemotelyViaMobility(final Collection<T> input, Session session, ConnectionIdentifier connectionIdentifier) {
+    static <T extends Comparable> Collection<T> processRemotelyViaMobility(final Collection<T> input, MobilitySession session, ConnectionIdentifier connectionIdentifier) {
         return session.execute(connectionIdentifier, ExecutionMode.RETURN_RESPONSE,
             new Callable<Collection<T>>() {
                 public Collection<T> call() throws Exception {

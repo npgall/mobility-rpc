@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.mobilityrpc.network.impl;
+package com.googlecode.mobilityrpc.network.impl.tcp;
 
 import com.googlecode.mobilityrpc.network.*;
+import com.googlecode.mobilityrpc.network.impl.*;
 
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
@@ -26,7 +27,7 @@ import java.util.logging.Logger;
 /**
  * @author Niall Gallagher
  */
-public class TCPConnection implements ManagedConnection {
+public class TCPConnection implements ConnectionInternal {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 

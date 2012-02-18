@@ -15,10 +15,10 @@
  */
 package com.googlecode.mobilityrpc.protocol.processors.impl;
 
-import com.googlecode.mobilityrpc.execution.impl.MessageHandlingExecutionCoordinator;
+import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
 import com.googlecode.mobilityrpc.network.Connection;
 import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
-import com.googlecode.mobilityrpc.network.ConnectionController;
+import com.googlecode.mobilityrpc.network.ConnectionManager;
 import com.googlecode.mobilityrpc.protocol.converters.messages.EnvelopeMessageConverter;
 import com.googlecode.mobilityrpc.protocol.converters.messages.PongMessageConverter;
 import com.googlecode.mobilityrpc.protocol.pojo.Envelope;
@@ -41,7 +41,7 @@ public class PingMessageProcessor implements DeserializedMessageProcessor<Ping> 
 
 
     @Override
-    public void process(MessageHandlingExecutionCoordinator executionCoordinator, ConnectionController connectionController, ConnectionIdentifier connectionIdentifier, Ping ping) {
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionIdentifier connectionIdentifier, Ping ping) {
         // Send a reply Pong message...
         Pong pong = new Pong(ping.getRequestId(), "PONG! " + ping.getMessage());
 
@@ -50,7 +50,7 @@ public class PingMessageProcessor implements DeserializedMessageProcessor<Ping> 
                 Envelope.MessageType.PONG,
                 pongMessage
         ));
-        Connection connection = connectionController.getConnection(connectionIdentifier);
+        Connection connection = connectionManager.getConnection(connectionIdentifier);
         connection.enqueueOutgoingMessage(replyEnvelope);
         if (logger.isLoggable(Level.INFO)) {
             logger.log(Level.INFO, "Received and replied to Ping message from connection '" + connectionIdentifier + "': " + ping);
