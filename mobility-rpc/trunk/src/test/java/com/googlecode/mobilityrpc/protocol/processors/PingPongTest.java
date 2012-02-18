@@ -18,8 +18,8 @@ package com.googlecode.mobilityrpc.protocol.processors;
 import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 import com.googlecode.mobilityrpc.network.Connection;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.network.ConnectionManager;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.converters.messages.EnvelopeMessageConverter;
 import com.googlecode.mobilityrpc.protocol.converters.messages.PingMessageConverter;
 import com.googlecode.mobilityrpc.protocol.pojo.Envelope;
@@ -72,7 +72,7 @@ public class PingPongTest {
         final MobilityController mobilityController = new MobilityControllerImpl();
         final ConnectionManager connectionManager = mobilityController.getConnectionManager();
 
-        final ConnectionIdentifier localEndpointIdentifier = new ConnectionIdentifier("127.0.0.1", 5739);
+        final ConnectionId localEndpointIdentifier = new ConnectionId("127.0.0.1", 5739);
         connectionManager.bindConnectionListener(localEndpointIdentifier);
         sleep(10);
         connectionManager.unbindConnectionListener(localEndpointIdentifier);
@@ -89,7 +89,7 @@ public class PingPongTest {
         final MobilityController mobilityController = new MobilityControllerImpl();
         final ConnectionManager connectionManager = mobilityController.getConnectionManager();
 
-        Connection connection = connectionManager.getConnection(new ConnectionIdentifier("127.0.0.1", 5739));
+        Connection connection = connectionManager.getConnection(new ConnectionId("127.0.0.1", 5739));
 
         // Send a Ping message...
         Ping ping = new Ping(UUID.randomUUID(), "Hello World");

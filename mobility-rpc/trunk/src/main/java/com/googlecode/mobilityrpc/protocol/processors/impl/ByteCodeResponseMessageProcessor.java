@@ -16,8 +16,8 @@
 package com.googlecode.mobilityrpc.protocol.processors.impl;
 
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.network.ConnectionManager;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.session.MobilitySession;
 import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeResponse;
 import com.googlecode.mobilityrpc.protocol.pojo.RequestIdentifier;
@@ -34,7 +34,7 @@ public class ByteCodeResponseMessageProcessor implements DeserializedMessageProc
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     @Override
-    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionIdentifier connectionIdentifier, ByteCodeResponse byteCodeResponse) {
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionId connectionId, ByteCodeResponse byteCodeResponse) {
         RequestIdentifier requestIdentifier = byteCodeResponse.getRequestIdentifier();
         MobilitySession session = mobilityController.getSession(requestIdentifier.getSessionId());
         logger.log(Level.FINER, "Received ByteCodeResponse, submitting to session class loader: {0}", byteCodeResponse);

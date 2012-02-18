@@ -48,7 +48,7 @@ public interface ConnectionManager {
      * @param destinationIdentifier Identifies a remote machine (address and port) to which a connection is required
      * @return A connection to the remote machine
      */
-    public Connection getConnection(ConnectionIdentifier destinationIdentifier);
+    public Connection getConnection(ConnectionId destinationIdentifier);
 
     /**
      * Opens a listener on the local machine to receive inbound connections from other machines to the specified
@@ -59,22 +59,22 @@ public interface ConnectionManager {
      *
      * @param localEndpointIdentifier Identifies an address and port on the local machine
      */
-    public void bindConnectionListener(ConnectionIdentifier localEndpointIdentifier);
+    public void bindConnectionListener(ConnectionId localEndpointIdentifier);
 
     /**
      * Closes a listener on the local machine which was previously opened via the
-     * {@link #bindConnectionListener(ConnectionIdentifier)} method.
+     * {@link #bindConnectionListener(ConnectionId)} method.
      * @param localEndpointIdentifier The localEndpointIdentifier previously used to bind the connection
      */
-    public void unbindConnectionListener(ConnectionIdentifier localEndpointIdentifier);
+    public void unbindConnectionListener(ConnectionId localEndpointIdentifier);
 
     /**
-     * @return The set of {@code ConnectionIdentifier}s for the currently bound listeners
+     * @return The set of {@code ConnectionId}s for the currently bound listeners
      */
-    public Collection<ConnectionIdentifier> getConnectionListenerIdentifiers();
+    public Collection<ConnectionId> getConnectionListenerIdentifiers();
 
     /**
-     * @return The set of {@code ConnectionIdentifier}s for the currently open connections
+     * @return The set of {@code ConnectionId}s for the currently open connections
      */
-    public Collection<ConnectionIdentifier> getConnectionIdentifiers();
+    public Collection<ConnectionId> getConnectionIds();
 }

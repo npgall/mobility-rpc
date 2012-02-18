@@ -17,7 +17,7 @@ package com.googlecode.mobilityrpc.benchmarks.rmi;
 
 import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
 import com.googlecode.mobilityrpc.session.MobilitySession;
 
@@ -104,7 +104,7 @@ public class BenchmarkMultithreaded {
                 // Set up Mobility connection...
                 final MobilityController mobilityController = new MobilityControllerImpl();
                 final MobilitySession session = mobilityController.getSession(UUID.randomUUID());
-                final ConnectionIdentifier connectionIdentifier = new ConnectionIdentifier("127.0.0.1", 5739);
+                final ConnectionId connectionId = new ConnectionId("127.0.0.1", 5739);
 
                 final AtomicLong numIterations = new AtomicLong();
                 final AtomicLong numObjectsSent = new AtomicLong();
@@ -117,7 +117,7 @@ public class BenchmarkMultithreaded {
                         Collection<? extends Comparable> output = null;
                         long startTime = System.nanoTime();
                         for (int iterationNumber = 0; iterationNumber < NUM_REQUESTS_PER_THREAD; iterationNumber++) {
-                            output = processRemotelyViaMobility(input, session, connectionIdentifier);
+                            output = processRemotelyViaMobility(input, session, connectionId);
                         }
                         long timeTakenNanos = System.nanoTime() - startTime;
                         numIterations.addAndGet(NUM_REQUESTS_PER_THREAD);
@@ -171,8 +171,8 @@ public class BenchmarkMultithreaded {
     }
 
     @SuppressWarnings("unchecked")
-    static <T extends Comparable> Collection<T> processRemotelyViaMobility(final Collection<T> input, MobilitySession session, ConnectionIdentifier connectionIdentifier) {
-        return session.execute(connectionIdentifier, ExecutionMode.RETURN_RESPONSE,
+    static <T extends Comparable> Collection<T> processRemotelyViaMobility(final Collection<T> input, MobilitySession session, ConnectionId connectionId) {
+        return session.execute(connectionId, ExecutionMode.RETURN_RESPONSE,
             new Callable<Collection<T>>() {
                 public Collection<T> call() throws Exception {
                     return ServerBusinessLogic.processRequest(input);

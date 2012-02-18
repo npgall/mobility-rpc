@@ -16,8 +16,8 @@
 package com.googlecode.mobilityrpc.controller;
 
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.network.ConnectionManager;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
 import com.googlecode.mobilityrpc.session.MobilitySession;
 import com.googlecode.mobilityrpc.util.LoggingUtil;
@@ -77,7 +77,7 @@ public class ExecutionTest {
         final MobilityController mobilityController = new MobilityControllerImpl();
         final ConnectionManager connectionManager = mobilityController.getConnectionManager();
 
-        final ConnectionIdentifier localEndpointIdentifier = new ConnectionIdentifier("127.0.0.1", 5739);
+        final ConnectionId localEndpointIdentifier = new ConnectionId("127.0.0.1", 5739);
 
         connectionManager.bindConnectionListener(localEndpointIdentifier);
         sleep(10);
@@ -95,7 +95,7 @@ public class ExecutionTest {
 
         logger.log(Level.INFO, "Created session: " + session);
 
-        session.execute(new ConnectionIdentifier("127.0.0.1", 5739), ExecutionMode.RETURN_RESPONSE,
+        session.execute(new ConnectionId("127.0.0.1", 5739), ExecutionMode.RETURN_RESPONSE,
                 new Runnable() {
                     @Override
                     public void run() {
@@ -118,7 +118,7 @@ public class ExecutionTest {
         final int numOne = 5;
         final int numTwo = 6;
 
-        Integer result = session.execute(new ConnectionIdentifier("127.0.0.1", 5739), ExecutionMode.RETURN_RESPONSE,
+        Integer result = session.execute(new ConnectionId("127.0.0.1", 5739), ExecutionMode.RETURN_RESPONSE,
                 new Callable<Integer>() {
                     @Override
                     public Integer call() {
@@ -141,7 +141,7 @@ public class ExecutionTest {
 
         logger.log(Level.INFO, "Created session: " + session);
 
-        session.execute(new ConnectionIdentifier("192.168.56.101", 5739), ExecutionMode.RETURN_RESPONSE,
+        session.execute(new ConnectionId("192.168.56.101", 5739), ExecutionMode.RETURN_RESPONSE,
                 new Runnable() {
                     @Override
                     public void run() {

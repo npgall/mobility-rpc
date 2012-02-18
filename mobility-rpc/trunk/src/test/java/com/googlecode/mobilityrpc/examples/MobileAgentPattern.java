@@ -15,7 +15,7 @@
  */
 package com.googlecode.mobilityrpc.examples;
 
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
 import com.googlecode.mobilityrpc.quickstart.AdHocTask;
 import com.googlecode.mobilityrpc.quickstart.MobilityContext;
@@ -43,7 +43,7 @@ public class MobileAgentPattern {
                 return;
             }
             MobilityContext.getCurrentSession().execute(
-                    new ConnectionIdentifier(machinesToVisit.remove(0), 5739),
+                    new ConnectionId(machinesToVisit.remove(0), 5739),
                     ExecutionMode.RETURN_RESPONSE,
                     this
             );
@@ -51,7 +51,7 @@ public class MobileAgentPattern {
     }
 
     public static void main(String[] args) {
-        AdHocTask.execute(new ConnectionIdentifier("192.168.56.102", 5739),
+        AdHocTask.execute(new ConnectionId("192.168.56.102", 5739),
                 new MobileAgent()
         );
     }

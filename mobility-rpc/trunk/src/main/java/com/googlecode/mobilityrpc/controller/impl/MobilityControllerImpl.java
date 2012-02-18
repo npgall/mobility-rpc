@@ -15,6 +15,7 @@
  */
 package com.googlecode.mobilityrpc.controller.impl;
 
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.network.impl.ConnectionManagerInternal;
 import com.googlecode.mobilityrpc.session.MobilitySession;
 import com.googlecode.mobilityrpc.session.impl.MobilitySessionInternal;
@@ -23,7 +24,6 @@ import com.googlecode.mobilityrpc.protocol.converters.MasterMessageConverter;
 import com.googlecode.mobilityrpc.protocol.processors.DeserializedMessageProcessor;
 import com.googlecode.mobilityrpc.protocol.processors.DeserializedMessageProcessorRegistry;
 import com.googlecode.mobilityrpc.network.ConnectionManager;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.network.impl.ConnectionManagerImpl;
 import com.googlecode.mobilityrpc.protocol.converters.MessageConverter;
 import com.googlecode.mobilityrpc.protocol.converters.MessageConverterRegistry;
@@ -63,12 +63,12 @@ public class MobilityControllerImpl implements MobilityControllerInternal {
     }
 
     @Override
-    public void receiveIncomingMessage(ConnectionIdentifier connectionIdentifier, byte[] message) {
-        messageProcessorService.submit(new MessageProcessorTask(connectionIdentifier, message));
+    public void receiveIncomingMessage(ConnectionId connectionId, byte[] message) {
+        messageProcessorService.submit(new MessageProcessorTask(connectionId, message));
     }
 
     @Override
-    public void sendOutgoingMessage(ConnectionIdentifier identifier, Object message) {
+    public void sendOutgoingMessage(ConnectionId identifier, Object message) {
         // TODO: offload serialization to the queue/background thread?..
         byte[] messageDataInEnvelope = masterMessageConverter.convertToProtobuf(message);
         connectionManager.getConnection(identifier).enqueueOutgoingMessage(messageDataInEnvelope);
@@ -92,23 +92,23 @@ public class MobilityControllerImpl implements MobilityControllerInternal {
 
     class MessageProcessorTask implements Runnable {
 
-        private final ConnectionIdentifier connectionIdentifier;
+        private final ConnectionId connectionId;
         private final byte[] messageData;
 
-        MessageProcessorTask(ConnectionIdentifier connectionIdentifier, byte[] messageData) {
-            this.connectionIdentifier = connectionIdentifier;
+        MessageProcessorTask(ConnectionId connectionId, byte[] messageData) {
+            this.connectionId = connectionId;
             this.messageData = messageData;
         }
 
         @Override
         public void run() {
-            processMessage(connectionIdentifier, messageData);
+            processMessage(connectionId, messageData);
         }
 
-        public <T> void processMessage(ConnectionIdentifier connectionIdentifier, byte[] messageData) {
+        public <T> void processMessage(ConnectionId connectionId, byte[] messageData) {
             try {
                 if (logger.isLoggable(Level.FINEST)) {
-                    logger.log(Level.FINEST, "Processing incoming message: " + messageData.length + " bytes from " + connectionIdentifier);
+                    logger.log(Level.FINEST, "Processing incoming message: " + messageData.length + " bytes from " + connectionId);
                 }
                 Envelope envelope = messageConverterRegistry.getConverter(Envelope.class).convertFromProtobuf(messageData);
 
@@ -120,12 +120,12 @@ public class MobilityControllerImpl implements MobilityControllerInternal {
                 T message = messageConverter.convertFromProtobuf(envelope.getMessage());
 
                 if (logger.isLoggable(Level.FINE)) {
-                    logger.log(Level.FINE, "Received message and submitting for processing, " + messageData.length + " bytes from " + connectionIdentifier + ": " + message);
+                    logger.log(Level.FINE, "Received message and submitting for processing, " + messageData.length + " bytes from " + connectionId + ": " + message);
                 }
-                deserializedMessageProcessor.process(MobilityControllerImpl.this, connectionManager, connectionIdentifier, message);
+                deserializedMessageProcessor.process(MobilityControllerImpl.this, connectionManager, connectionId, message);
             }
             catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to process incoming message: " + messageData.length + " bytes from " + connectionIdentifier, e);
+                logger.log(Level.WARNING, "Failed to process incoming message: " + messageData.length + " bytes from " + connectionId, e);
             }
         }
 

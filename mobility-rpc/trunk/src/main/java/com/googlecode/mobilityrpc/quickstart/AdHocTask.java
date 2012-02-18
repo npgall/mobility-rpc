@@ -17,7 +17,7 @@ package com.googlecode.mobilityrpc.quickstart;
 
 import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
 import com.googlecode.mobilityrpc.session.MobilitySession;
 
@@ -29,12 +29,12 @@ import java.util.concurrent.Callable;
  */
 public class AdHocTask {
 
-    public static void execute(ConnectionIdentifier connectionIdentifier,
+    public static void execute(ConnectionId connectionId,
                                Runnable runnable) {
         MobilityController mobilityController = new MobilityControllerImpl();
         try {
             MobilitySession session = mobilityController.getSession(UUID.randomUUID());
-            session.execute(connectionIdentifier,
+            session.execute(connectionId,
                     ExecutionMode.RETURN_RESPONSE,
                     runnable
             );
@@ -44,12 +44,12 @@ public class AdHocTask {
         }
     }
 
-    public static <T> T execute(ConnectionIdentifier connectionIdentifier,
+    public static <T> T execute(ConnectionId connectionId,
                                 Callable<T> callable) {
         MobilityController mobilityController = new MobilityControllerImpl();
         try {
             MobilitySession session = mobilityController.getSession(UUID.randomUUID());
-            return session.execute(connectionIdentifier,
+            return session.execute(connectionId,
                     ExecutionMode.RETURN_RESPONSE,
                     callable
             );

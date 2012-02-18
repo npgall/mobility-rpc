@@ -15,7 +15,7 @@
  */
 package com.googlecode.mobilityrpc.quickstart;
 
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.session.MobilitySession;
 
 import java.util.Map;
@@ -40,17 +40,17 @@ public class MobilityContext {
         return currentSession;
     }
 
-    private static final ThreadLocal<ConnectionIdentifier> threadLocalConnectionIdentifiers = new ThreadLocal<ConnectionIdentifier>();
+    private static final ThreadLocal<ConnectionId> threadLocalConnectionIds = new ThreadLocal<ConnectionId>();
 
-    public static void setConnectionIdentifier(ConnectionIdentifier connectionIdentifier) {
-        threadLocalConnectionIdentifiers.set(connectionIdentifier);
+    public static void setConnectionId(ConnectionId connectionId) {
+        threadLocalConnectionIds.set(connectionId);
     }
-    public static ConnectionIdentifier getCurrentConnectionIdentifier() {
-        ConnectionIdentifier currentConnectionIdentifier = threadLocalConnectionIdentifiers.get();
-        if (currentConnectionIdentifier == null) {
-            throw new IllegalStateException("No current connection identifier");
+    public static ConnectionId getCurrentConnectionId() {
+        ConnectionId currentConnectionId = threadLocalConnectionIds.get();
+        if (currentConnectionId == null) {
+            throw new IllegalStateException("No current connection id");
         }
-        return currentConnectionIdentifier;
+        return currentConnectionId;
     }
 
     private static final Map<Class<?>, Object> singletonObjectRegistry = new ConcurrentHashMap<Class<?>, Object>();

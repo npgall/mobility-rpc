@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.googlecode.mobilityrpc.examples;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.quickstart.AdHocTask;
 
 /**
@@ -25,7 +25,7 @@ public class HelloWorld {
     private static final String remoteAddress = "192.168.56.102";
 
     public static void main(String[] args) {
-        AdHocTask.execute(new ConnectionIdentifier(remoteAddress, 5739), new Runnable() {
+        AdHocTask.execute(new ConnectionId(remoteAddress, 5739), new Runnable() {
             public void run() {
                 System.out.println("Hello World");
             }

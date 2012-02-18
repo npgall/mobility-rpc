@@ -16,8 +16,8 @@
 package com.googlecode.mobilityrpc.protocol.processors.impl;
 
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.network.ConnectionManager;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
 import com.googlecode.mobilityrpc.session.MobilitySession;
 import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeRequest;
 import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeResponse;
@@ -39,7 +39,7 @@ public class ByteCodeRequestMessageProcessor implements DeserializedMessageProce
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     @Override
-    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionIdentifier connectionIdentifier, ByteCodeRequest byteCodeRequest) {
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionId connectionId, ByteCodeRequest byteCodeRequest) {
         RequestIdentifier requestIdentifier = byteCodeRequest.getRequestIdentifier();
         MobilitySession session = mobilityController.getSession(requestIdentifier.getSessionId());
         if (byteCodeRequest.getClassNames().size() != 1) {
@@ -69,7 +69,7 @@ public class ByteCodeRequestMessageProcessor implements DeserializedMessageProce
                 classDataListToReturn,
                 requestIdentifier
         );
-        mobilityController.sendOutgoingMessage(connectionIdentifier, byteCodeResponse);
+        mobilityController.sendOutgoingMessage(connectionId, byteCodeResponse);
         if (logger.isLoggable(Level.FINER)) {
             if (byteCodeResponse.getByteCodeResponses().isEmpty()) {
                 logger.log(Level.FINER, "Failed to locate bytecode for class '" + requestedClassName + "', returned response: " + byteCodeResponse);

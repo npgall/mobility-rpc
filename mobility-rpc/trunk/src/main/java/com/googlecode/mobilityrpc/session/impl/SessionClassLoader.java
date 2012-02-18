@@ -16,7 +16,7 @@
 package com.googlecode.mobilityrpc.session.impl;
 
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeRequest;
 import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeResponse;
 import com.googlecode.mobilityrpc.protocol.pojo.RequestIdentifier;
@@ -45,7 +45,7 @@ public class SessionClassLoader extends ClassLoader {
 
     private final MobilityControllerInternal mobilityController;
     private final UUID sessionId;
-    private final ThreadLocal<ConnectionIdentifier> threadLocalConnectionIdentifiers = new ThreadLocal<ConnectionIdentifier>();
+    private final ThreadLocal<ConnectionId> threadLocalConnectionIds = new ThreadLocal<ConnectionId>();
 
     private final ConcurrentMap<RequestIdentifier, FutureByteCodeResponse> futureByteCodeResponses = new ConcurrentHashMap<RequestIdentifier, FutureByteCodeResponse>();
 
@@ -63,12 +63,12 @@ public class SessionClassLoader extends ClassLoader {
      * remote machine indicated.
      * <p/>
      * When threads finish processing execution requests, they should call this method supplying {@code null} for the
-     * connection identifier.
+     * connection id.
      *
-     * @param connectionIdentifier Indicates the current connection in use by a thread processing an execution request
+     * @param connectionId Indicates the current connection in use by a thread processing an execution request
      */
-    public void setThreadLocalConnectionIdentifier(ConnectionIdentifier connectionIdentifier) {
-        threadLocalConnectionIdentifiers.set(connectionIdentifier);
+    public void setThreadLocalConnectionId(ConnectionId connectionId) {
+        threadLocalConnectionIds.set(connectionId);
     }
 
     /**
@@ -102,9 +102,9 @@ public class SessionClassLoader extends ClassLoader {
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         try {
-            final ConnectionIdentifier threadLocalConnectionIdentifier = threadLocalConnectionIdentifiers.get();
-            if (threadLocalConnectionIdentifier == null) {
-                throw new ClassNotFoundException("No thread-local connection identifier is registered for the thread requesting class: " + name);
+            final ConnectionId threadLocalConnectionId = threadLocalConnectionIds.get();
+            if (threadLocalConnectionId == null) {
+                throw new ClassNotFoundException("No thread-local connection id is registered for the thread requesting class: " + name);
             }
 
             // Wrap our required class in a singleton list.
@@ -159,9 +159,9 @@ public class SessionClassLoader extends ClassLoader {
      * from the remote machine
      */
     FutureByteCodeResponse sendRequestForByteCode(List<String> requestedClasses) {
-        final ConnectionIdentifier threadLocalConnectionIdentifier = threadLocalConnectionIdentifiers.get();
-        if (threadLocalConnectionIdentifier == null) {
-            throw new IllegalStateException("No thread-local connection identifier is registered for the thread requesting classes: " + requestedClasses);
+        final ConnectionId threadLocalConnectionId = threadLocalConnectionIds.get();
+        if (threadLocalConnectionId == null) {
+            throw new IllegalStateException("No thread-local connection id is registered for the thread requesting classes: " + requestedClasses);
         }
         // Create a unique RequestIdentifier for the ByteCodeRequest we will send...
         UUID requestId = UUID.randomUUID();
@@ -173,7 +173,7 @@ public class SessionClassLoader extends ClassLoader {
 
         // Send a ByteCodeRequest to the remote machine...
         ByteCodeRequest byteCodeRequest = new ByteCodeRequest(requestedClasses, requestIdentifier);
-        mobilityController.sendOutgoingMessage(threadLocalConnectionIdentifier, byteCodeRequest);
+        mobilityController.sendOutgoingMessage(threadLocalConnectionId, byteCodeRequest);
 
         // Return our FutureByteCodeResponse object, which the calling method can block on until response arrives...
         return futureByteCodeResponse;

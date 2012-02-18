@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.googlecode.mobilityrpc.examples;
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.quickstart.AdHocTask;
 import java.net.InetAddress;
 import java.util.Properties;
@@ -39,7 +39,7 @@ public class BoomerangPattern {
 
     public static void main(String[] args) {
         BoomerangObject boomerangObject = AdHocTask.execute(
-            new ConnectionIdentifier("192.168.56.102", 5739), new BoomerangObject()
+            new ConnectionId("192.168.56.102", 5739), new BoomerangObject()
         );
         System.out.println(boomerangObject.someData);
         System.out.println(boomerangObject.someOtherData);

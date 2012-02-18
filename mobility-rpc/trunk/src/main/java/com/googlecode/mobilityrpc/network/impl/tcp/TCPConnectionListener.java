@@ -46,7 +46,7 @@ public class TCPConnectionListener implements ConnectionListenerInternal {
 
     private final IncomingMessageHandler incomingMessageHandler;
     private final ConnectionStateListener connectionStateListener;
-    private final ConnectionIdentifier localEndpointIdentifier;
+    private final ConnectionId localEndpointIdentifier;
 
     /**
      * Auxiliary connections are additional connections that we receive from (or establish to) a remote machine beyond
@@ -56,12 +56,12 @@ public class TCPConnectionListener implements ConnectionListenerInternal {
      * to/from that machine, we allocate the received connection an auxiliary connection id which is less than zero.
      * <p/>
      * Auxiliary connection ids are never communicated, they are used only within this application instance. However
-     * since we encapsulate the auxiliary connection id inside the connection identifier which we create for the
+     * since we encapsulate the auxiliary connection id inside the connection id which we create for the
      * connection and pass to upper layers, any requests we receive via this connection will be associated with this
-     * connection identifier and so when returning responses, we will route responses via the same connection.
+     * connection id and so when returning responses, we will route responses via the same connection.
      * <p/>
      * Applications which wish to establish outgoing auxiliary connections are responsible for choosing auxiliary
-     * connection ids themselves, which they supply to the constructor of {@link ConnectionIdentifier}, and those
+     * connection ids themselves, which they supply to the constructor of {@link ConnectionId}, and those
      * auxiliary connection ids should always be greater than zero.
      * <p/>
      * We always assign auxiliary connections which we receive arbitrary auxiliary connection ids which are less than
@@ -74,7 +74,7 @@ public class TCPConnectionListener implements ConnectionListenerInternal {
      * This is to avoid an edge case where an incoming auxiliary connection could be interpreted as a primary
      * connection on the receiving side.
      * <p/>
-     * We decrement this AtomicInteger to allocate (effectively arbitrary) auxiliary connection identifiers.
+     * We decrement this AtomicInteger to allocate (effectively arbitrary) auxiliary connection ids.
      */
     private final AtomicInteger auxiliaryConnectionIdProvider = new AtomicInteger();
 
@@ -91,7 +91,7 @@ public class TCPConnectionListener implements ConnectionListenerInternal {
      * @param incomingMessageHandler An object to which message received should be passed
      * @param connectionStateListener an object which should be notified if the connection is closed
      */
-    public TCPConnectionListener(ConnectionIdentifier localEndpointIdentifier, IncomingMessageHandler incomingMessageHandler, ConnectionStateListener connectionStateListener) {
+    public TCPConnectionListener(ConnectionId localEndpointIdentifier, IncomingMessageHandler incomingMessageHandler, ConnectionStateListener connectionStateListener) {
         this.localEndpointIdentifier = localEndpointIdentifier;
         this.incomingMessageHandler = incomingMessageHandler;
         this.connectionStateListener = connectionStateListener;
@@ -128,7 +128,7 @@ public class TCPConnectionListener implements ConnectionListenerInternal {
 
 
     @Override
-    public ConnectionIdentifier getConnectionIdentifier() {
+    public ConnectionId getConnectionId() {
         return localEndpointIdentifier;
     }
 
@@ -157,7 +157,7 @@ public class TCPConnectionListener implements ConnectionListenerInternal {
                     // is closed...
 
                     final int auxiliaryConnectionId;
-                    if (!connectionStateListener.isConnectionRegistered(new ConnectionIdentifier(socket.getInetAddress().getHostAddress(), socket.getPort(), 0))) {
+                    if (!connectionStateListener.isConnectionRegistered(new ConnectionId(socket.getInetAddress().getHostAddress(), socket.getPort(), 0))) {
                         // A primary connection is not registered,
                         // register this incoming connection as the primary connection...
                         auxiliaryConnectionId = 0;
@@ -168,7 +168,7 @@ public class TCPConnectionListener implements ConnectionListenerInternal {
                     }
                     ConnectionInternal connection = new TCPConnection(socket, auxiliaryConnectionId, incomingMessageHandler, connectionStateListener);
                     if (logger.isLoggable(Level.FINER)) {
-                        logger.log(Level.FINER, "Received connection on local endpoint " + localEndpointIdentifier + " from " + connection.getConnectionIdentifier());
+                        logger.log(Level.FINER, "Received connection on local endpoint " + localEndpointIdentifier + " from " + connection.getConnectionId());
                     }
                     // Initialise the connection, and register it with the ConnectionManager...
                     connection.init();

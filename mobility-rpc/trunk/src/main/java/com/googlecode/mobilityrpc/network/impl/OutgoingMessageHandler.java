@@ -15,7 +15,7 @@
  */
 package com.googlecode.mobilityrpc.network.impl;
 
-import com.googlecode.mobilityrpc.network.ConnectionIdentifier;
+import com.googlecode.mobilityrpc.network.ConnectionId;
 
 /**
  * An internal interface, implemented by objects which can accept a Java object representation of a protocol
@@ -40,8 +40,8 @@ public interface OutgoingMessageHandler {
      * As such if the object supplied cannot be serialized to protobuf format, this method will throw an exception
      * to the code calling this method. This method does not block.
      *
-     * @param connectionIdentifier Identifies the connection through which the message should be sent
+     * @param connectionId Identifies the connection through which the message should be sent
      * @param message A java object representation of a protocol message
      */
-    public void sendOutgoingMessage(ConnectionIdentifier connectionIdentifier, Object message);
+    public void sendOutgoingMessage(ConnectionId connectionId, Object message);
 }
