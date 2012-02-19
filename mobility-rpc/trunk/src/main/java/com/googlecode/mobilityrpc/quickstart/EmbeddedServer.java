@@ -21,7 +21,7 @@ import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.quickstart.util.NetworkUtil;
 
 /**
- * A quick way to programmatically start the mobility-rpc library to listen for incoming connections, using default
+ * A quick way to programmatically start the Mobility-RPC library to listen for incoming connections, using default
  * settings. The library will listen for incoming connections on port 5739, on all network interfaces detected on the
  * machine.
  * <p/>
@@ -50,7 +50,7 @@ public class EmbeddedServer {
     private static volatile MobilityController instance = null;
 
     /**
-     * Starts the mobility-rpc library to listen for incoming connections on port 5739 on all network interfaces
+     * Starts the Mobility-RPC library to listen for incoming connections on port 5739 on all network interfaces
      * detected on the local machine.
      * <p/>
      * Once this method returns, the library is initialised, and the {@link #getMobilityController()} method will
@@ -76,7 +76,7 @@ public class EmbeddedServer {
     }
 
     /**
-     * Shuts down the instance of the mobility-rpc library which was created via the {@link #start()} method. If the
+     * Shuts down the instance of the Mobility-RPC library which was created via the {@link #start()} method. If the
      * library was never initialized via that method, this method does nothing.
      */
     public static synchronized void stop() {

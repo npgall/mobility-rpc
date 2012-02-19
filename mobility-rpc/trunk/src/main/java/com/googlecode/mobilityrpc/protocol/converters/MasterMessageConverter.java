@@ -18,7 +18,8 @@ package com.googlecode.mobilityrpc.protocol.converters;
 import com.googlecode.mobilityrpc.protocol.pojo.Envelope;
 
 /**
- * A converter which can convert any message object to/from protobuf and wrap/unwrap in an envelope automatically.
+ * A "master converter" which can convert any message object to/from protobuf and wrap/unwrap in an envelope
+ * automatically.
  * <p/>
  * Delegates to other {@link MessageConverter} implementations depending on the type of message supplied, via
  * {@link MessageTypeRegistry} and {@link MessageConverterRegistry}.

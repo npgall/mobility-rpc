@@ -16,6 +16,9 @@
 package com.googlecode.mobilityrpc.protocol.converters;
 
 /**
+ * Interface implemented by classes which can convert Java object (POJO) representations of message components
+ * to/from binary using protobuf.
+ *
  * @author Niall Gallagher
  */
 public interface ComponentConverter<T, ProtobufObject, ProtobufBuilder> {

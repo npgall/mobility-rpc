@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Given the class of a Java (POJO) object which represents a message, returns the relevant {@link MessageConverter}
+ * which can convert instances of that class to/from protobuf.
+ *
  * @author Niall Gallagher
  */
 public class MessageConverterRegistry {
