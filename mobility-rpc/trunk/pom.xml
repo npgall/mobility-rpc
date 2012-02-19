@@ -1,15 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.googlecode.mobilityrpc</groupId>
     <artifactId>mobility-rpc</artifactId>
     <version>0.5.0</version>
     <packaging>jar</packaging>
-
     <name>Mobility-RPC</name>
     <url>http://maven.apache.org</url>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -25,17 +22,44 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.google.protobuf.tools</groupId>
-                <artifactId>maven-protoc-plugin</artifactId>
-                <version>0.1.10</version>
-                <configuration>
-                    <protocExecutable>/usr/local/bin/protoc</protocExecutable>
-                </configuration>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>compile-protoc</id>
+                        <!--
+                            Ideally we would use maven-protoc-plugin to generate protobuf classes,
+                            but that plugin is not in Maven Central.
+
+                            We wish to deploy this library to Maven Central, and guidelines for doing so
+                            forbid relying on dependencies which are not also in central:
+                            https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+
+                            Therefore we use antrun to invoke protoc as a workaround. Note: like maven-protoc-plugin,
+                            this requires protoc to be installed on the machine, and be accessible via the 'protoc'
+                            command.
+                        -->
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="target/generated-sources/protoc"/>
+                                <!--<mkdir dir="target/generated-sources/com/googlecode/mobilityrpc/protobuf"/>-->
+                                <path id="proto.path">
+                                    <fileset dir="src/main/proto">
+                                        <include name="**/*.proto" />
+                                    </fileset>
+                                </path>
+                                <pathconvert pathsep=" " property="proto.files" refid="proto.path" />
+                                <exec executable="protoc" failonerror="true">
+                                    <arg value="--java_out=target/generated-sources/protoc" />
+                                    <arg value="-I${project.basedir}/src/main/proto" />
+                                    <!--suppress MavenModelInspection -->
+                                    <arg line="${proto.files}" />
+                                </exec>
+                            </tasks>
+                            <sourceRoot>target/generated-sources</sourceRoot>
+                        </configuration>
                         <goals>
-                            <goal>compile</goal>
-                            <goal>testCompile</goal>
+                            <goal>run</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -43,6 +67,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -52,18 +77,17 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.dstovall</groupId>
+                <groupId>com.jolira</groupId>
                 <artifactId>onejar-maven-plugin</artifactId>
                 <version>1.4.4</version>
                 <executions>
                     <execution>
                         <configuration>
-                            <!-- Optional, default is false -->
                             <attachToBuild>true</attachToBuild>
-                            <!-- Optional, default is "onejar" -->
-                            <classifier>onejar</classifier>
+                            <filename>${project.artifactId}-standalone-server-${project.version}.jar</filename>
                         </configuration>
                         <goals>
+                            <!--suppress MavenModelInspection -->
                             <goal>one-jar</goal>
                         </goals>
                     </execution>
@@ -72,13 +96,16 @@
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
+                <version>1.10.b1</version>
                 <configuration>
                     <header>src/etc/header.txt</header>
+                    <excludes>
+                        <exclude>src/main/proto/*</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
                         <phase>validate</phase>
-
                         <goals>
                             <goal>check</goal>
                         </goals>
@@ -94,7 +121,6 @@
             <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.googlecode</groupId>
             <artifactId>kryo</artifactId>
@@ -117,30 +143,4 @@
             <optional>false</optional>
         </dependency>
     </dependencies>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <!-- Repository for maven-protoc-plugin -->
-            <id>dtrott</id>
-            <url>http://maven.davidtrott.com/repository</url>
-        </pluginRepository>
-        <pluginRepository>
-            <!-- Repository for onejar-maven-plugin -->
-            <id>onejar-maven-plugin.googlecode.com</id>
-            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
-        </pluginRepository>
-        <pluginRepository>
-            <!-- Repository for maven-license-plugin -->
-            <id>mc-release</id>
-            <name>Local Maven repository of releases</name>
-            <url>http://mc-repo.googlecode.com/svn/maven2/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-
 </project>
