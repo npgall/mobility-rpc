@@ -139,6 +139,11 @@ public class MobilityControllerImpl implements MobilityControllerInternal {
     }
 
     @Override
+    public MobilitySession newSession() {
+        return getSession(UUID.randomUUID());
+    }
+
+    @Override
     public void removeSession(UUID sessionId) {
         MobilitySession session = sessionRegistry.get(sessionId);
         if (session == null) {

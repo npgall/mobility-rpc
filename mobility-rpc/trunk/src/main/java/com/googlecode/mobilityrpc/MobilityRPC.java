@@ -20,18 +20,28 @@ import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 
 /**
  * A static factory which returns a new {@link MobilityController} object, which provides the main API of the
- * mobility-rpc library.
+ * Mobility-RPC library.
  *
  * @author Niall Gallagher
  */
 public class MobilityRPC {
 
     /**
-     * @return A new {@link MobilityController} instance. Usually the application will want to hold on to this instance
-     * so that it can interact with the library via the same controller
+     * Returns a new {@link MobilityController} instance.
+     * <p/>
+     * Usually the application will want to hold on to this instance so that it can interact with the library
+     * via the same controller.
+     *
+     * @return A new {@link MobilityController} instance
      */
     public static MobilityController newController() {
         // Return the default implementation...
         return new MobilityControllerImpl();
+    }
+
+    /**
+     * Private constructor, not used.
+     */
+    MobilityRPC() {
     }
 }

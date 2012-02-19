@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Given a message type, returns the class of its Java (POJO) representation, and vice-versa.
+ *
  * @author Niall Gallagher
  */
 public class MessageTypeRegistry {

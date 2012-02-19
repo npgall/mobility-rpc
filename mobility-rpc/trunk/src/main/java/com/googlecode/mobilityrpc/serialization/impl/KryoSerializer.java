@@ -30,6 +30,12 @@ import java.util.Currency;
 import java.util.GregorianCalendar;
 
 /**
+ * A serializer which serializes regular Java objects to/from binary using the
+ * <a href="http://code.google.com/p/kryo/">Kryo</a> serilaization framework.
+ * <p/>
+ * The advantages of this framework over Java's built-in serialization, are: speed, compact data sizes, and an ability
+ * to serialize regular Java objects without requiring them to implement {@link java.io.Serializable}.
+ *
  * @author Niall Gallagher
  */
 public class KryoSerializer implements Serializer {

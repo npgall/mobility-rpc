@@ -24,7 +24,7 @@ import java.util.UUID;
 
 /**
  * A combination of several internal interfaces implemented by the mobility controller, most of which are not part
- * of the public API. Only {@link MobilityController} is part of the public API.
+ * of the public API. Only {@link com.googlecode.mobilityrpc.controller.MobilityController} is part of the public API.
  *
  * @author Niall Gallagher
  */
@@ -35,8 +35,9 @@ public interface MobilityControllerInternal extends MobilityController, Incoming
     /**
      * Removes the given session from the session registry, if it is registered. If not registered, does nothing.
      * <p/>
-     * Note: the preferred way to shut down and unregister a session is via {@link com.googlecode.mobilityrpc.session.MobilitySession#destroy()}, which
-     * actually invokes this method behind the scenes, but might also release other resources at session level.
+     * Note: the preferred way to shut down and unregister a session is via
+     * {@link com.googlecode.mobilityrpc.session.MobilitySession#release()}, which actually invokes this method behind
+     * the scenes.
      *
      * @param sessionId The session id to remove
      */

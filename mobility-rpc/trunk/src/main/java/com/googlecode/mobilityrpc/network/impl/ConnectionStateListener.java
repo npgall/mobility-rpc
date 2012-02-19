@@ -21,9 +21,10 @@ import com.googlecode.mobilityrpc.network.ConnectionId;
  * An internal interface used by the framework - implemented by an object which can be notified when connections are
  * opened or closed.
  * <p/>
- * Note: in practice this is implemented by the {@link ConnectionManager} as a means to be notified of connection
- * events, and this interface is invoked by {@link ConnectionListener}s when incoming connections are received and by
- * {@link com.googlecode.mobilityrpc.network.Connection} objects when connections are closed.
+ * Note: in practice this is implemented by the {@link com.googlecode.mobilityrpc.network.ConnectionManager} as a means
+ * to be notified of connection events, and this interface is invoked by {@link ConnectionListener}s when incoming
+ * connections are received and by {@link com.googlecode.mobilityrpc.network.Connection} objects when connections are
+ * closed.
  * <p/>
  * This interface really only exists to decouple objects which send notifications from the implementations which
  * subscribe to them, to simplify independent unit testing etc.
@@ -45,6 +46,7 @@ public interface ConnectionStateListener {
     public void notifyConnectionClosed(ConnectionInternal connection);
 
     /**
+     * @param connectionId The connection id to check
      * @return Allows the sender of notifications to query the destination
      * to see if a specific connection is registered (typically used to check if primary connection is up)
      */

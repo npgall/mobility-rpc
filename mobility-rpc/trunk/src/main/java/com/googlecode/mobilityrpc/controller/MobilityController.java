@@ -22,13 +22,14 @@ import com.googlecode.mobilityrpc.session.MobilitySession;
 import java.util.UUID;
 
 /**
- * The main interface of the mobility-rpc library.
+ * The main interface of the Mobility-RPC library.
  * <p/>
- * Provides access to Sessions, which are the gateway through which the application can send objects to remote machines.
+ * Provides access to {@link MobilitySession}s, which are the gateway through which the application can send objects
+ * to remote machines.
  * <p/>
  * Provides access to a {@link ConnectionManager} object responsible for managing incoming and outgoing connections
- * to other instances of the library, and providing an API to the application to have the library bind/unbind from
- * certain ports/network interfaces to listen for incoming connections.
+ * to other instances of the library, and allowing the application to request the library to bind/unbind from
+ * ports/network interfaces to listen for incoming connections.
  *
  * @author Niall Gallagher
  */
@@ -42,11 +43,22 @@ public interface MobilityController extends Destroyable {
     /**
      * Returns the existing session with the specified id, or if no such session with the id exists, (re)creates a
      * new session with the same id and adds it to the session registry.
-     * <p/>
-     * To create an entirely new session call: <code>MobilityController.getSession(UUID.randomUUID())</code>
      *
      * @param sessionId The session id of the session to return
      * @return The existing session with the specified id, or a new session initialised with this same id
      */
     public MobilitySession getSession(UUID sessionId);
+
+    /**
+     * Creates a new session, having a newly generated UUID, and adds it to the session registry.
+     *
+     * @return A new session
+     */
+    public MobilitySession newSession();
+
+    /**
+     * Destroys (closes/shuts down) the resources managed by the controller, closing connections, stopping threads,
+     * releasing all sessions etc.
+     */
+    public void destroy();
 }
