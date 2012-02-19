@@ -50,7 +50,7 @@ public interface MobilityController extends Destroyable {
     public MobilitySession getSession(UUID sessionId);
 
     /**
-     * Creates a new session, having a newly generated UUID, and adds it to the session registry.
+     * Creates a new session, with a newly generated UUID, and adds it to the session registry.
      *
      * @return A new session
      */
