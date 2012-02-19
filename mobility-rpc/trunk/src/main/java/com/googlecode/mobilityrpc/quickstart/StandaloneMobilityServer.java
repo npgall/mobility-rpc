@@ -20,13 +20,13 @@ import com.googlecode.mobilityrpc.quickstart.util.LoggingUtil;
 import java.util.logging.*;
 
 /**
- * Starts EmbeddedServer as a standalone application, listening on port 5739 on all network interfaces by default.
+ * Starts EmbeddedMobilityServer as a standalone application, listening on port 5739 on all network interfaces by default.
  * <p/>
  * Supply system property "-Ddebug=true" on the command line to enable debug logging.
  *
  * @author Niall Gallagher
  */
-public class StandaloneServer {
+public class StandaloneMobilityServer {
 
     /**
      * @param args Not used
@@ -37,9 +37,9 @@ public class StandaloneServer {
         LoggingUtil.setSingleLineLoggingFormat();
 
         // Start the server...
-        EmbeddedServer.start();
-        System.out.println("Server started, listening on port " + EmbeddedServer.DEFAULT_PORT + " on the following addresses:");
-        for (String networkAddress : EmbeddedServer.getAddresses()) {
+        EmbeddedMobilityServer.start();
+        System.out.println("Server started, listening on port " + EmbeddedMobilityServer.DEFAULT_PORT + " on the following addresses:");
+        for (String networkAddress : EmbeddedMobilityServer.getAddresses()) {
             System.out.println(networkAddress);
         }
         System.out.println();
@@ -48,7 +48,7 @@ public class StandaloneServer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                EmbeddedServer.stop();
+                EmbeddedMobilityServer.stop();
                 System.out.println("Server stopped");
             }
         });

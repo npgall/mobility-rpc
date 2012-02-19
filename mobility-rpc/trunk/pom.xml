@@ -46,7 +46,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.googlecode.mobilityrpc.quickstart.StandaloneServer</mainClass>
+                            <mainClass>com.googlecode.mobilityrpc.quickstart.StandaloneMobilityServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
