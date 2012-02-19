@@ -14,27 +14,23 @@
  * limitations under the License.
  */
 package com.googlecode.mobilityrpc.examples;
-import com.googlecode.mobilityrpc.network.ConnectionId;
-import com.googlecode.mobilityrpc.quickstart.AdHocTask;
+import com.googlecode.mobilityrpc.quickstart.QuickTask;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
 /**
+ * Retrieves system properties from the remote machine and prints to the console on the local machine.
+ *
  * @author Niall Gallagher
  */
 public class RetrieveData {
 
-    private static final String remoteAddress = "192.168.56.102";
-
     public static void main(String[] args) {
-        Properties data = AdHocTask.execute(
-            new ConnectionId(remoteAddress, 5739),
-            new Callable<Properties>() {
-                public Properties call() throws Exception {
-                    return System.getProperties();
-                }
+        Properties data = QuickTask.execute("bob", new Callable<Properties>() {
+            public Properties call() throws Exception {
+                return System.getProperties();
             }
-        );
+        });
         System.out.println(data);
     }
 }

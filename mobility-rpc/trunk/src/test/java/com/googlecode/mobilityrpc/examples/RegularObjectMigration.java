@@ -15,10 +15,15 @@
  */
 package com.googlecode.mobilityrpc.examples;
 
-import com.googlecode.mobilityrpc.network.ConnectionId;
-import com.googlecode.mobilityrpc.quickstart.AdHocTask;
+import com.googlecode.mobilityrpc.quickstart.QuickTask;
 
 /**
+ * Demonstrates that a regular object can be migrated to a remote machine.
+ * <p/>
+ * The example regular object is not special in any way and does not any particular interfaces.
+ * <p/>
+ * Sends the object, and calls its <code>printDetails()</code> method on the remote machine.
+ *
  * @author Niall Gallagher
  */
 public class RegularObjectMigration {
@@ -34,16 +39,10 @@ public class RegularObjectMigration {
         }
     }
 
-    public static void migrateRegularObject(final RegularObject regularObject) {
-        AdHocTask.execute(new ConnectionId("192.168.56.102", 5739),
-            new Runnable() {
-                public void run() {
-                    regularObject.printDetails();
-        }});
-    }
-
     public static void main(String[] args) {
-        RegularObject regularObject = new RegularObject();
-        migrateRegularObject(regularObject);
+        final RegularObject regularObject = new RegularObject();
+        QuickTask.execute("bob", new Runnable() { public void run() {
+                regularObject.printDetails();
+        }});
     }
 }

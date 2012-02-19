@@ -15,6 +15,7 @@
  */
 package com.googlecode.mobilityrpc.benchmarks.rmi;
 
+import com.googlecode.mobilityrpc.MobilityRPC;
 import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 import com.googlecode.mobilityrpc.network.ConnectionId;
@@ -102,7 +103,7 @@ public class BenchmarkMultithreaded {
         public static void main(String[] args) {
             try {
                 // Set up Mobility connection...
-                final MobilityController mobilityController = new MobilityControllerImpl();
+                final MobilityController mobilityController = MobilityRPC.newController();
                 final MobilitySession session = mobilityController.getSession(UUID.randomUUID());
                 final ConnectionId connectionId = new ConnectionId("127.0.0.1", 5739);
 

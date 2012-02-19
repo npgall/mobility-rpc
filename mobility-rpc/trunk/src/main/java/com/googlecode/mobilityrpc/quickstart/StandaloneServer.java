@@ -15,61 +15,31 @@
  */
 package com.googlecode.mobilityrpc.quickstart;
 
-import com.googlecode.mobilityrpc.controller.MobilityController;
-import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
-import com.googlecode.mobilityrpc.network.ConnectionId;
-import com.googlecode.mobilityrpc.quickstart.util.NetworkUtil;
-import com.googlecode.mobilityrpc.quickstart.util.StandaloneLoggingUtil;
+import com.googlecode.mobilityrpc.quickstart.util.LoggingUtil;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.*;
 
 /**
+ * Starts EmbeddedServer as a standalone application, listening on port 5739 on all network interfaces by default.
+ * <p/>
+ * Supply system property "-Ddebug=true" on the command line to enable debug logging.
+ *
  * @author Niall Gallagher
  */
 public class StandaloneServer {
 
-    private volatile MobilityController mobilityController = null;
-
-    public void startServer(Iterable<ConnectionId> bindAddresses) {
-        this.mobilityController = new MobilityControllerImpl();
-        for (ConnectionId bindAddress : bindAddresses) {
-            mobilityController.getConnectionManager().bindConnectionListener(bindAddress);
-        }
-    }
-
-    public void stopServer() {
-        mobilityController.destroy();
-    }
-
     /**
-     * Starts StandaloneServer as an application, listening on port 5793 on all network interfaces by default.
-     * <p/>
-     * Supply system property "-Dport=x" on the command line to override the default port to listen on.<br/>
-     * Supply system property "-Ddebug=true" on the command line to enable debug logging.
-     *
      * @param args Not used
      */
     public static void main(String[] args) {
         // Set up JDK logging...
-        StandaloneLoggingUtil.setAppLoggingLevel("com.googlecode.mobilityrpc", Boolean.getBoolean("debug") ? Level.FINER : Level.INFO);
-        StandaloneLoggingUtil.setSingleLineLoggingFormat();
-
-        final int port = 5739;
-
-        // Determine the IP addresses on the local machine that we should bind to...
-        List<String> networkInterfaceAddresses = NetworkUtil.getAllNetworkInterfaceAddresses();
-        List<ConnectionId> bindAddresses = new ArrayList<ConnectionId>();
-        for (String networkAddress : networkInterfaceAddresses) {
-            bindAddresses.add(new ConnectionId(networkAddress, port));
-        }
+        LoggingUtil.setLibraryLoggingLevel(Boolean.getBoolean("debug") ? Level.FINER : Level.INFO);
+        LoggingUtil.setSingleLineLoggingFormat();
 
         // Start the server...
-        final StandaloneServer standaloneServer = new StandaloneServer();
-        standaloneServer.startServer(bindAddresses);
-        System.out.println("Server started, listening on port " + port + " on the following addresses:");
-        for (String networkAddress : networkInterfaceAddresses) {
+        EmbeddedServer.start();
+        System.out.println("Server started, listening on port " + EmbeddedServer.DEFAULT_PORT + " on the following addresses:");
+        for (String networkAddress : EmbeddedServer.getAddresses()) {
             System.out.println(networkAddress);
         }
         System.out.println();
@@ -78,7 +48,7 @@ public class StandaloneServer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                standaloneServer.stopServer();
+                EmbeddedServer.stop();
                 System.out.println("Server stopped");
             }
         });

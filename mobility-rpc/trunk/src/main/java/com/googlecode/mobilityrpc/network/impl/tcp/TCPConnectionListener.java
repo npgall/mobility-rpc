@@ -166,7 +166,12 @@ public class TCPConnectionListener implements ConnectionListenerInternal {
                         // A primary connection is already established, register this as an auxiliary connection...
                         auxiliaryConnectionId = auxiliaryConnectionIdProvider.decrementAndGet();
                     }
-                    ConnectionInternal connection = new TCPConnection(socket, auxiliaryConnectionId, incomingMessageHandler, connectionStateListener);
+                    ConnectionId connectionId = new ConnectionId(
+                        socket.getInetAddress().getHostAddress(),
+                        socket.getPort(),
+                        auxiliaryConnectionId
+                    );
+                    ConnectionInternal connection = new TCPConnection(socket, connectionId, incomingMessageHandler, connectionStateListener);
                     if (logger.isLoggable(Level.FINER)) {
                         logger.log(Level.FINER, "Received connection on local endpoint " + localEndpointIdentifier + " from " + connection.getConnectionId());
                     }

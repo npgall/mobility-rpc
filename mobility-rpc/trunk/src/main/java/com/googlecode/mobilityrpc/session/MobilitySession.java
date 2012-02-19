@@ -182,7 +182,22 @@ public interface MobilitySession {
      *<p/>
      * All references to the session and its class loader will be released by the library. This means that, unless some
      * application code has stored a reference to the session somewhere, the session and all of the classes it has
-     * loaded will be garbage collected.
+     * loaded will be garbage collected. Also note that this means that any data stored in static fields in those
+     * classes will also be garbage collected.
+     * <p/>
+     * <b>Deferred Session Release</b><br/>
+     * Note that if this is called on a remote machine by an object sent to that machine, the remote machine will
+     * defer releasing the session until all threads concurrently processing requests in that session have finished.
+     * <p/>
+     * This mechanism allows mobile code to effectively schedule the session in which it is executing, on what it views
+     * as the local machine, to be released after it has finished executing on that machine.
+     * <p/>
+     * If this method is called by a thread not managed by the library (e.g. from the host application), the method will
+     * check if remote threads are executing in the session, and either schedule the session to be released when those
+     * threads finish, or release it immediately if the session is actually not in use.
+     * <p/>
+     * See also {@link com.googlecode.mobilityrpc.controller.MobilityController#releaseSession(java.util.UUID)},
+     * which bypasses this safeguard, and allows sessions to be released immediately.
      */
     void release();
 }

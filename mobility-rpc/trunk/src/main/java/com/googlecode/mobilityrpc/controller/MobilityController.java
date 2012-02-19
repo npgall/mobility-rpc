@@ -59,6 +59,17 @@ public interface MobilityController extends Destroyable {
     public MobilitySession newSession();
 
     /**
+     * Releases the given session immediately, if it is registered. If not registered, does nothing.
+     * <p/>
+     * Note: the preferred way to release a session is via
+     * {@link com.googlecode.mobilityrpc.session.MobilitySession#release()}, which includes logic to gracefully release
+     * sessions after threads which are using them have finished. This method would release sessions while they are in
+     * use, which could cause errors for requests executing in those sessions.
+     *
+     * @param sessionId The session id to release
+     */
+    void releaseSession(UUID sessionId);
+    /**
      * Destroys (closes/shuts down) the resources managed by the controller, closing connections, stopping threads,
      * releasing all sessions etc.
      */

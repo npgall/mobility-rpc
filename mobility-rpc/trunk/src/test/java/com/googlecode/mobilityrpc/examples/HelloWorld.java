@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 package com.googlecode.mobilityrpc.examples;
-import com.googlecode.mobilityrpc.network.ConnectionId;
-import com.googlecode.mobilityrpc.quickstart.AdHocTask;
+import com.googlecode.mobilityrpc.quickstart.QuickTask;
 
 /**
+ * Prints "Hello World" to the console on a remote machine.
+ *
  * @author Niall Gallagher
  */
 public class HelloWorld {
 
-    private static final String remoteAddress = "192.168.56.102";
-
+    // Assumes remote machine is called bob...
     public static void main(String[] args) {
-        AdHocTask.execute(new ConnectionId(remoteAddress, 5739), new Runnable() {
-            public void run() {
+        QuickTask.execute("bob", new Runnable() { public void run() {
                 System.out.println("Hello World");
-            }
-        });
+        }});
     }
 }

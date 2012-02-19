@@ -32,14 +32,4 @@ public interface MobilityControllerInternal extends MobilityController, Incoming
 
     public MobilitySessionInternal getMessageHandlingSession(UUID sessionId);
 
-    /**
-     * Removes the given session from the session registry, if it is registered. If not registered, does nothing.
-     * <p/>
-     * Note: the preferred way to shut down and unregister a session is via
-     * {@link com.googlecode.mobilityrpc.session.MobilitySession#release()}, which actually invokes this method behind
-     * the scenes.
-     *
-     * @param sessionId The session id to remove
-     */
-    void removeSession(UUID sessionId);
 }
