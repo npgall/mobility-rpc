@@ -43,7 +43,7 @@ import java.util.List;
  * <p/>
  * @author Niall Gallagher
  */
-public class EmbeddedServer {
+public class EmbeddedMobilityServer {
     // NOTE: This class has bad code smell - static state etc.
     // The purpose is just to provide the simplest API possible for "quickstart" purposes.
 
@@ -110,12 +110,12 @@ public class EmbeddedServer {
     }
 
     /**
-     * Hook method used by {@link StandaloneServer}.
+     * Hook method used by {@link StandaloneMobilityServer}.
      *
      * @return The addresses bound
      */
     static List<String> getAddresses() {
-        List<String> addresses = EmbeddedServer.addresses;
+        List<String> addresses = EmbeddedMobilityServer.addresses;
         if (addresses == null) {
             throw new IllegalStateException("Server has not been started");
         }

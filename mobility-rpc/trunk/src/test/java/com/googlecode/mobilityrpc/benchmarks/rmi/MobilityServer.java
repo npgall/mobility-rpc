@@ -15,7 +15,7 @@
  */
 package com.googlecode.mobilityrpc.benchmarks.rmi;
 
-import com.googlecode.mobilityrpc.quickstart.StandaloneServer;
+import com.googlecode.mobilityrpc.quickstart.StandaloneMobilityServer;
 
 /**
  * @author Niall Gallagher
@@ -23,7 +23,7 @@ import com.googlecode.mobilityrpc.quickstart.StandaloneServer;
 public class MobilityServer {
 
     public static void main(String[] args) {
-        // Delegate to the StandaloneServer class in the quickstart package...
-        StandaloneServer.main(args);
+        // Delegate to the StandaloneMobilityServer class in the quickstart package...
+        StandaloneMobilityServer.main(args);
     }
 }

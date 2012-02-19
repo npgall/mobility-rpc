@@ -16,11 +16,9 @@
 package com.googlecode.mobilityrpc.quickstart;
 
 import com.googlecode.mobilityrpc.MobilityRPC;
-import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.session.MobilityContext;
 import com.googlecode.mobilityrpc.session.MobilitySession;
-import com.googlecode.mobilityrpc.session.impl.MobilityContextInternal;
 
 import java.util.concurrent.Callable;
 
@@ -54,7 +52,7 @@ public class QuickTask {
      * @param runnable The object to send and execute on the remote machine
      */
     public static void execute(String address, Runnable runnable) {
-        execute(new ConnectionId(address, EmbeddedServer.DEFAULT_PORT), runnable);
+        execute(new ConnectionId(address, EmbeddedMobilityServer.DEFAULT_PORT), runnable);
     }
 
     /**
@@ -89,7 +87,7 @@ public class QuickTask {
      * this machine)
      */
     public static <T> T execute(String address, Callable<T> callable) {
-        return execute(new ConnectionId(address, EmbeddedServer.DEFAULT_PORT), callable);
+        return execute(new ConnectionId(address, EmbeddedMobilityServer.DEFAULT_PORT), callable);
     }
 
     /**

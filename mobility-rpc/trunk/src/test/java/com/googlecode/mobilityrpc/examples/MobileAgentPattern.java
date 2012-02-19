@@ -15,13 +15,10 @@
  */
 package com.googlecode.mobilityrpc.examples;
 
-import com.googlecode.mobilityrpc.MobilityRPC;
 import com.googlecode.mobilityrpc.network.ConnectionId;
-import com.googlecode.mobilityrpc.quickstart.EmbeddedServer;
+import com.googlecode.mobilityrpc.quickstart.EmbeddedMobilityServer;
 import com.googlecode.mobilityrpc.quickstart.QuickTask;
 import com.googlecode.mobilityrpc.session.MobilityContext;
-import com.googlecode.mobilityrpc.session.impl.MobilityContextInternal;
-import com.googlecode.mobilityrpc.session.MobilitySession;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +63,7 @@ public class MobileAgentPattern {
                 System.out.println("Ran out of machines to visit");
             } else {
                 MobilityContext.getCurrentSession().execute(
-                        new ConnectionId(machinesToVisit.remove(0), EmbeddedServer.DEFAULT_PORT),
+                        new ConnectionId(machinesToVisit.remove(0), EmbeddedMobilityServer.DEFAULT_PORT),
                         this
                 );
             }
