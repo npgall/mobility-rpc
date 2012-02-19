@@ -36,6 +36,8 @@ import java.util.UUID;
 public interface MobilityController extends Destroyable {
 
     /**
+     * Returns the {@link ConnectionManager} which manages connections for this controller.
+     *
      * @return The {@link ConnectionManager} which manages connections for this controller
      */
     public ConnectionManager getConnectionManager();
