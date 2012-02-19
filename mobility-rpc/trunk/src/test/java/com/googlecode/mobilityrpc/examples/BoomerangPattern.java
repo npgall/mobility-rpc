@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 package com.googlecode.mobilityrpc.examples;
-import com.googlecode.mobilityrpc.network.ConnectionId;
-import com.googlecode.mobilityrpc.quickstart.AdHocTask;
+import com.googlecode.mobilityrpc.quickstart.QuickTask;
 import java.net.InetAddress;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
 /**
+ * Demonstrates the Boomerang Pattern - a {@link Callable} object which returns itself.
+ * <p/>
+ * Sends a Callable object to a remote machine, where it gathers some data.
+ * <p/>
+ * The Callable object then returns itself back to the local machine, where the data is printed to the console.
+ *
  * @author Niall Gallagher
  */
 public class BoomerangPattern {
 
+    // The Boomerang pattern: a Callable object which returns itself...
     static class BoomerangObject implements Callable<BoomerangObject> {
 
         private Properties someData;
@@ -37,10 +43,9 @@ public class BoomerangPattern {
         }
     }
 
+    // Assumes remote machine is called bob...
     public static void main(String[] args) {
-        BoomerangObject boomerangObject = AdHocTask.execute(
-            new ConnectionId("192.168.56.102", 5739), new BoomerangObject()
-        );
+        BoomerangObject boomerangObject = QuickTask.execute( "bob", new BoomerangObject());
         System.out.println(boomerangObject.someData);
         System.out.println(boomerangObject.someOtherData);
     }

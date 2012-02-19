@@ -20,6 +20,8 @@ import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.quickstart.util.NetworkUtil;
 
+import java.util.List;
+
 /**
  * A quick way to programmatically start the Mobility-RPC library to listen for incoming connections, using default
  * settings. The library will listen for incoming connections on port 5739, on all network interfaces detected on the
@@ -45,34 +47,41 @@ public class EmbeddedServer {
     // NOTE: This class has bad code smell - static state etc.
     // The purpose is just to provide the simplest API possible for "quickstart" purposes.
 
-    private static final int DEFAULT_PORT = 5739;
+    public static final int DEFAULT_PORT = 5739;
 
     private static volatile MobilityController instance = null;
+    private static volatile List<String> addresses = null;
 
     /**
      * Starts the Mobility-RPC library to listen for incoming connections on port 5739 on all network interfaces
      * detected on the local machine.
      * <p/>
-     * Once this method returns, the library is initialised, and the {@link #getMobilityController()} method will
-     * return the {@link MobilityController} object responsible for managing all aspects of the library, and providing
-     * the main API of the library.
+     * This method returns the {@link MobilityController} once initialised, the object responsible for managing all
+     * aspects of the library, and providing the main API of the library. This can also be accessed subsequently via
+     * the {@link #getMobilityController()} method.
+     *
      * @throws IllegalStateException If the library is already started
+     * @return The {@link MobilityController} object responsible for managing all aspects of the library, and providing
+     * the main API of the library
      */
-    public static synchronized void start() {
+    public static synchronized MobilityController start() {
         MobilityController mobilityController = instance;
         if (mobilityController != null) {
-            throw new IllegalStateException("EmbeddedServer is already running");
+            throw new IllegalStateException("Server is already running");
         }
         // Create a new MobilityController...
         mobilityController = MobilityRPC.newController();
 
         // Detect and bind to all network interfaces...
-        for (String networkAddress : NetworkUtil.getAllNetworkInterfaceAddresses()) {
+        List<String> bindAddresses = NetworkUtil.getAllNetworkInterfaceAddresses();
+        for (String networkAddress : bindAddresses) {
             mobilityController.getConnectionManager().bindConnectionListener(
                     new ConnectionId(networkAddress, DEFAULT_PORT));
         }
         // Done...
         instance = mobilityController;
+        addresses = bindAddresses;
+        return mobilityController;
     }
 
     /**
@@ -95,9 +104,21 @@ public class EmbeddedServer {
     public static MobilityController getMobilityController() {
         MobilityController mobilityController = instance;
         if (mobilityController == null) {
-            throw new IllegalStateException("EmbeddedServer has not been started");
+            throw new IllegalStateException("Server has not been started");
         }
         return mobilityController;
     }
 
+    /**
+     * Hook method used by {@link StandaloneServer}.
+     *
+     * @return The addresses bound
+     */
+    static List<String> getAddresses() {
+        List<String> addresses = EmbeddedServer.addresses;
+        if (addresses == null) {
+            throw new IllegalStateException("Server has not been started");
+        }
+        return addresses;
+    }
 }

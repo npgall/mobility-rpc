@@ -44,18 +44,16 @@ public class TCPConnection implements ConnectionInternal {
     /**
      *
      * @param socket The socket through which this connection communicates.
-     * @param auxiliaryConnectionId If zero, indicates that this is a primary connection, otherwise this is
-     * simply a number which distinguishes this connection from other "auxiliary" connections to the remote machine
+     * @param connectionId The connection id, comprising the address, port and auxiliary connection id. If auxiliary
+     * connection id is zero, indicates that this is a primary connection, otherwise this is simply a number which
+     * distinguishes this connection from other "auxiliary" connections to the remote machine
      * @param incomingMessageHandler An object to which messages received on this connection should be supplied.
      * @param connectionStateListener An object which this connection should notify if the connection is closed.
      */
-    public TCPConnection(Socket socket, int auxiliaryConnectionId, IncomingMessageHandler incomingMessageHandler, ConnectionStateListener connectionStateListener) {
+    public TCPConnection(Socket socket, ConnectionId connectionId, IncomingMessageHandler incomingMessageHandler, ConnectionStateListener connectionStateListener) {
         this.socket = socket;
+        this.connectionId = connectionId;
         this.incomingMessageHandler = incomingMessageHandler;
-        this.connectionId = new ConnectionId(
-                socket.getInetAddress().getHostAddress(),
-                socket.getPort(),
-                auxiliaryConnectionId);
         this.connectionStateListener = connectionStateListener;
     }
 

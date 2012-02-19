@@ -30,15 +30,16 @@ import java.util.logging.*;
  *
  * @author Niall Gallagher
  */
-public class StandaloneLoggingUtil {
+public class LoggingUtil {
 
 
     /**
      * Sets the logging level for all loggers in or a descendant of the package specified, to the level specified.
+     * 
      * @param packageRoot The root package to which the logging level should be applied e.g. "com.foo"
      * @param level The logging level to apply.
      */
-    public static void setAppLoggingLevel(String packageRoot, Level level) {
+    public static void setPackageLoggingLevel(String packageRoot, Level level) {
         Logger appLogger = Logger.getLogger(packageRoot);
         appLogger.setLevel(level);
         Logger rootLogger = Logger.getLogger("");
@@ -46,6 +47,10 @@ public class StandaloneLoggingUtil {
             handler.setLevel(level);
         }
 
+    }
+
+    public static void setLibraryLoggingLevel(Level level) {
+        setPackageLoggingLevel("com.googlecode.mobilityrpc", level);
     }
 
     /**
@@ -57,6 +62,7 @@ public class StandaloneLoggingUtil {
             handler.setFormatter(new SingleLineFormater());
         }
     }
+
 
     /**
      * A modified version of {@link java.util.logging.SimpleFormatter} which updates the standard 2-line JDK logging format

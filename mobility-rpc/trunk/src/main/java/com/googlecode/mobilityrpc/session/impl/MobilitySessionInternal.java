@@ -21,6 +21,9 @@ import com.googlecode.mobilityrpc.protocol.pojo.ExecutionResponse;
 import com.googlecode.mobilityrpc.session.MobilitySession;
 
 /**
+ * Internal interface used by the library, extends the public {@link MobilitySession} interface with methods for
+ * processing incoming requests, as required by the library.
+ *
  * @author Niall Gallagher
  */
 public interface MobilitySessionInternal extends MobilitySession {

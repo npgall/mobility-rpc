@@ -15,44 +15,65 @@
  */
 package com.googlecode.mobilityrpc.examples;
 
+import com.googlecode.mobilityrpc.MobilityRPC;
 import com.googlecode.mobilityrpc.network.ConnectionId;
-import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
-import com.googlecode.mobilityrpc.quickstart.AdHocTask;
-import com.googlecode.mobilityrpc.quickstart.MobilityContext;
+import com.googlecode.mobilityrpc.quickstart.QuickTask;
+import com.googlecode.mobilityrpc.session.MobilityContext;
+import com.googlecode.mobilityrpc.session.impl.MobilityContextInternal;
+import com.googlecode.mobilityrpc.session.MobilitySession;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Demonstrates an object that autonomously migrates itself around the network - a "mobile agent".
+ * <p/>
+ * The main method transfers the object to machine "bob", where the <code>run()</code> method is called. It prints
+ * "Hello World" and its hop number, 1, to the console on "bob".
+ * <p/>
+ * From "bob" the object transfers itself to "alice", which is the next machine on its list of machines to visit. It
+ * prints "Hello World" and its incremented hop number, 2, to the console on "alice".
+ * <p/>
+ * From "alice" the object transfers itself back to "bob" again, where it prints "Hello World" and an incremented
+ * hop number, 3, on "bob", but then it finds that it has run out of machines to visit, so it prints "Ran out of
+ * machines to visit".
+ * <p/>
+ * <b>Output on bob</b><br/>
+ * <pre>
+ * ﻿Hello World, this is hop number: 1 in MobilitySession{sessionId=836d7e5f-42ca-445f-acf0-4db525dcd6ab}
+ * Hello World, this is hop number: 3 in MobilitySession{sessionId=836d7e5f-42ca-445f-acf0-4db525dcd6ab}
+ * Ran out of machines to visit
+ * </pre>
+ * <b>Output on alice</b><br/>
+ * <pre>
+ * ﻿Hello World, this is hop number: 2 in MobilitySession{sessionId=836d7e5f-42ca-445f-acf0-4db525dcd6ab}
+ * </pre>
+ *
  * @author Niall Gallagher
  */
 public class MobileAgentPattern {
 
     static class MobileAgent implements Runnable {
-        private List<String> machinesToVisit = new ArrayList<String>(
-                Arrays.asList("192.168.56.103", "192.168.56.102")
-        );
+        private List<String> machinesToVisit = new ArrayList<String>(Arrays.asList("alice", "bob"));
         private int hopNumber = 0;
 
-        @Override
         public void run() {
             System.out.println("Hello World, this is hop number: " + (++hopNumber)
                     + " in " + MobilityContext.getCurrentSession());
             if (machinesToVisit.isEmpty()) {
                 System.out.println("Ran out of machines to visit");
-                return;
+            } else {
+                MobilityContext.getCurrentSession().execute(
+                        new ConnectionId(machinesToVisit.remove(0), QuickTask.DEFAULT_PORT),
+                        this
+                );
             }
-            MobilityContext.getCurrentSession().execute(
-                    new ConnectionId(machinesToVisit.remove(0), 5739),
-                    ExecutionMode.RETURN_RESPONSE,
-                    this
-            );
+            MobilityContext.getCurrentSession().release();
         }
     }
-
+    // Agent visits bob, then alice, then bob again...
     public static void main(String[] args) {
-        AdHocTask.execute(new ConnectionId("192.168.56.102", 5739),
-                new MobileAgent()
-        );
+        QuickTask.execute("bob", new MobileAgent());
     }
 }

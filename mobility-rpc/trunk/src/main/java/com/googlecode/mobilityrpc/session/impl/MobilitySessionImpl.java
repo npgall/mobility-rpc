@@ -19,12 +19,12 @@ import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
 import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.protocol.pojo.*;
-import com.googlecode.mobilityrpc.quickstart.MobilityContext;
 import com.googlecode.mobilityrpc.serialization.Serializer;
 import com.googlecode.mobilityrpc.serialization.impl.KryoSerializer;
 
 import java.util.UUID;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +47,9 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
     private final SerializationFormat defaultSerializationFormat;
 
     private final ConcurrentMap<RequestIdentifier, FutureExecutionResponse> futureExecutionResponses = new ConcurrentHashMap<RequestIdentifier, FutureExecutionResponse>();
+
+    private final AtomicInteger numRemoteThreadsExecutingInThisSession = new AtomicInteger(); // TODO: ..use Semaphore instead?
+    private volatile boolean sessionReleaseRequested = false;
 
     public MobilitySessionImpl(UUID sessionId, MobilityControllerInternal mobilityController) {
         this.sessionId = sessionId;
@@ -250,6 +253,7 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
         // Outer try-catch to catch and log all exceptions
         // so as not to kill a processing thread on a bad request...
         try {
+            numRemoteThreadsExecutingInThisSession.incrementAndGet();
             // Inner try-catch to catch unexpected exceptions
             // and add additional context information to exception messages...
             try {
@@ -263,8 +267,8 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                 Object objectReturned = null;
                 try {
                     // Set the current session details into a thread-local variable, so code can access its own session...
-                    MobilityContext.setCurrentSession(this);
-                    MobilityContext.setConnectionId(connectionId);
+                    MobilityContextInternal.setCurrentSession(this);
+                    MobilityContextInternal.setCurrentConnectionId(connectionId);
 
                     // Determine if object is Runnable or Callable...
                     if (executableObject instanceof Runnable) {
@@ -286,8 +290,8 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                 }
                 finally {
                     // Unset current session details from the thread-local variable...
-                    MobilityContext.setCurrentSession(null);
-                    MobilityContext.setConnectionId(null);
+                    MobilityContextInternal.setCurrentSession(null);
+                    MobilityContextInternal.setCurrentConnectionId(null);
                 }
                 final ExecutionResponse executionResponse;
                 switch (executionRequest.getExecutionMode()) {
@@ -334,6 +338,22 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
             catch (Exception e) {
                 // Catch any exceptions above and simply re-throw them with additional context information...
                 throw new IllegalStateException("Failed to process execution request, for connection id: " + connectionId + ", execution request: " + executionRequest, e);
+            }
+            finally {
+                if (numRemoteThreadsExecutingInThisSession.decrementAndGet() == 0 && sessionReleaseRequested) {
+                    // This is the last (or only) thread in this session processing a request from a remote machine.
+                    // At least one of the mobile objects executed called MobilitySession.release(), which set the
+                    // sessionReleaseRequested flag to true.
+                    // Only now that the last remote thread is about to finish, do we release the session...
+                    doRelease();
+                    sessionReleaseRequested = false;
+                    if (logger.isLoggable(Level.FINER)) {
+                        logger.log(Level.FINER, "Processed deferred release of session, for connection id: " + connectionId + ", execution request: " + executionRequest);
+                    }
+                }
+                else if (sessionReleaseRequested && logger.isLoggable(Level.FINER)) {
+                    logger.log(Level.FINER, "Deferred release of session to another thread, for connection id: " + connectionId + ", execution request: " + executionRequest);
+                }
             }
         }
         catch (Exception e) {
@@ -423,7 +443,29 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
 
     @Override
     public void release() {
-        mobilityController.removeSession(this.sessionId);
+        if (MobilityContextInternal.hasCurrentSession()) {
+            // This is being called by a thread executing a request from a remote machine.
+            // Defer releasing the session until all threads processing remote requests in this session have finished.
+            // Set a flag to signal that last such thread to finish, should release the session...
+            this.sessionReleaseRequested = true;
+        }
+        else {
+            // This is being called by a thread from the local application.
+            // Check if remote threads are executing in the session...
+            if (numRemoteThreadsExecutingInThisSession.get() == 0) {
+                // No remote threads are executing in this session, release the session...
+                doRelease();
+            }
+            else {
+                // Some remote threads are executing in the session,
+                // set the flag to have those threads release the session...
+                this.sessionReleaseRequested = true;
+            }
+        }
+    }
+
+    void doRelease() {
+        mobilityController.releaseSession(this.sessionId);
     }
 
     private Object deserialize(byte[] serializedObject, SerializationFormat serializationFormat) {

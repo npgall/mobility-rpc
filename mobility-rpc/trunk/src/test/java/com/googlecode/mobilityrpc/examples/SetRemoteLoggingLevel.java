@@ -15,25 +15,21 @@
  */
 package com.googlecode.mobilityrpc.examples;
 
-import com.googlecode.mobilityrpc.network.ConnectionId;
-import com.googlecode.mobilityrpc.quickstart.AdHocTask;
-import com.googlecode.mobilityrpc.util.LoggingUtil;
+import com.googlecode.mobilityrpc.quickstart.QuickTask;
+import com.googlecode.mobilityrpc.quickstart.util.LoggingUtil;
 
 import java.util.logging.Level;
 
 /**
+ * Utility to enable FINEST level logging in the library on a remote machine.
+ *
  * @author Niall Gallagher
  */
 public class SetRemoteLoggingLevel {
 
-
-    private static final String remoteAddress = "192.168.56.102";
-
     public static void main(String[] args) {
-        AdHocTask.execute(new ConnectionId(remoteAddress, 5739), new Runnable() {
-            public void run() {
-                LoggingUtil.setAppLoggingLevel(Level.FINEST);
-            }
-        });
+        QuickTask.execute("bob", new Runnable() { public void run() {
+            LoggingUtil.setLibraryLoggingLevel(Level.FINEST);
+        }});
     }
 }

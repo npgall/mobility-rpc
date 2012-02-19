@@ -84,7 +84,7 @@ public class ConnectionManagerImpl implements ConnectionManagerInternal, Connect
             final Socket socket;
             try {
                 socket = new Socket();
-                socket.connect(new InetSocketAddress(InetAddress.getByName(identifier.getAddress()), identifier.getPort()));
+                socket.connect(new InetSocketAddress(identifier.getAddress(), identifier.getPort()));
             }
             catch (Exception e) {
                 throw new IllegalStateException("Failed to establish outgoing connection to: " + identifier, e);
@@ -92,7 +92,7 @@ public class ConnectionManagerImpl implements ConnectionManagerInternal, Connect
             // Wrap the socket in a TCPConnection object which will manage the sockets incoming and outgoing streams...
             ConnectionInternal connection = new TCPConnection(
                     socket,
-                    auxiliaryConnectionId,
+                    identifier,
                     mobilityController,
                     this
             );

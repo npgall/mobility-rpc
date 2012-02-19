@@ -15,6 +15,7 @@
  */
 package com.googlecode.mobilityrpc.protocol.processors;
 
+import com.googlecode.mobilityrpc.MobilityRPC;
 import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 import com.googlecode.mobilityrpc.network.Connection;
@@ -24,7 +25,7 @@ import com.googlecode.mobilityrpc.protocol.converters.messages.EnvelopeMessageCo
 import com.googlecode.mobilityrpc.protocol.converters.messages.PingMessageConverter;
 import com.googlecode.mobilityrpc.protocol.pojo.Envelope;
 import com.googlecode.mobilityrpc.protocol.pojo.Ping;
-import com.googlecode.mobilityrpc.util.LoggingUtil;
+import com.googlecode.mobilityrpc.quickstart.util.LoggingUtil;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -43,7 +44,7 @@ public class PingPongTest {
 
     static {
         LoggingUtil.setSingleLineLoggingFormat();
-        LoggingUtil.setAppLoggingLevel(Level.FINER);
+        LoggingUtil.setLibraryLoggingLevel(Level.FINER);
     }
 
     // A test which runs the listener and client in the same JVM.
@@ -69,7 +70,7 @@ public class PingPongTest {
     // Run this for manual testing in its own JUnit process (right-click in IDE),
     // and simultaneously run testStartClient in a separate JUnit process...
     public void testStartListener() {
-        final MobilityController mobilityController = new MobilityControllerImpl();
+        final MobilityController mobilityController = MobilityRPC.newController();
         final ConnectionManager connectionManager = mobilityController.getConnectionManager();
 
         final ConnectionId localEndpointIdentifier = new ConnectionId("127.0.0.1", 5739);
@@ -86,7 +87,7 @@ public class PingPongTest {
         final PingMessageConverter pingMessageConverter = new PingMessageConverter();
         final EnvelopeMessageConverter envelopeMessageConverter = new EnvelopeMessageConverter();
         
-        final MobilityController mobilityController = new MobilityControllerImpl();
+        final MobilityController mobilityController = MobilityRPC.newController();
         final ConnectionManager connectionManager = mobilityController.getConnectionManager();
 
         Connection connection = connectionManager.getConnection(new ConnectionId("127.0.0.1", 5739));

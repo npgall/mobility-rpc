@@ -15,12 +15,13 @@
  */
 package com.googlecode.mobilityrpc.controller;
 
+import com.googlecode.mobilityrpc.MobilityRPC;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerImpl;
 import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.network.ConnectionManager;
 import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
+import com.googlecode.mobilityrpc.quickstart.util.LoggingUtil;
 import com.googlecode.mobilityrpc.session.MobilitySession;
-import com.googlecode.mobilityrpc.util.LoggingUtil;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -48,7 +49,7 @@ public class ExecutionTest {
     @Before
     public void setUp() {
         LoggingUtil.setSingleLineLoggingFormat();
-        LoggingUtil.setAppLoggingLevel(Level.FINER);
+        LoggingUtil.setLibraryLoggingLevel(Level.FINER);
     }
 
     // A test which runs the listener and client in the same JVM.
@@ -74,7 +75,7 @@ public class ExecutionTest {
     // Run this for manual testing in its own JUnit process (right-click in IDE),
     // and simultaneously run testStartClientAndSubmitExecutionRequest in a separate JUnit process...
     public void testStartListener() {
-        final MobilityController mobilityController = new MobilityControllerImpl();
+        final MobilityController mobilityController = MobilityRPC.newController();
         final ConnectionManager connectionManager = mobilityController.getConnectionManager();
 
         final ConnectionId localEndpointIdentifier = new ConnectionId("127.0.0.1", 5739);
@@ -89,7 +90,7 @@ public class ExecutionTest {
     // Run this for manual testing in its own JUnit process (right-click in IDE),
     // and simultaneously run testStartListener in a separate JUnit process...
     public void testStartClientAndSubmitRunnable() {
-        final MobilityController mobilityController = new MobilityControllerImpl();
+        final MobilityController mobilityController = MobilityRPC.newController();
 
         MobilitySession session = mobilityController.getSession(UUID.fromString("1dc91c11-79f3-47fe-a77f-37277c73a929"));
 
@@ -110,7 +111,7 @@ public class ExecutionTest {
     // Run this for manual testing in its own JUnit process (right-click in IDE),
     // and simultaneously run testStartListener in a separate JUnit process...
     public void testStartClientAndSubmitCallable() {
-        final MobilityController mobilityController = new MobilityControllerImpl();
+        final MobilityController mobilityController = MobilityRPC.newController();
 
         MobilitySession session = mobilityController.getSession(UUID.randomUUID());
 
@@ -134,7 +135,7 @@ public class ExecutionTest {
     // Run this for manual testing in its own JUnit process (right-click in IDE),
     // and simultaneously run testStartListener in a separate JUnit process...
     public void testStartClientAndSubmitRunnable_External() {
-        final MobilityController mobilityController = new MobilityControllerImpl();
+        final MobilityController mobilityController = MobilityRPC.newController();
 
 //        MobilitySession session = mobilityController.getSession(UUID.fromString("1dc91c11-79f3-47fe-a77f-37277c73a929"));
         MobilitySession session = mobilityController.getSession(UUID.randomUUID());

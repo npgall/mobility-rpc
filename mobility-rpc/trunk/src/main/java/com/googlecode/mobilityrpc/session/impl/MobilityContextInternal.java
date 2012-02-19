@@ -13,26 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.googlecode.mobilityrpc.quickstart;
+package com.googlecode.mobilityrpc.session.impl;
 
 import com.googlecode.mobilityrpc.network.ConnectionId;
+import com.googlecode.mobilityrpc.session.MobilityContext;
 import com.googlecode.mobilityrpc.session.MobilitySession;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * A "back-end" implementation of {@link MobilityContext} with package-private setter methods to allow
+ * {@link MobilitySession} (in this same pacakge) to set thread-local values while keeping the setters methods
+ * non-public.
+ *
  * @author Niall Gallagher
  */
-public class MobilityContext {
+public class MobilityContextInternal {
 
     private static final ThreadLocal<MobilitySession> threadLocalSessions = new ThreadLocal<MobilitySession>();
+    private static final ThreadLocal<ConnectionId> threadLocalConnectionIds = new ThreadLocal<ConnectionId>();
 
-    public static void setCurrentSession(MobilitySession session) {
-        threadLocalSessions.set(session);
-    }
-    public static MobilitySession getCurrentSession() {
+    protected static MobilitySession getCurrentSession() {
         MobilitySession currentSession = threadLocalSessions.get();
         if (currentSession == null) {
             throw new IllegalStateException("No current session");
@@ -40,12 +46,16 @@ public class MobilityContext {
         return currentSession;
     }
 
-    private static final ThreadLocal<ConnectionId> threadLocalConnectionIds = new ThreadLocal<ConnectionId>();
-
-    public static void setConnectionId(ConnectionId connectionId) {
-        threadLocalConnectionIds.set(connectionId);
+    protected static boolean hasCurrentSession() {
+        MobilitySession currentSession = threadLocalSessions.get();
+        return currentSession != null;
     }
-    public static ConnectionId getCurrentConnectionId() {
+
+    static void setCurrentSession(MobilitySession session) {
+        threadLocalSessions.set(session);
+    }
+
+    protected static ConnectionId getCurrentConnectionId() {
         ConnectionId currentConnectionId = threadLocalConnectionIds.get();
         if (currentConnectionId == null) {
             throw new IllegalStateException("No current connection id");
@@ -53,25 +63,14 @@ public class MobilityContext {
         return currentConnectionId;
     }
 
-    private static final Map<Class<?>, Object> singletonObjectRegistry = new ConcurrentHashMap<Class<?>, Object>();
+    static void setCurrentConnectionId(ConnectionId connectionId) {
+        threadLocalConnectionIds.set(connectionId);
+    }
+    /**
+     * Private constructor, not used.
+     */
+    protected MobilityContextInternal() {
 
-    public static <C, T extends C> void setSingletonObject(Class<C> cls, T object) {
-        singletonObjectRegistry.put(cls, object);
     }
 
-    public static <C, T extends C> T getSingletonObject(Class<C> cls) {
-        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        T result = (T) singletonObjectRegistry.get(cls);
-        return result;
-    }
-
-    private static final Map<UUID, Object> uuidObjectRegistry = new ConcurrentHashMap<UUID, Object>();
-
-    public static void setUuidObject(UUID uuid, Object object) {
-        uuidObjectRegistry.put(uuid, object);
-    }
-
-    public static Object getUuidObject(UUID uuid) {
-        return uuidObjectRegistry.get(uuid);
-    }
 }
