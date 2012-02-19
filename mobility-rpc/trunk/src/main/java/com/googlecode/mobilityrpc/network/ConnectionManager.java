@@ -18,15 +18,23 @@ package com.googlecode.mobilityrpc.network;
 import java.util.Collection;
 
 /**
- * The public interface of an object which keeps track of incoming and outgoing connections to/from remote machines,
- * and which controls the opening and closing of server sockets on the local machine to receive incoming connections.
+ * Keeps track of incoming and outgoing connections to/from remote machines, and controls the opening and closing of
+ * server sockets on the local machine to receive incoming connections.
  * <p/>
- * The {@link #getConnection} method allows client code to obtain a connection to a remote machine, establishing
- * connections or reusing inbound connections as necessary.
- * <p/>
- * The {@link #bindConnectionListener} and {@link #unbindConnectionListener} methods cause the controller to start and
- * stop (respectively) {@link com.googlecode.mobilityrpc.network.impl.ConnectionListener}s which open server sockets on the local machine to listen for inbound
+ * Provides {@link #bindConnectionListener(ConnectionId)} and {@link #unbindConnectionListener(ConnectionId)} methods
+ * which allow the application to request the library to start and stop listening, respectively, for incoming
  * connections from remote machines on the specified ports.
+ * <p/>
+ * Provides a {@link #getConnection(ConnectionId)} method, which will establish a new connection to the specified
+ * machine if no such connection already exists, or will return an <i>already-established</i> connection if one already
+ * exists. It should be noted that an <i>already-established</i> connection could include an <i>inbound</i> connection received
+ * from the specified machine. Connections are persistent, bi-directional, full-duplex, multiplexed, and responses are
+ * asynchronous and non-blocking; therefore inbound connections are equivalent to outbound ones.
+ * <p/>
+ * <b>Note that applications are unlikely to call {@code getConnection(ConnectionId)} explicitly</b>; connections
+ * are established/reused automatically whenever sessions enqueue objects/messages for sending to remote machines.
+ * The only reason for an application to call this directly, would be if the application wished to establish connections
+ * proactively, for example at startup.
  *
  * @author Niall Gallagher
  */
@@ -69,11 +77,15 @@ public interface ConnectionManager {
     public void unbindConnectionListener(ConnectionId localEndpointIdentifier);
 
     /**
+     * Returns the set of {@code ConnectionId}s for the currently bound listeners.
+     *
      * @return The set of {@code ConnectionId}s for the currently bound listeners
      */
     public Collection<ConnectionId> getConnectionListenerIdentifiers();
 
     /**
+     * Returns the set of {@code ConnectionId}s for the currently open connections.
+     *
      * @return The set of {@code ConnectionId}s for the currently open connections
      */
     public Collection<ConnectionId> getConnectionIds();
