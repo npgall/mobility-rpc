@@ -44,8 +44,6 @@ import java.util.concurrent.Callable;
  */
 public class QuickTask {
 
-    public static final int DEFAULT_PORT = 5739;
-
     /**
      * Transfers the given <code>Runnable</code> object, and any objects it references, to the given remote machine,
      * and executes it (calls the {@link Runnable#run()} method) on the remote machine.
@@ -56,7 +54,7 @@ public class QuickTask {
      * @param runnable The object to send and execute on the remote machine
      */
     public static void execute(String address, Runnable runnable) {
-        execute(new ConnectionId(address, DEFAULT_PORT), runnable);
+        execute(new ConnectionId(address, EmbeddedServer.DEFAULT_PORT), runnable);
     }
 
     /**
@@ -72,12 +70,6 @@ public class QuickTask {
             session.execute(connectionId, new SessionReleasingRunnable(runnable));
         }
         finally {
-            session.release();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
             session.getMobilityController().destroy();
         }
     }
@@ -97,7 +89,7 @@ public class QuickTask {
      * this machine)
      */
     public static <T> T execute(String address, Callable<T> callable) {
-        return execute(new ConnectionId(address, DEFAULT_PORT), callable);
+        return execute(new ConnectionId(address, EmbeddedServer.DEFAULT_PORT), callable);
     }
 
     /**
@@ -113,15 +105,12 @@ public class QuickTask {
      * this machine)
      */
     public static <T> T execute(ConnectionId connectionId, Callable<T> callable) {
-        MobilityController mobilityController = MobilityRPC.newController();
+        MobilitySession session = MobilityRPC.newController().newSession();
         try {
-            return mobilityController.newSession().execute(
-                    connectionId,
-                    new SessionReleasingCallable<T>(callable)
-            );
+            return session.execute(connectionId, new SessionReleasingCallable<T>(callable));
         }
         finally {
-            mobilityController.destroy();
+            session.getMobilityController().destroy();
         }
     }
 
