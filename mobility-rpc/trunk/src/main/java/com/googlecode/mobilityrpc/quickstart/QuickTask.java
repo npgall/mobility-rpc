@@ -26,18 +26,7 @@ import java.util.concurrent.Callable;
  * A simplified API for sending and executing one-off tasks ({@link Runnable} or {@link Callable} objects) on
  * remote machines.
  * <p/>
- * <b>Usage</b><br/>
- * <i>Hello World</i>
- * <pre>
- *
- * </pre>
- * <p/>
- * Note that this QuickTask API is certainly the easiest way to use the library, but it is not the most flexible nor is
- * it the most efficient way. This API creates a new connection and session every time it is used, only to shut them
- * both down when the task completes, which incurs the overhead of establishing a new connection every time, and
- * requires several round trips to send a task because doing this bypasses caching on the remote side. The main API is
- * recommended instead for non-trivial cases, plus it's not that complicated.
- *
+ * 
  * @author Niall Gallagher
  */
 public class QuickTask {
@@ -156,5 +145,12 @@ public class QuickTask {
                 MobilityContext.getCurrentSession().release();
             }
         }
+    }
+
+    /**
+     * Private constructor, not used.
+     */
+    QuickTask() {
+
     }
 }
