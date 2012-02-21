@@ -20,7 +20,7 @@ import com.googlecode.mobilityrpc.quickstart.QuickTask;
 /**
  * Demonstrates that a regular object can be migrated to a remote machine.
  * <p/>
- * The example regular object is not special in any way and does not any particular interfaces.
+ * The example regular object is not special in any way and does not implement any particular interfaces.
  * <p/>
  * Sends the object, and calls its <code>printDetails()</code> method on the remote machine.
  *
@@ -28,7 +28,7 @@ import com.googlecode.mobilityrpc.quickstart.QuickTask;
  */
 public class RegularObjectMigration {
 
-    public static class RegularObject {
+    static class RegularObject {
 
         private String name = "Joe Bloggs";
         private String address = "Sesame Street";

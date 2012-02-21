@@ -77,6 +77,16 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!--
+                    *** Option one to build an executable jar: onejar-maven-plugin ***
+                    Builds an single executable jar by embedding all dependency jars into a /lib folder within the outer
+                    jar, then launches the main class via a special class loader which understands nested jars.
+                    See: http://one-jar.sourceforge.net/
+
+                    The advantage of this is: the executable is robust - we do not modify any dependency jars.
+                    The disadvantage this is: the resulting jar is non-standard and cannot be used as a
+                    library in other projects, it can only run the library as a standalone server only.
+                -->
                 <groupId>com.jolira</groupId>
                 <artifactId>onejar-maven-plugin</artifactId>
                 <version>1.4.4</version>
@@ -84,11 +94,70 @@
                     <execution>
                         <configuration>
                             <attachToBuild>true</attachToBuild>
-                            <filename>${project.artifactId}-standalone-server-${project.version}.jar</filename>
+                            <filename>${project.artifactId}-${project.version}-standalone-server.jar</filename>
                         </configuration>
                         <goals>
                             <!--suppress MavenModelInspection -->
                             <goal>one-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!--
+                    *** Option two to build an executable jar: maven-shade-plugin ***
+                    Builds a single executable by copying classes from all dependency jars directly into the main jar.
+                    To prevent duplicate class issues, it relocates those classes to a new package within the jar:
+                     com.googlecode.mobilityrpc.lib.*
+                    It then updates the bytecode in all classes to refer to dependency classes in their new package.
+                    Also this configures some transformers to merge licences present in any of the jars.
+
+                    The advantage of this is: the resulting jar is a standard jar, and can be used as an executable,
+                    or as a library in other projects (even if those projects use the same dependencies).
+                    The disadvantage this is: this relocates classes from dependency jars and modifies their bytecode,
+                    which carries risks of breaking something. However it seems to work with this project.
+                 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.5</version>
+                <configuration>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <shadedClassifierName>all</shadedClassifierName>
+                    <relocations>
+                        <relocation>
+                            <pattern>de</pattern>
+                            <shadedPattern>com.googlecode.mobilityrpc.lib.de</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org</pattern>
+                            <shadedPattern>com.googlecode.mobilityrpc.lib.org</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.google.protobuf</pattern>
+                            <shadedPattern>com.googlecode.mobilityrpc.lib.com.google.protobuf</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.esotericsoftware</pattern>
+                            <shadedPattern>com.googlecode.mobilityrpc.lib.com.esotericsoftware</shadedPattern>
+                        </relocation>
+                    </relocations>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                            <addHeader>false</addHeader>
+                        </transformer>
+                    </transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <manifestEntries>
+                    <Main-Class>com.googlecode.mobilityrpc.quickstart.StandaloneMobilityServer</Main-Class>
+                  </manifestEntries>
+                </transformer>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <!--suppress MavenModelInspection -->
+                            <goal>shade</goal>
                         </goals>
                     </execution>
                 </executions>
