@@ -1,7 +1,0 @@
-package com.googlecode.mobilityrpc.protocol.protobuf;
-
-// A 128-bit id, transferred as two 64-bit longs
-message UUID {
-    required sint64 least_significant_bits = 1;
-    required sint64 most_significant_bits = 2;
-}
