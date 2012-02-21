@@ -1,0 +1,13 @@
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_uuid.proto";
+
+// A message sent by the machine at the remote side of a connection
+// in response to a Ping message
+message Pong {
+    // The request_id sent by the client when it sent the Ping request
+    // to which this Pong message is the reply
+    required UUID request_id = 1;
+
+    // An arbitrary string which can be sent for debugging purposes
+    required string message = 2;
+}
