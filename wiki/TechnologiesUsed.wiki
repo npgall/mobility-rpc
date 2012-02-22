@@ -1,0 +1,13 @@
+Links to the websites of other technologies and libraries used by mobility-rpc.
+
+==Serialization of Java objects==
+
+ * [http://code.google.com/p/kryo/ Kryo] - An excellent object serialization library for the Java platform. Significantly outperforms Java's built-in serialization in speed and data sizes. Used to serialize Java object graphs supplied by the application for sending to remote machines, prior to encapsulating in protocol messages.
+
+ * [http://code.google.com/p/objenesis/ Objenesis] - Used to instantiate objects during deserialization without calling their constructors. Mobility-rpc extends Kryo to use this for side-effect-free deserialization and compatibility with objects not having no-arg constructors.
+
+==Serialization for network protocol==
+ * [http://code.google.com/p/protobuf/ Google Protocol Buffers] - Used to serialize framework-internal Java objects representing protocol messages to binary, for sending over the network. Very efficient and allows protocol messages to be defined clearly in .proto files.
+
+==Build tools==
+ * [http://maven.apache.org/ Maven] - Software project build and dependency management tool. Managing a project without this would be difficult.
