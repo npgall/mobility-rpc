@@ -1,3 +1,4 @@
+#labels Featured
 Links to the websites of other technologies and libraries used by mobility-rpc.
 
 ==Serialization of Java objects==
