@@ -1,0 +1,14 @@
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_request_identifier.proto";
+
+message ResourceRequest {
+    // The name of the class or resource required from the class loader on the remote machine.
+    // This name will be supplied to sessionClassLoader.getResourceAsStream(String name) on the remote machine.
+    // In the case of requesting bytecode for a class, this name should be the binary name of the class
+    // with '/'-separated path name and '.class' appended. E.g. class com.foo.Bar -> com/foo/Bar.class
+    repeated string resource_name = 1;
+
+    // Request identifier which will be echoed bach to the client by the server, identifies the session and
+    // request on the client to which the response will be addressed
+    required RequestIdentifier request_identifier = 2;
+}
