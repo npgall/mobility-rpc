@@ -38,7 +38,7 @@ public class StandaloneMobilityServer {
 
         // Start the server...
         EmbeddedMobilityServer.start();
-        System.out.println("Server started, listening on port " + EmbeddedMobilityServer.DEFAULT_PORT + " on the following addresses:");
+        System.out.println("Mobility-RPC Server started, listening on port " + EmbeddedMobilityServer.DEFAULT_PORT + " on the following addresses:");
         for (String networkAddress : EmbeddedMobilityServer.getAddresses()) {
             System.out.println(networkAddress);
         }
@@ -49,7 +49,7 @@ public class StandaloneMobilityServer {
             @Override
             public void run() {
                 EmbeddedMobilityServer.stop();
-                System.out.println("Server stopped");
+                System.out.println("\nMobility-RPC Server stopped");
             }
         });
     }

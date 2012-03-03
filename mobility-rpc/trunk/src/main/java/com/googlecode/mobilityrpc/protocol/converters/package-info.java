@@ -16,5 +16,8 @@
 /**
  * [private api] Classes which convert Java object (POJO) representations of messages to and from binary, using
  * Google Protocol Buffers (protobuf).
+ * <p/>
+ * For documentation on each protocol messages and how they are processed, see each of the .proto files in
+ * <code>src/main/proto</code>.
  */
 package com.googlecode.mobilityrpc.protocol.converters;

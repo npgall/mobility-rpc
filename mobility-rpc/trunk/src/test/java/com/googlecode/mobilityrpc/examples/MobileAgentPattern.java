@@ -15,10 +15,9 @@
  */
 package com.googlecode.mobilityrpc.examples;
 
-import com.googlecode.mobilityrpc.network.ConnectionId;
-import com.googlecode.mobilityrpc.quickstart.EmbeddedMobilityServer;
 import com.googlecode.mobilityrpc.quickstart.QuickTask;
 import com.googlecode.mobilityrpc.session.MobilityContext;
+import com.googlecode.mobilityrpc.session.MobilitySession;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,17 +56,15 @@ public class MobileAgentPattern {
         private int hopNumber = 0;
 
         public void run() {
-            System.out.println("Hello World, this is hop number: " + (++hopNumber)
-                    + " in " + MobilityContext.getCurrentSession());
+            MobilitySession session = MobilityContext.getCurrentSession();
+            System.out.println("Hello World, this is hop number: " + (++hopNumber) + " in " + session);
             if (machinesToVisit.isEmpty()) {
                 System.out.println("Ran out of machines to visit");
             } else {
-                MobilityContext.getCurrentSession().execute(
-                        new ConnectionId(machinesToVisit.remove(0), EmbeddedMobilityServer.DEFAULT_PORT),
-                        this
-                );
+                // Migrate to next machine and remove from the list...
+                session.execute(machinesToVisit.remove(0), this);
             }
-            MobilityContext.getCurrentSession().release();
+            session.release();
         }
     }
     // Agent visits bob, then alice, then bob again...

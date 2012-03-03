@@ -16,5 +16,8 @@
 /**
  * [private api] {@link com.googlecode.mobilityrpc.protocol.converters.MessageConverter} classes for individual
  * message types.
+ * <p/>
+ * For documentation on each protocol messages and how they are processed, see each of the .proto files in
+ * <code>src/main/proto</code>.
  */
 package com.googlecode.mobilityrpc.protocol.converters.messages;

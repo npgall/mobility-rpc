@@ -19,6 +19,7 @@ import com.googlecode.mobilityrpc.controller.MobilityController;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
 import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.protocol.pojo.*;
+import com.googlecode.mobilityrpc.quickstart.EmbeddedMobilityServer;
 import com.googlecode.mobilityrpc.serialization.Serializer;
 import com.googlecode.mobilityrpc.serialization.impl.KryoSerializer;
 
@@ -62,6 +63,11 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
     @Override
     public UUID getSessionId() {
         return sessionId;
+    }
+
+    @Override
+    public void execute(String address, Runnable runnable) {
+        execute(new ConnectionId(address, EmbeddedMobilityServer.DEFAULT_PORT), runnable);
     }
 
     @Override
@@ -151,6 +157,11 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
             default:
                 throw new IllegalStateException("Unexpected ExecutionMode specified: " + executionMode);
         }
+    }
+
+    @Override
+    public <T> T execute(String address, Callable<T> callable) {
+        return execute(new ConnectionId(address, EmbeddedMobilityServer.DEFAULT_PORT), callable);
     }
 
     @Override
