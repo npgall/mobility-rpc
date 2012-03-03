@@ -21,39 +21,39 @@ import java.util.List;
 /**
  * @author Niall Gallagher
  */
-public class ByteCodeResponse {
+public class ResourceResponse {
 
-    private final List<ClassData> byteCodeResponses;
+    private final List<ResourceData> resourceDataResponses;
     private final RequestIdentifier requestIdentifier;
 
-    public ByteCodeResponse(List<ClassData> byteCodeResponses, RequestIdentifier requestIdentifier) {
-        this.byteCodeResponses = byteCodeResponses;
+    public ResourceResponse(List<ResourceData> resourceDataResponses, RequestIdentifier requestIdentifier) {
+        this.resourceDataResponses = resourceDataResponses;
         this.requestIdentifier = requestIdentifier;
     }
 
-    public List<ClassData> getByteCodeResponses() {
-        return byteCodeResponses;
+    public List<ResourceData> getResourceDataResponses() {
+        return resourceDataResponses;
     }
 
     public RequestIdentifier getRequestIdentifier() {
         return requestIdentifier;
     }
 
-    public static class ClassData {
-        private final String className;
-        private final byte[] byteCode;
+    public static class ResourceData {
+        private final String resourceName;
+        private final byte[] resourceData;
 
-        public ClassData(String className, byte[] byteCode) {
-            this.className = className;
-            this.byteCode = byteCode;
+        public ResourceData(String resourceName, byte[] resourceData) {
+            this.resourceName = resourceName;
+            this.resourceData = resourceData;
         }
 
-        public String getClassName() {
-            return className;
+        public String getResourceName() {
+            return resourceName;
         }
 
-        public byte[] getByteCode() {
-            return byteCode;
+        public byte[] getResourceData() {
+            return resourceData;
         }
 
         @Override
@@ -61,23 +61,23 @@ public class ByteCodeResponse {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            ClassData classData = (ClassData) o;
-            return className.equals(classData.className)
-                    && Arrays.equals(byteCode, classData.byteCode);
+            ResourceData resourceData = (ResourceData) o;
+            return resourceName.equals(resourceData.resourceName)
+                    && Arrays.equals(this.resourceData, resourceData.resourceData);
         }
 
         @Override
         public int hashCode() {
-            int result = className.hashCode();
-            result = 31 * result + Arrays.hashCode(byteCode);
+            int result = resourceName.hashCode();
+            result = 31 * result + Arrays.hashCode(resourceData);
             return result;
         }
 
         @Override
         public String toString() {
-            return "ClassData{" +
-                    "className='" + className + '\'' +
-                    ", byteCode=" + byteCode.length + " bytes" +
+            return "ResourceData{" +
+                    "resourceName='" + resourceName + '\'' +
+                    ", resourceData=" + resourceData.length + " bytes" +
                     '}';
         }
     }
@@ -87,7 +87,7 @@ public class ByteCodeResponse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ByteCodeResponse that = (ByteCodeResponse) o;
+        ResourceResponse that = (ResourceResponse) o;
 
         return requestIdentifier.equals(that.requestIdentifier);
 
@@ -100,8 +100,8 @@ public class ByteCodeResponse {
 
     @Override
     public String toString() {
-        return "ByteCodeResponse{" +
-                "byteCodeResponses=" + byteCodeResponses +
+        return "ResourceResponse{" +
+                "resourceDataResponses=" + resourceDataResponses +
                 ", requestIdentifier=" + requestIdentifier +
                 '}';
     }

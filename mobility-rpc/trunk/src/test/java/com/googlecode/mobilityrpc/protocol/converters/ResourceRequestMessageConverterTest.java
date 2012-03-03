@@ -15,8 +15,8 @@
  */
 package com.googlecode.mobilityrpc.protocol.converters;
 
-import com.googlecode.mobilityrpc.protocol.converters.messages.ByteCodeRequestMessageConverter;
-import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeRequest;
+import com.googlecode.mobilityrpc.protocol.converters.messages.ResourceRequestMessageConverter;
+import com.googlecode.mobilityrpc.protocol.pojo.ResourceRequest;
 import com.googlecode.mobilityrpc.protocol.pojo.RequestIdentifier;
 import org.junit.Test;
 
@@ -28,21 +28,21 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Niall Gallagher
  */
-public class ByteCodeRequestMessageConverterTest {
+public class ResourceRequestMessageConverterTest {
 
     @Test
-    public void testMessageByteCodeRequestConverter() {
-        ByteCodeRequestMessageConverter converter = new ByteCodeRequestMessageConverter();
+    public void testMessageResourceRequestConverter() {
+        ResourceRequestMessageConverter converter = new ResourceRequestMessageConverter();
         UUID sessionId = UUID.randomUUID();
         UUID requestId = UUID.randomUUID();
 
-        ByteCodeRequest input = new ByteCodeRequest(Arrays.asList("foo, bar"), new RequestIdentifier(sessionId, requestId, "foo"));
+        ResourceRequest input = new ResourceRequest(Arrays.asList("foo, bar"), new RequestIdentifier(sessionId, requestId, "foo"));
         byte[] serialized = converter.convertToProtobuf(input);
         System.out.println("Serialized to: " + serialized.length + " bytes");
-        ByteCodeRequest output = converter.convertFromProtobuf(serialized);
+        ResourceRequest output = converter.convertFromProtobuf(serialized);
         System.out.println("Output: " + output);
 
-        assertEquals(Arrays.asList("foo, bar"), output.getClassNames());
+        assertEquals(Arrays.asList("foo, bar"), output.getResourceNames());
         assertEquals(new RequestIdentifier(sessionId, requestId, "foo"), output.getRequestIdentifier());
     }
 }

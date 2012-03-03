@@ -18,8 +18,8 @@ package com.googlecode.mobilityrpc.protocol.processors.impl;
 import com.googlecode.mobilityrpc.controller.impl.MobilityControllerInternal;
 import com.googlecode.mobilityrpc.network.ConnectionId;
 import com.googlecode.mobilityrpc.network.ConnectionManager;
+import com.googlecode.mobilityrpc.protocol.pojo.ResourceResponse;
 import com.googlecode.mobilityrpc.session.MobilitySession;
-import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeResponse;
 import com.googlecode.mobilityrpc.protocol.pojo.RequestIdentifier;
 import com.googlecode.mobilityrpc.protocol.processors.DeserializedMessageProcessor;
 
@@ -29,15 +29,15 @@ import java.util.logging.Logger;
 /**
  * @author Niall Gallagher
  */
-public class ByteCodeResponseMessageProcessor implements DeserializedMessageProcessor<ByteCodeResponse> {
+public class ResourceResponseMessageProcessor implements DeserializedMessageProcessor<ResourceResponse> {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     @Override
-    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionId connectionId, ByteCodeResponse byteCodeResponse) {
-        RequestIdentifier requestIdentifier = byteCodeResponse.getRequestIdentifier();
+    public void process(MobilityControllerInternal mobilityController, ConnectionManager connectionManager, ConnectionId connectionId, ResourceResponse resourceResponse) {
+        RequestIdentifier requestIdentifier = resourceResponse.getRequestIdentifier();
         MobilitySession session = mobilityController.getSession(requestIdentifier.getSessionId());
-        logger.log(Level.FINER, "Received ByteCodeResponse, submitting to session class loader: {0}", byteCodeResponse);
-        session.getSessionClassLoader().processBytecodeResponse(byteCodeResponse);
+        logger.log(Level.FINER, "Received ResourceResponse, submitting to session class loader: {0}", resourceResponse);
+        session.getSessionClassLoader().processResourceResponse(resourceResponse);
     }
 }
