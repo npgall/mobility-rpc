@@ -15,8 +15,8 @@
  */
 package com.googlecode.mobilityrpc.protocol.converters;
 
-import com.googlecode.mobilityrpc.protocol.converters.messages.ByteCodeResponseMessageConverter;
-import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeResponse;
+import com.googlecode.mobilityrpc.protocol.converters.messages.ResourceResponseMessageConverter;
+import com.googlecode.mobilityrpc.protocol.pojo.ResourceResponse;
 import com.googlecode.mobilityrpc.protocol.pojo.RequestIdentifier;
 import org.junit.Test;
 
@@ -28,26 +28,26 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Niall Gallagher
  */
-public class ByteCodeResponseMessageConverterTest {
+public class ResourceResponseMessageConverterTest {
 
     @Test
-    public void testByteCodeResponseMessageConverter() {
-        ByteCodeResponseMessageConverter converter = new ByteCodeResponseMessageConverter();
+    public void testResourceResponseMessageConverter() {
+        ResourceResponseMessageConverter converter = new ResourceResponseMessageConverter();
         UUID sessionId = UUID.randomUUID();
         UUID requestId = UUID.randomUUID();
-        ByteCodeResponse input = new ByteCodeResponse(
+        ResourceResponse input = new ResourceResponse(
                 Arrays.asList(
-                    new ByteCodeResponse.ClassData("foo", new byte[]{1,2}),
-                    new ByteCodeResponse.ClassData("bar", new byte[]{3,4,5})
+                    new ResourceResponse.ResourceData("foo", new byte[]{1,2}),
+                    new ResourceResponse.ResourceData("bar", new byte[]{3,4,5})
                 ),
                 new RequestIdentifier(sessionId, requestId, "foo")
         );
         byte[] serialized = converter.convertToProtobuf(input);
         System.out.println("Serialized to: " + serialized.length + " bytes");
-        ByteCodeResponse output = converter.convertFromProtobuf(serialized);
+        ResourceResponse output = converter.convertFromProtobuf(serialized);
         System.out.println("Output: " + output);
 
-        assertEquals(input.getByteCodeResponses(), output.getByteCodeResponses());
+        assertEquals(input.getResourceDataResponses(), output.getResourceDataResponses());
         assertEquals(new RequestIdentifier(sessionId, requestId, "foo"), output.getRequestIdentifier());
     }
 }

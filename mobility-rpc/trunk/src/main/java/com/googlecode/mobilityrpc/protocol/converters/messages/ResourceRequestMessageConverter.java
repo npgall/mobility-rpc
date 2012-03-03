@@ -17,30 +17,30 @@ package com.googlecode.mobilityrpc.protocol.converters.messages;
 
 import com.googlecode.mobilityrpc.protocol.converters.MessageConverter;
 import com.googlecode.mobilityrpc.protocol.converters.components.RequestIdentifierComponentConverter;
-import com.googlecode.mobilityrpc.protocol.pojo.ByteCodeRequest;
-import com.googlecode.mobilityrpc.protocol.protobuf.MessageByteCodeRequest;
+import com.googlecode.mobilityrpc.protocol.pojo.ResourceRequest;
+import com.googlecode.mobilityrpc.protocol.protobuf.MessageResourceRequest;
 
 /**
  * @author Niall Gallagher
  */
-public class ByteCodeRequestMessageConverter extends MessageConverter<ByteCodeRequest> {
+public class ResourceRequestMessageConverter extends MessageConverter<ResourceRequest> {
 
     private final RequestIdentifierComponentConverter requestIdentifierConverter = new RequestIdentifierComponentConverter();
 
     @Override
-    protected ByteCodeRequest fromProtobuf(byte[] bytes) throws Exception {
-        MessageByteCodeRequest.ByteCodeRequest.Builder builder = MessageByteCodeRequest.ByteCodeRequest.newBuilder();
+    protected ResourceRequest fromProtobuf(byte[] bytes) throws Exception {
+        MessageResourceRequest.ResourceRequest.Builder builder = MessageResourceRequest.ResourceRequest.newBuilder();
         builder.mergeFrom(bytes);
-        return new ByteCodeRequest(
-                builder.getClassNameList(),
+        return new ResourceRequest(
+                builder.getResourceNameList(),
                 requestIdentifierConverter.convertFromProtobuf(builder.getRequestIdentifier())
         );
     }
 
     @Override
-    protected byte[] toProtobuf(ByteCodeRequest object) throws Exception {
-        MessageByteCodeRequest.ByteCodeRequest.Builder builder = MessageByteCodeRequest.ByteCodeRequest.newBuilder();
-        builder.addAllClassName(object.getClassNames());
+    protected byte[] toProtobuf(ResourceRequest object) throws Exception {
+        MessageResourceRequest.ResourceRequest.Builder builder = MessageResourceRequest.ResourceRequest.newBuilder();
+        builder.addAllResourceName(object.getResourceNames());
         builder.setRequestIdentifier(requestIdentifierConverter.convertToProtobuf(object.getRequestIdentifier()));
         return builder.build().toByteArray();
     }

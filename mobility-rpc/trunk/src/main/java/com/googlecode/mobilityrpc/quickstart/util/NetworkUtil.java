@@ -28,9 +28,6 @@ import java.util.List;
 public class NetworkUtil {
 
     /**
-     * <b>Note: you might find the source of this method online, but it is my own code e.g.
-     * https://issues.apache.org/jira/browse/JCS-40</b>
-     * <p/>
      * Returns an <code>InetAddress</code> object encapsulating what is most likely the machine's LAN IP address.
      * <p/>
      * This method is intended for use as a replacement of JDK method <code>InetAddress.getLocalHost</code>, because

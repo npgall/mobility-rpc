@@ -20,18 +20,18 @@ import java.util.List;
 /**
  * @author Niall Gallagher
  */
-public class ByteCodeRequest {
+public class ResourceRequest {
 
-    private final List<String> classNames;
+    private final List<String> resourceNames;
     private final RequestIdentifier requestIdentifier;
 
-    public ByteCodeRequest(List<String> classNames, RequestIdentifier requestIdentifier) {
-        this.classNames = classNames;
+    public ResourceRequest(List<String> resourceNames, RequestIdentifier requestIdentifier) {
+        this.resourceNames = resourceNames;
         this.requestIdentifier = requestIdentifier;
     }
 
-    public List<String> getClassNames() {
-        return classNames;
+    public List<String> getResourceNames() {
+        return resourceNames;
     }
 
     public RequestIdentifier getRequestIdentifier() {
@@ -59,8 +59,8 @@ public class ByteCodeRequest {
 
     @Override
     public String toString() {
-        return "ByteCodeRequest{" +
-                "classNames=" + classNames +
+        return "ResourceRequest{" +
+                "resourceNames=" + resourceNames +
                 ", requestIdentifier=" + requestIdentifier +
                 '}';
     }

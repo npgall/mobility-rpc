@@ -31,8 +31,8 @@ public class MessageConverterRegistry {
 
     public MessageConverterRegistry() {
         register(Envelope.class, new EnvelopeMessageConverter());
-        register(ByteCodeRequest.class, new ByteCodeRequestMessageConverter());
-        register(ByteCodeResponse.class, new ByteCodeResponseMessageConverter());
+        register(ResourceRequest.class, new ResourceRequestMessageConverter());
+        register(ResourceResponse.class, new ResourceResponseMessageConverter());
         register(ExecutionRequest.class, new ExecutionRequestMessageConverter());
         register(ExecutionResponse.class, new ExecutionResponseMessageConverter());
         register(Ping.class, new PingMessageConverter());

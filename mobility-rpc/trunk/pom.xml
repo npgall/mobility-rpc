@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.mobilityrpc</groupId>
     <artifactId>mobility-rpc</artifactId>
-    <version>0.5.1</version>
+    <version>0.5.2</version>
     <packaging>jar</packaging>
     <name>Mobility-RPC</name>
     <url>http://maven.apache.org</url>
@@ -26,23 +26,34 @@
                 <executions>
                     <execution>
                         <id>compile-protoc</id>
+                        <phase>generate-sources</phase>
                         <!--
-                            Ideally we would use maven-protoc-plugin to generate protobuf classes,
-                            but that plugin is not in Maven Central.
-
-                            We wish to deploy this library to Maven Central, and guidelines for doing so
+                            Run protoc (Google Protocol Buffers compiler) to generate Java classes from .proto files.
+                            See: http://code.google.com/p/protobuf/
+                            
+                            Ideally we would use maven-protoc-plugin to invoke protoc, but that plugin is not in Maven
+                            Central. We wish to deploy this library to Maven Central, and guidelines for doing so
                             forbid relying on dependencies which are not also in central:
                             https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
 
-                            Therefore we use antrun to invoke protoc as a workaround. Note: like maven-protoc-plugin,
-                            this requires protoc to be installed on the machine, and be accessible via the 'protoc'
-                            command.
+                            Therefore we use maven-antrun-plugin to invoke protoc as a workaround. Note: like
+                            maven-protoc-plugin, this requires protoc to be installed on the machine, and be accessible
+                            via the 'protoc' command.
+                            
+                            To install protoc (Google Protocol Buffers):
+                            - on Mac: sudo port install protobuf-java  (requires: http://www.macports.org/)
+                            - on Linux: sudo apt-get install protobuf-java  (or similar e.g. yum install ...)
+                            - on Windows: download binaries from http://code.google.com/p/protobuf/ and add to the
+                            operating system's PATH
+
+                            Mac OS issue: After installing protobuf as above on Mac OS, this plugin will work when Maven
+                            is run from the command line, but it will not work if run from IntelliJ IDE. To fix this,
+                            put a symlink to protoc directly into /usr/bin.
+                            From a terminal: sudo ln -s `which protoc` /usr/bin/protoc
                         -->
-                        <phase>generate-sources</phase>
                         <configuration>
                             <tasks>
                                 <mkdir dir="target/generated-sources/protoc"/>
-                                <!--<mkdir dir="target/generated-sources/com/googlecode/mobilityrpc/protobuf"/>-->
                                 <path id="proto.path">
                                     <fileset dir="src/main/proto">
                                         <include name="**/*.proto" />
@@ -50,8 +61,8 @@
                                 </path>
                                 <pathconvert pathsep=" " property="proto.files" refid="proto.path" />
                                 <exec executable="protoc" failonerror="true">
-                                    <arg value="--java_out=target/generated-sources/protoc" />
-                                    <arg value="-I${project.basedir}/src/main/proto" />
+                                    <arg value="--proto_path=${project.basedir}/src/main/proto" />
+                                    <arg value="--java_out=${project.basedir}/target/generated-sources/protoc" />
                                     <!--suppress MavenModelInspection -->
                                     <arg line="${proto.files}" />
                                 </exec>
@@ -78,12 +89,20 @@
             </plugin>
             <plugin>
                 <!--
-                    *** Build an executable jar (for StandaloneMobilityServer) containing all dependencies ***
-                    Builds a single executable by copying classes from all dependency jars directly into the main jar.
-                    To prevent duplicate class issues, it relocates those classes to a new package within the jar:
-                     com.googlecode.mobilityrpc.lib.*
-                    It then updates the bytecode in all classes to refer to dependency classes in their new package.
-                    Also this configures some transformers to merge open source licences present in any of the jars.
+                    Build an jar containing all dependencies, by copying classes from all dependency jars directly into
+                    the main jar.
+
+                    The resulting jar can be used as a library in other applications (without requiring any transitive
+                    dependencies of its own), or it can be run as a standalone mobility-rpc server from the command line
+                    (launches StandaloneMobilityServer).
+
+                    If used as a library in another application, in case the other application also shares any of the
+                    same dependencies, to avoid duplicate class issues resulting from copying dependency classes into
+                    this jar, we relocate classes which are dependencies of this library into a new package within this
+                    jar: com.googlecode.mobilityrpc.lib.*. We then update the bytecode in all classes in this jar to
+                    refer to dependency classes in their new package.
+
+                    Also we configure some transformers to merge open source licences present in any of the jars.
                  -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -113,24 +132,30 @@
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
                             <addHeader>false</addHeader>
                         </transformer>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <manifestEntries>
+                                <Main-Class>com.googlecode.mobilityrpc.quickstart.StandaloneMobilityServer</Main-Class>
+                            </manifestEntries>
+                        </transformer>
                     </transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifestEntries>
-                    <Main-Class>com.googlecode.mobilityrpc.quickstart.StandaloneMobilityServer</Main-Class>
-                  </manifestEntries>
-                </transformer>
                 </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <!--suppress MavenModelInspection -->
                             <goal>shade</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
+                <!--
+                    Plugin to check that all source files have the appropriate open source license header.
+                    
+                    This will fail the build if any source files don't have the open source license header.
+
+                    To actually apply the header to new source files, run: mvn license:format
+                -->
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <version>1.10.b1</version>

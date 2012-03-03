@@ -29,8 +29,8 @@ public class DeserializedMessageProcessorRegistry {
     private final Map<Class<?>, DeserializedMessageProcessor<?>> converters = new HashMap<Class<?>, DeserializedMessageProcessor<?>>() {{
         put(ExecutionRequest.class, new ExecutionRequestMessageProcessor());
         put(ExecutionResponse.class, new ExecutionResponseMessageProcessor());
-        put(ByteCodeRequest.class, new ByteCodeRequestMessageProcessor());
-        put(ByteCodeResponse.class, new ByteCodeResponseMessageProcessor());
+        put(ResourceRequest.class, new ResourceRequestMessageProcessor());
+        put(ResourceResponse.class, new ResourceResponseMessageProcessor());
         put(Ping.class, new PingMessageProcessor());
         put(Pong.class, new PongMessageProcessor());
     }};

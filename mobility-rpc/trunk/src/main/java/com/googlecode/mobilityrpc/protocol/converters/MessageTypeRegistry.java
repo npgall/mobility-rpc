@@ -30,8 +30,8 @@ public class MessageTypeRegistry {
     public MessageTypeRegistry() {
         register(Envelope.MessageType.EXECUTION_REQUEST, ExecutionRequest.class);
         register(Envelope.MessageType.EXECUTION_RESPONSE, ExecutionResponse.class);
-        register(Envelope.MessageType.BYTE_CODE_REQUEST, ByteCodeRequest.class);
-        register(Envelope.MessageType.BYTE_CODE_RESPONSE, ByteCodeResponse.class);
+        register(Envelope.MessageType.BYTE_CODE_REQUEST, ResourceRequest.class);
+        register(Envelope.MessageType.BYTE_CODE_RESPONSE, ResourceResponse.class);
         register(Envelope.MessageType.PING, Ping.class);
         register(Envelope.MessageType.PONG, Pong.class);
     }
