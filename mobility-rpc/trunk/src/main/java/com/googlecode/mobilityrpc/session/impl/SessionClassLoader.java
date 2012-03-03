@@ -126,7 +126,7 @@ public class SessionClassLoader extends ClassLoader {
             // however implementing this optimization is reserved for future work.
             byte[] requiredResourceData = null;
             for (ResourceResponse.ResourceData resourceData : resourceResponse.getResourceDataResponses()) {
-                if (name.equals(resourceData.getResourceName())) {
+                if (resourceName.equals(resourceData.getResourceName())) {
                     requiredResourceData = resourceData.getResourceData();
                     resourceDataCache.put(resourceName, requiredResourceData);
                     break;
@@ -136,7 +136,7 @@ public class SessionClassLoader extends ClassLoader {
             if (requiredResourceData == null) {
                 // The remote machine returned a response but it did not include the required class,
                 // i.e. it could not locate the required class (this is an unexpected condition)...
-                throw new ClassNotFoundException("The remote machine could not locate bytecode for the requested class: " + name);
+                throw new ClassNotFoundException("The remote machine could not locate bytecode for the requested class: " + name + ", resource name: " + resourceName);
             }
             return defineClass(name, requiredResourceData, 0, requiredResourceData.length);
         }

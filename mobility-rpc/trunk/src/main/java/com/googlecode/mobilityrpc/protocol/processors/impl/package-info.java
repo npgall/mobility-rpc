@@ -16,5 +16,8 @@
 /**
  * [private api] Implementations of {@link com.googlecode.mobilityrpc.protocol.processors.DeserializedMessageProcessor}
  * for processing various types of incoming message.
+ * <p/>
+ * For documentation on each protocol messages and how they are processed, see each of the .proto files in
+ * <code>src/main/proto</code>.
  */
 package com.googlecode.mobilityrpc.protocol.processors.impl;

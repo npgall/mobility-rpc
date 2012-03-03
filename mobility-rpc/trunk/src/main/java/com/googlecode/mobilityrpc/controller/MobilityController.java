@@ -22,14 +22,13 @@ import com.googlecode.mobilityrpc.session.MobilitySession;
 import java.util.UUID;
 
 /**
- * The main interface of the Mobility-RPC library.
+ * Manages an instance of the Mobility-RPC library and provides access to its main APIs.
  * <p/>
- * Provides access to {@link MobilitySession}s, which are the gateway through which the application can send objects
+ * Provides access to {@link MobilitySession} objects, the gateway through which the application can send objects
  * to remote machines.
  * <p/>
- * Provides access to a {@link ConnectionManager} object responsible for managing incoming and outgoing connections
- * to other instances of the library, and allowing the application to request the library to bind/unbind from
- * ports/network interfaces to listen for incoming connections.
+ * Provides access to a {@link ConnectionManager} object, allowing the application to request the library to bind/unbind
+ * from ports/network interfaces to listen for incoming connections and receive objects from remote machines.
  *
  * @author Niall Gallagher
  */
@@ -69,6 +68,7 @@ public interface MobilityController extends Destroyable {
      * @param sessionId The session id to release
      */
     void releaseSession(UUID sessionId);
+
     /**
      * Destroys (closes/shuts down) the resources managed by the controller, closing connections, stopping threads,
      * releasing all sessions etc.
