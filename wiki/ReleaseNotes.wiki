@@ -1,0 +1,9 @@
+
+===Version 0.5.2 - 2012-03-03===
+ * Added support to the protocol for transferring arbitrary classpath resources. Objects sent to remote machines can now load properties/configuration files etc. via usual methods (e.g. `this.getClass().getResourceAsStream(String name)`) and these will be uploaded transparently
+ * Added `MobilitySession.execute(String, Runnable)` and `execute(String, Callable)`, convenience methods to send objects to a `String` machine name using default port
+
+===Version 0.5.1 - 2012-02-20===
+ * First release version
+ * Built with maven-shade-plugin, includes all dependencies
+ * Jar can be used as a library in an application, or run as a `StandaloneMobilityServer`: java -jar mobility-rpc-0.5.1-all.jar
