@@ -6,8 +6,8 @@ message Envelope {
     enum MessageType {
         EXECUTION_REQUEST = 1;
         EXECUTION_RESPONSE = 2;
-        BYTE_CODE_REQUEST = 3;
-        BYTE_CODE_RESPONSE = 4;
+        RESOURCE_REQUEST = 3;
+        RESOURCE_RESPONSE = 4;
         PING = 5;
         PONG = 6;
     }
