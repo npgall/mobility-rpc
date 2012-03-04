@@ -55,7 +55,7 @@ For item 2, it appears that there is no good reason to make application-layer pr
 
 It can be noted that in [http://www.ietf.org/rfc/rfc2616.txt HTTP version 1.1], the protocol was extended to support request pipelining, thereby extending this protocol in the asynchronous direction (albeit with FIFO restrictions). In the area of HTTP, Google have developed [http://dev.chromium.org/spdy/spdy-whitepaper SPDY], an alternative protocol to HTTP which can reduce web latency. A stated goal of this project is to _“allow many concurrent HTTP requests to run across a single TCP session”_.
 
-Also, in earlier versions of Java, RMI supported a (flawed - [http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4161204 bug 4161204] [http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4257730 bug 4257730]) [http://docs.oracle.com/javase/6/docs/platform/rmi/spec/rmi-protocol7.html multiplexing protocol], one that Oracle engineers believe that if enhanced and reenabled would _[http://weblogs.java.net/blog/emcmanus/archive/2007/01/reimplementing.html “allow a more efficient use of TCP connections”]_.
+Also, in earlier versions of Java, RMI supported a (flawed - [http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4161204 bug 4161204] [http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4257730 bug 4257730]) and now disabled [http://docs.oracle.com/javase/6/docs/platform/rmi/spec/rmi-protocol7.html multiplexing protocol], one that Oracle engineers believe that if enhanced and reenabled would _[http://weblogs.java.net/blog/emcmanus/archive/2007/01/reimplementing.html “allow a more efficient use of TCP connections”]_.
 
 Therefore for items 1 & 2, precedents have been set which indicate that these are not valid reasons to establish multiple simultaneous connections.
 
