@@ -1,0 +1,383 @@
+#summary Mobility-RPC's communication and serialization protocols
+#labels Featured,Phase-Design
+
+The communication protocol used in Mobility-RPC has been designed from the ground up to be as efficient as possible. To achieve this, it does not rely on the serialization support built in to Java, and it does not rely on RMI, the default RPC framework of Java.
+
+<wiki:toc max_depth="3" />
+
+= The problems with RMI and Java Serialization =
+
+==Efficiency==
+In terms of runtime performance, Java Serialization is _eleven times slower_ than third party serialization libraries for the Java platform, and the serialized data sizes that it outputs are _three times larger_ than third party serialization libraries for the Java platform, according to [http://code.google.com/p/thrift-protobuf-compare/wiki/Benchmarking independent benchmarks].
+
+RMI, the default RPC framework of Java, is tightly coupled with Java Serialization. Therefore any objects transferred to remote machines via RMI will inherit the slow serialization speed of Java Serialization, and will require more data to be transmitted on the network.
+
+==Compatibility==
+Java Serialization actually has poor compatibility with standard Java code. By default, all Java objects are _not_ compatible with Java Serialization. Objects must be explicitly coded to be compatible with Java Serialization, by implementing the interface [http://docs.oracle.com/javase/6/docs/api/java/io/Serializable.html java.io.Serializable].
+
+In non-trivial applications, where functionality might be implemented by various libraries, this non-compatibility by default of Java Serialization with standard objects can cause headaches. If an application tries to assemble an object graph for sending over RMI, and one of the component objects originates from a third-party library which did not implement `java.io.Serializable` on that object, the serialization of that object graph will fail with an exception at runtime.
+
+==Networking Complexity==
+
+The design of RMI's communication protocol seems complex from a network interactions point of view. RMI requires objects which are to made accessible over the network to be added to an RMI Registry. The RMI Registry can be embedded in the remote application, or can run as a separate process on a different machine. Either way, the registry listens on a fixed port. Client machines wishing to access a particular object, connect to this registry, and "look up" the required object by name, which returns another address and port number, the actual address and port of the machine on which this object is listening. Client machines then connect to the object on the identified address and port.
+
+In RMI, remote objects themselves are not bound to fixed ports, but to arbitrary ports. This is not inefficient _per-se_, as the address and port can be cached by the client, and subsequent invocations on the same object can bypass the lookup. However, the involvement of a registry would seem to complicate usage, can act as a single point of failure, and the proliferation of arbitrary ports can cause headaches for administrators wishing to restrict access to certain ports. It would seem simpler if clients could just connect directly to objects, on a fixed port, and without the registry look up round trip.
+
+==Multi-threaded Clients==
+
+RMI can restrict performance in multi-threaded clients. The [http://download.oracle.com/javase/6/docs/platform/rmi/spec/rmiTOC.html Java RMI Specification] states that the RMI runtime makes [http://docs.oracle.com/javase/6/docs/platform/rmi/spec/rmi-arch3.html no guarantees] on how concurrent requests from multi-threaded clients will be handled server-side, whether those requests will be executed concurrently or serially on the server.
+
+==Synchronous, Half-Duplex Connections==
+
+RMI is a half-duplex protocol. TCP, on top of which RMI runs, is full-duplex, providing incoming and outgoing byte streams which operate independently of each other. When a method invocation is performed over an RMI connection, RMI sends an invocation request to the remote machine via the outgoing stream, and then waits for a response via the incoming stream. As such, RMI uses only one direction in a TCP connection at a time, limiting connections to half-duplex operation.
+
+This also means that RMI connections are synchronous: while one invocation is ongoing on a connection, the connection is occupied until the entire invocation returns, which is the latency in sending the request, plus the server's latency in processing it, plus the latency in the response returning to the client.
+
+Any _concurrent_ requests to the same destination cause RMI to establish additional connections. RMI, as implemented in Oracle/OpenJDK 6 and 7, mitigates the overhead of establishing multiple connections by using a connection pool. It can be noted that 
+
+=The problems with Synchronous Protocols=
+
+RMI is not alone as a synchronous half-duplex protocol, which establishes multiple TCP connections, each one dedicated to an individual request-response interaction.
+
+The earlier [http://www.ietf.org/rfc/rfc1945.txt HTTP 1.0 protocol] was entirely synchronous. Database communication protocols from most vendors, in typical usage, also employ one connection per request-response transaction and are therefore mostly synchronous also.
+
+Given that the network interfaces on servers and networking equipment typically have a fixed bandwidth, we might wonder why applications choose to establish multiple simultaneous TCP connections from a single machine to the same destination. Doing so would appear to _reduce_ the usable bandwidth of a link, given the additional overhead and signalling required to maintain each connection. 
+
+The use of multiple TCP connections to a destination is commonplace for four reasons:
+ # *Head-Of-Line blocking at application layer.* Head-Of-Line blocking occurs due to the strict order-of-transmission delivery of data under TCP. If a multi-threaded client application wishes to transmit multiple requests to a server, TCP's stream-oriented nature will force those requests to be transmitted in serial. If the first request (the head of the line) however blocks at the server, then all subsequent requests queued for sending over TCP will also block
+ # *Synchronous application-layer protocols.* TCP is full-duplex, however many application-layer protocols which run on top of TCP are synchronous, effectively limiting the interaction to half- duplex operation. For example in HTTP 1.0 and RMI, as soon as a client finishes sending a request to the server via the TCP outgoing stream, it expects then and only then to receive a response from the server via the incoming stream. This forces queued requests for that connection to block until at least one round trip between client and server has completed, and the blocking delay is also subject to the server's latency in returning its response
+ # *Head-Of-Line blocking at transport layer.* Head-Of-Line blocking in TCP can also occur at the transport layer, when packets are lost or arrive out of order. The stream-oriented nature of TCP requires it to deliver data in the order it was transmitted. As such if a packet at the head of the line is lost or delayed, TCP must block delivery of subsequent packets until the head-of-line packet arrives
+ # *Stream monopolization.* This occurs when a single large request or response is exchanged between client and server, forcing queued requests to block in one direction while waiting for the TCP stream to become free
+
+For item 1, it is clear that if a server never blocks when receiving incoming data from a TCP connection, then Head-Of-Line blocking will not occur at the application layer. As such this reason is entirely due to inefficient server application design.
+
+For item 2, it appears that there is no good reason to make application-layer protocols synchronous, except that it is easier to design synchronous protocols than asynchronous ones.
+
+It can be noted that in [http://www.ietf.org/rfc/rfc2616.txt HTTP version 1.1], the protocol was extended to support request pipelining, thereby extending this protocol in the asynchronous direction (albeit with FIFO restrictions). In the area of HTTP, Google have developed [http://dev.chromium.org/spdy/spdy-whitepaper SPDY], an alternative protocol to HTTP which can reduce web latency. A stated goal of this project is to _“allow many concurrent HTTP requests to run across a single TCP session”_.
+
+Also, in earlier versions of Java, RMI supported a (flawed - [http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4161204 bug 4161204] [http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4257730 bug 4257730]) [http://download.oracle.com/javase/6/docs/platform/rmi/spec/rmiTOC.html multiplexing protocol], one that Oracle engineers believe that if enhanced and reenabled would _[http://weblogs.java.net/blog/emcmanus/archive/2007/01/reimplementing.html “allow a more efficient use of TCP connections”]_.
+
+Therefore for items 1 & 2, precedents have been set which indicate that these are not valid reasons to establish multiple simultaneous connections.
+
+For items 3 and 4, it appears that the inherent order-of-transmission, stream-oriented nature of TCP itself is more a liability than a benefit for many applications, and that in fact these can be valid reasons to establish multiple connections.
+
+==SCTP and Message-Oriented Protocols==
+
+It can be observed that many application-layer protocols which run atop TCP support the exchange of finite-length requests and responses, and thus are more message-oriented than stream-oriented. These protocols might benefit from implementation atop a message-oriented underlying transport, rather than the stream-oriented TCP protocol.
+
+[http://tools.ietf.org/html/rfc3257 Stream Control Transmission Protocol] (SCTP) is a transport layer protocol at the same level in the Internet Protocol stack as TCP and UDP. SCTP is message-oriented like UDP, but provides reliable delivery like TCP. SCTP supports ordering of messages, but does not mandate it, such that applications which do not require strict ordering can choose to process messages in the order they are received rather than the order in which they were sent. This would eliminate Head-Of-Line blocking at transport layer and stream monopolisation, thus would eliminate the two remaining reasons to establish multiple simultaneous connections.
+
+=Mobility-RPC Protocol Overview=
+
+SCTP would offer significant benefits to the Mobility-RPC library, versus TCP, however support for SCTP is not widespread as yet, having only become supported in [http://java.sun.com/developer/technicalArticles/javase/jdk7-sctp/ Java 7].
+
+The Mobility-RPC protocol is designed to be compatible with SCTP. However because SCTP is not yet widely available, the library implements this protocol atop TCP.
+
+The presented code mobility protocol has been designed with the following characteristics:
+ * *Message-oriented.* The formats of discrete messages which can be exchanged are predefined, and inside these (variable-length) messages, serialized objects, bytecode etc. are encapsulated
+ * *Stateless, connectionless.* Connections may be established ad-hoc, may be maintained persistently, or may not to be established at all (where the underlying transport is connectionless). In any case the protocol does not require any synchronization or setup sequences before actual messages can be sent
+ * *Asynchronous, non-blocking.* Machines at either end of a connection can both send any type of message to each other at any time in full-duplex. If a machine transmits a request, it will not expect an immediate response, and the transport layer will not block waiting for such a response
+ * *Multiplexing.* Both client-side and server-side applications are expected to be multi- threaded. “Request identifiers” (UUIDs) are encoded into messages to which responses are expected, and these identifiers are copied into responses. As such the protocol can multiplex and interleave requests and responses to and from multiple threads on both machines over the same connection
+ * *Sessions.* In addition to simple RPC-style interactions, the protocol (while itself stateless) supports stateful interactions between applications. “Session identifiers” are encoded (also UUIDs) into request messages, and where applications use the same session ids, those applications will also be able to access the same classes and static state on remote machines
+ * *`RETURN_RESPONSE` and `FIRE_AND_FORGET`.* The protocol supports requesting these two modes of remote code execution, and the relevant mode is encoded into execution request messages. The former allows the implementation of synchronous (blocking) invocations atop the asynchronous protocol (in the session layer). The latter mode allows applications to explicitly state that a response is not required from the server, eliminating unnecessary round trips
+
+==Support for Multiple TCP Connections==
+
+As discussed above, establishing a single multiplexed TCP connection between pairs of machines is likely to be more efficient than establishing many, however there are some valid reasons to establish multiple TCP connections. The implementation of the Mobility-RPC protocol atop TCP is therefore as follows:
+
+ * The library will establish a single TCP connection to a destination, and will multiplex requests from all threads via this connection by default
+ * The library also allows applications to send requests via additional _auxiliary_ connections
+ * The library routes responses via the same connection from which it receives a request, effectively allowing applications to open multiple “channels” to a destination when, and only when necessary
+
+=Mobility-RPC Protocol Message Definitions=
+
+Mobility-RPC uses [http://code.google.com/apis/protocolbuffers/ Google Protocol Buffers] (protobuf) to encode messages for sending "on the wire". Protocol messages are defined using protobuf syntax, each message defined in a .proto file in the `src/main/proto` directory. Google Protocol Buffers provides a `protoc` compiler, which generates Java class files from these .proto files. These classes allow the library to assemble protocol messages, and convert them to and from binary efficiently for sending over the network.
+
+==Shared Components==
+
+First, some _shared components_ of protocol messages, which are reused in several other messages.
+
+===component_uuid.proto===
+
+{{{
+package com.googlecode.mobilityrpc.protocol.protobuf;
+
+// A 128-bit id, transferred as two 64-bit longs
+message UUID {
+    required sint64 least_significant_bits = 1;
+    required sint64 most_significant_bits = 2;
+}
+}}}
+This defines a signed 128-bit number, which is transmitted as two signed 64-bit integers comprising the least significant and most significant 64 bits respectively. In Java, the [http://docs.oracle.com/javase/6/docs/api/java/util/UUID.html java.util.UUID] class constructor accepts these least significant and most significant bits, allowing the Java representation to be reconstructed.
+
+===component_serialization_format.proto===
+{{{
+package com.googlecode.mobilityrpc.protocol.protobuf;
+
+enum SerializationFormat {
+    JAVA = 0;
+    KRYO = 1;
+    JBOSS_MARSHALLING = 2;
+}
+}}}
+Whenever a serialized object is transmitted, the `SerializationFormat` is included in the same message. This indicates to the receiving side which deserializer it should use to decode the message. Mobility-RPC currently only supports the Kryo format, and the additional formats listed here are remnants from earlier experimental implementations, provided for reference. This mechanism allows backward compatibility with previous formats, support for adding a new serialization format if desired, or the use of different serializers in different scenarios.
+
+===component_request_identifier.proto===
+{{{
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_uuid.proto";
+
+message RequestIdentifier {
+    // A UUID which identifies the relevant class loader to use on remote machines
+    // for deserializing objects and caching classes
+    // This is usually generated as a UUID on the first/initiating client,
+    // but could be persistent/constant for some applications
+    required UUID session_id = 1;
+
+    // A UUID generated by the client for each request it sends, which will allows it
+    // to identify the relevant request object when the UUID is echoed back to the client
+    // by a remote machine in an execution response message on completion of the request
+    required UUID request_id = 2;
+
+    // An optional arbitrary string generated by the client which describes the execution request,
+    // for debugging purposes on both client and remote machine
+    optional string request_label = 3 [default = "<no label>"];
+}
+}}}
+The `RequestIdentifier` component encapsulates:
+ * A session id (128-bit UUID) which identifies the session to which a message is addressed on a remote machine. For example an execution request message will be generated by a session on the client machine, and in doing so the session will encapsulate its own session id in the request message it sends to a remote machine.
+ * A request id (128-bit UUID) which is generated by the client. This request id is copied by the server into any messages it sends back to the client in response to the original request. If a thread in the client is blocked waiting for a response, this technique allows the library in the client to look up the library-managed object containing the method on which the thread is blocked and unblock the thread supplying it the response
+ * A request label (optional) which is an arbitrary string generated by the client which describes the execution request, and which both client and server will print if debug logging is enabled
+
+==Protocol Messages==
+
+The following are the formats of the actual protocol messages, which reuse some of the components above.
+
+===message_resource_request.proto===
+
+{{{
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_request_identifier.proto";
+
+message ResourceRequest {
+    // The name of the class or resource required from the class loader on the remote machine.
+    // This name will be supplied to sessionClassLoader.getResourceAsStream(String name) on the remote machine.
+    // In the case of requesting bytecode for a class, this name should be the binary name of the class
+    // with '/'-separated path name and '.class' appended. E.g. class com.foo.Bar -> com/foo/Bar.class
+    repeated string resource_name = 1;
+
+    // Request identifier which will be echoed bach to the client by the server, identifies the session and
+    // request on the client to which the response will be addressed
+    required RequestIdentifier request_identifier = 2;
+}
+}}}
+
+The `ResourceRequest` message is sent by a remote machine to a local machine, when it requires the local machine to upload a class definition or some resource file from the classpath.
+
+Typically this will be sent when a mobile object is transferred to a remote machine for _the first time_, and so the remote machine needs the class definitions from the local machine so it can deserialize the object. Subsequently the remote machine will cache classes and resources in the class loader for the session on the remote machine. Objects of the same type sent subsequently would be deserialized from cached classes. Also it should be noted that classes which are already deployed to the remote machine, will never be requested.
+
+The `ResourceRequest` message encapsulates:
+ * A `RequestIdentifier`, which the server will copy into its response to this request, to allow the library to unblock the thread waiting for requested classes to arrive
+ * A _repeated_ class name. In protobuf syntax, this means a _collection_ of class names
+   * Note that this allows a machine to request multiple classes in a single round trip
+   * Code mobility can require multiple classes to deserialize an object it has not seen before
+   * Although not currently implemented, the library might be enhanced to avail of this "hook" in future, supporting requests for multiple classes in a single operation. This would have the potential to greatly reduce the number of round trips between server and client when an object is first deserialized at the server
+   * Since the library controls deserialization, it would be possible to extract a list of the classes required to deserialize an object from serialized data. These classes could then be pre-loaded from the client in a single round trip
+   * Alternatively, it would be possible for the client-side serializer to notify the server of required classes, see the `ResourceResponse` message below
+ * In the current implementation, the server will request one class at a time
+
+===message_resource_response.proto===
+
+{{{
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_request_identifier.proto";
+
+message ResourceData {
+    // The name of the class or resource requested, as provided by the SessionClassLoader on the local machine
+    required string resource_name = 1;
+    // The bytecode of the class or binary data of the resource requested
+    required bytes resource_data = 2;
+}
+message ResourceResponse {
+    // The requested bytecode or binary resource data
+    repeated ResourceData resource_data = 1;
+
+    // The request identifier, copied from the corresponding resource request originally sent by the client
+    required RequestIdentifier request_identifier = 4;
+}
+}}}
+
+The `ResourceResponse` message encapsulates:
+ * A RequestIdentifier which is copied from the `ResourceRequest` message that originated the request
+ * Repeated (a collection of) ClassData components, which are comprised of class name-byte array pairs
+   * Note that this allows the client to return multiple classes to the server in a single round trip
+   * Although not currently implemented, as a possible future enhancement, the protocol has been designed to allow the client to return more classes to the server than the server requested
+   * Since the library controls serialization, it would be possible for the client to compose a list of classes which would be required to deserialize any particular object
+   * This would allow the client to use knowledge of which dependent classes the server might require to deserialize an object based on a particular class, especially on the first occasion that the client sees a request for a particular class from a particular server
+   * This would be an alternative mechanism to reduce round trips from server to client
+ * In the current implementation, the client will return only the classes explicitly requested by the server
+
+===message_ping.proto===
+
+{{{
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_uuid.proto";
+
+// A message which can be sent at any time by the client
+// to validate that a connection is still up
+message Ping {
+    // A UUID generated by the client when it generates a Ping request,
+    // which will be echoed back in a Pong response
+    required UUID request_id = 1;
+
+    // An arbitrary string which can be sent for debugging purposes
+    required string message = 2;
+}
+}}}
+
+The Ping message allows the library to test that the underlying transport is working. If the library receives a Ping message, it will simply echo it back in a Pong message via the same connection. Note that the library does not automatically send Ping requests, this is mostly for live testing from a manually controlled client.
+
+The Ping message encapsulates:
+ * A request id (128-bit UUID) which is generated by the client and copied by the server into a Pong message which it immediately sends back to the client
+ * A string message, which can be printed to client and server logs when debug logging is enabled
+
+===message_pong.proto===
+
+{{{
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_uuid.proto";
+
+// A message sent by the machine at the remote side of a connection
+// in response to a Ping message
+message Pong {
+    // The request_id sent by the client when it sent the Ping request
+    // to which this Pong message is the reply
+    required UUID request_id = 1;
+
+    // An arbitrary string which can be sent for debugging purposes
+    required string message = 2;
+}
+}}}
+
+The Pong message encapsulates:
+ * A request id (128-bit UUID) which is supplied by the client in a Ping message and copied by the server into the Pong reply message
+ * A string message, supplied by the client, which may be appended to by the server, which can be printed to client and server logs when debug logging is enabled
+
+===message_execution_request.proto===
+
+{{{
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_serialization_format.proto";
+import "component_request_identifier.proto";
+
+message ExecutionRequest {
+    enum ExecutionMode {
+        RETURN_RESPONSE = 0;
+        FIRE_AND_FORGET = 1;
+    }
+
+    // A serialized Runnable or Callable object
+    required bytes serialized_executable_object = 1;
+
+    // The serialized format of the executable object e.g. whether Kryo or Java serialization was used
+    required SerializationFormat serialization_format = 2;
+
+    // Whether the remote host needs to return a response to the client when the execution completes
+    required ExecutionMode execution_mode = 3 [default = RETURN_RESPONSE];
+
+    // Request identifier, indicates relevant session and identifies the relevant request to the client when
+    // response messages are returned
+    required RequestIdentifier request_identifier = 4;
+}
+}}}
+
+The `ExecutionRequest` message allows the local application to send an object (or graph of objects) to a remote application, and request that the library in the remote application invoke the object in a certain way.
+
+The `ExecutionRequest` message is comprised of:
+ * A serialized object or object graph, where the root of the graph is an object which implements interface `java.lang.Runnable` or `java.util.concurrent.Callable`
+   * Note that the root of this graph defines the entry point for the sever to invoke the object
+   * Typically the root of this graph will be an anonymous class or closure, calling some other method in its enclosing object or some referenced object
+   * Hidden references are stored in _synthetic fields_ within inner and anonymous classes. These references point to the enclosing object of the inner class. By exploiting these references it is possible to serialize an entry point and its related objects, without requiring the related objects to implement interfaces
+ * A field which indicates the serialization format of the serialized object
+ * An `ExecutionMode` field, having one of two possible values:
+   * `RETURN_RESPONSE` indicates that the client will block for a response from the server which contains:
+     * An indication of whether or not the server invoked the entry point (method) successfully
+     * The object returned by the entry point/method
+     * An exception, in the case that the entry point/method threw an exception
+       * The library will re-throw this exception to the calling thread in the client
+   * `FIRE_AND_FORGET` indicates that the client will not block for a response from the server and that the server should not return any response at all
+     * This can be considered an indication from the client that the server should make a “best effort” attempt to execute the object, but if it fails the client does not wish to be notified
+     * This eliminates a round trip in client-server interaction, and it is expected to be useful where failure is not critical or where the object executed might make its own callback to the client asynchronously
+ * A request id (128-bit UUID) generated by the client and copied by the server into an ExecutionResponse message (in the case of `RETURN_RESPONSE` mode)
+   * Each session in the session layer maintains a map of outstanding requests ids to objects on which client threads are blocked waiting for execution response messages, and the library will use this to unblock the relevant thread
+
+===message_execution_response.proto===
+
+{{{
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_serialization_format.proto";
+import "component_request_identifier.proto";
+
+message ExecutionResponse {
+    enum ExecutionOutcome {
+        VOID_RETURNED = 0;
+        VALUE_RETURNED = 1;
+        FAILURE = 2;
+    }
+
+    // An enum value which indicates whether the execution returned a response object or not, or whether execution failed
+    required ExecutionOutcome execution_outcome = 1;
+
+    // A serialized object whose type depends on the ExecutionOutcome:
+    // if VOID_RETURNED - serialized_return_object will be zero bytes
+    // if VALUE_RETURNED - serialized_return_object will be a serialized object returned by the Callable object
+    // if FAILURE - a serialized RuntimeException wrapping whatever exception caused execution to fail
+    required bytes serialized_return_object = 2;
+
+    // The serialized format of the return object e.g. whether Kryo or Java serialization was used
+    required SerializationFormat serialization_format = 3;
+
+    // The request identifier, copied from the corresponding execution request originally sent by the client
+    required RequestIdentifier request_identifier = 4;
+}
+}}}
+
+The `ExecutionResponse` message is comprised of:
+ * An `ExecutionOutcome` field, having one of three possible values:
+   * `VOID_RETURNED` indicates that the entry point method when executed on the server had a void return type, or it returned null
+   * `VALUE_RETURNED` indicates that the entry point method when executed on the server returned an object, and that the object will be found in the serialized_return_object field
+   * `FAILURE` indicates that the entry point method when executed on the server threw an exception, and that the exception will be found in the serialized_return_object field
+ * A field which indicates the serialization format of the serialized return object
+ * A request identifier (128-bit UUID) generated by the client and copied by the server into this response message, which allows the client to unblock a waiting thread as discussed above
+
+===message_envelope.proto===
+
+{{{
+package com.googlecode.mobilityrpc.protocol.protobuf;
+
+// Encapsulates protobuf data and indicates the type of message which has been
+// serialized, so that the relevant protobuf class can be chosen to deserialize it
+message Envelope {
+    enum MessageType {
+        EXECUTION_REQUEST = 1;
+        EXECUTION_RESPONSE = 2;
+        RESOURCE_REQUEST = 3;
+        RESOURCE_RESPONSE = 4;
+        PING = 5;
+        PONG = 6;
+    }
+
+  required MessageType message_type = 1;
+  required bytes message_bytes = 2;
+}
+}}}
+
+Google Protocol Buffer messages serialize to a stream of bytes, and these bytes do not have a signature to allow the the serialized message's type be determined.
+
+The type of the serialized message must be known before it can be deserialized. This is because it must be deserialized by the Protocol Buffer class generated from the relevant message's proto file.
+
+This problem is solved by defining an `Envelope` message, which is comprised of:
+ * A message_bytes field, containing another protobuf-serialized message
+ * A message_type enum field, which indicates the type of the message that can be found in the message_bytes field
+
+Thus every message that is sent is encapsulated in an `Envelope` message, and the receiving side therefore expects only to receive `Envelope` messages on the wire. The library on the receiving side will deserialize the envelope, then deserialize the contained message using the protobuf class appropriate for the message type.
