@@ -1,4 +1,4 @@
-#summary Release notes for official releases of the library
+#summary Release notes for official releases of the Mobility-RPC library
 #labels Featured
 
 ===Version 0.5.2 - 2012-03-03===
