@@ -297,7 +297,7 @@ Google Protocol Buffer messages serialize to a stream of bytes, and these bytes 
 The type of the serialized message must be known before it can be deserialized. This is because it must be deserialized by the Protocol Buffer class generated from the relevant message's proto file.
 
 This problem is solved by defining an `Envelope` message, which is comprised of:
- * A message_bytes field, containing another protobuf-serialized message
- * A message_type enum field, which indicates the type of the message that can be found in the message_bytes field
+ * A `message_bytes` field, containing another protobuf-serialized message
+ * A `message_type` enum field, which indicates the type of the message that can be found in the `message_bytes` field
 
 Thus every message that is sent is encapsulated in an `Envelope` message, and the receiving side therefore expects only to receive `Envelope` messages on the wire. The library on the receiving side will deserialize the envelope, then deserialize the contained message using the protobuf class appropriate for the message type.
