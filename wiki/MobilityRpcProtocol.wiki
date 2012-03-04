@@ -18,17 +18,17 @@ Java Serialization actually has poor compatibility with standard Java code. By d
 In non-trivial applications, where functionality might be implemented by various libraries, this non-compatibility by default of Java Serialization with standard objects can cause headaches. If an application tries to assemble an object graph for sending over RMI, and one of the component objects originates from a third-party library which did not implement `java.io.Serializable` on that object, the serialization of that object graph will fail with an exception at runtime.
 
 ==Networking Complexity==
-
 The design of RMI's communication protocol seems complex from a network interactions point of view. RMI requires objects which are to made accessible over the network to be added to an RMI Registry. The RMI Registry listens on a fixed port, and can be embedded in the remote application, or can be run as a separate process on a different machine. Client machines wishing to access a particular object, connect to this registry, and "look up" the required object by name, which returns another address and port number, the actual address and port of the machine on which this object is listening. Client machines then connect to the object on the identified address and port.
 
 In RMI, remote objects themselves are not bound to fixed ports, but to arbitrary ports. This is not inefficient _per-se_, as the address and port can be cached by the client, and subsequent invocations on the same object can bypass the lookup. However, the involvement of a registry would seem to complicate usage, can act as a single point of failure, and the proliferation of arbitrary ports can cause headaches for administrators wishing to restrict access to certain ports. It would seem simpler if clients could just connect directly to objects, on a fixed port, and without the registry look up round trip.
 
-==Multi-threaded Clients==
+==Remote Interfaces==
+RMI requires all objects which are to be invoked across the network, to implement an interface declaring the methods which can be invoked in advance. This interface must also be deployed with the client application. This means that adding the ability to invoke a new method, requires code changes to both local and remote applications, and a redeploy of both. Mobility-RPC would not require code changes on the remote application, and would not require any interfaces to be implemented.
 
+==Multi-threaded Clients==
 RMI can restrict performance in multi-threaded clients. The [http://download.oracle.com/javase/6/docs/platform/rmi/spec/rmiTOC.html Java RMI Specification] states that the RMI runtime makes [http://docs.oracle.com/javase/6/docs/platform/rmi/spec/rmi-arch3.html no guarantees] on how concurrent requests from multi-threaded clients will be handled server-side, whether those requests will be executed concurrently or serially on the server.
 
 ==Synchronous, Half-Duplex Connections==
-
 RMI is a half-duplex protocol. TCP, on top of which RMI runs, is full-duplex, providing incoming and outgoing byte streams which operate independently of each other. When a method invocation is performed over an RMI connection, RMI sends an invocation request to the remote machine via the outgoing stream, and then waits for a response via the incoming stream. As such, RMI uses only one direction in a TCP connection at a time, limiting connections to half-duplex operation.
 
 This also means that RMI connections are synchronous: while one invocation is ongoing on a connection, the connection is occupied until the entire invocation returns, which is the latency in sending the request, plus the server's latency in processing it, plus the latency in the response returning to the client.
