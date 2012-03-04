@@ -1,6 +1,7 @@
 #summary The internal structure of Mobility-RPC protocol messages
+#labels Featured
 
-The internal structure of individual Mobility-RPC protocol messages. See MobilityRpcProtocol for an overview of the protocol.
+The internal structure of Mobility-RPC protocol messages. See MobilityRpcProtocol for an overview of the protocol.
 
 =Mobility-RPC Protocol Message Definitions=
 
