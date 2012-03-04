@@ -73,7 +73,7 @@ SCTP would offer significant benefits to the Mobility-RPC library, versus TCP, h
 
 The Mobility-RPC protocol is designed to be compatible with SCTP. However because SCTP is not yet widely available, the library implements this protocol atop TCP.
 
-The presented code mobility protocol has been designed with the following characteristics:
+The Mobility-RPC protocol has therefore been designed with the following characteristics:
  * *Message-oriented.* The formats of discrete messages which can be exchanged are predefined, and inside these (variable-length) messages, serialized objects, bytecode etc. are encapsulated
  * *Stateless, connectionless.* Connections may be established ad-hoc, may be maintained persistently, or may not to be established at all (where the underlying transport is connectionless). In any case the protocol does not require any synchronization or setup sequences before actual messages can be sent
  * *Asynchronous, non-blocking.* Machines at either end of a connection can both send any type of message to each other at any time in full-duplex. If a machine transmits a request, it will not expect an immediate response, and the transport layer will not block waiting for such a response
