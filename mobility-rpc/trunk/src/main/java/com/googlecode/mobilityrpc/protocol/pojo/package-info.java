@@ -16,7 +16,7 @@
 /**
  * [private api] Java object (POJO) representations of protocol messages.
  * <p/>
- * For documentation on each protocol messages and how they are processed, see each of the .proto files in
+ * For documentation on protocol messages and how they are processed, see each of the .proto files in
  * <code>src/main/proto</code>.
  */
 package com.googlecode.mobilityrpc.protocol.pojo;
