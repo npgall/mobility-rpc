@@ -33,7 +33,7 @@ RMI is a half-duplex protocol. TCP, on top of which RMI runs, is full-duplex, pr
 
 This also means that RMI connections are synchronous: while one invocation is ongoing on a connection, the connection is occupied until the entire invocation returns, which is the latency in sending the request, plus the server's latency in processing it, plus the latency in the response returning to the client.
 
-Any _concurrent_ requests to the same destination cause RMI to establish additional connections. RMI, as implemented in Oracle/OpenJDK 6 and 7, mitigates the overhead of establishing multiple connections by using a connection pool. It can be noted that 
+Any _concurrent_ requests to the same destination cause RMI to establish additional connections. RMI, as implemented in Oracle/OpenJDK 6 and 7, mitigates the overhead of establishing multiple connections by using a connection pool. However high concurrency client applications would require many connections to be established, and if the server was serving many similar clients, overhead at the server would increase faster than at the clients.
 
 =The problems with Synchronous Protocols=
 
