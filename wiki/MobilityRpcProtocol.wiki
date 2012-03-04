@@ -61,7 +61,7 @@ Therefore for items 1 & 2, precedents have been set which indicate that these ar
 
 For items 3 and 4, it appears that the inherent order-of-transmission, stream-oriented nature of TCP itself is more a liability than a benefit for many applications, and that in fact these can be valid reasons to establish multiple connections.
 
-==SCTP and Message-Oriented Protocols==
+==SCTP and Message-Oriented Transports==
 
 It can be observed that many application-layer protocols which run atop TCP support the exchange of finite-length requests and responses, and thus are more message-oriented than stream-oriented. These protocols might benefit from implementation atop a message-oriented underlying transport, rather than the stream-oriented TCP protocol.
 
