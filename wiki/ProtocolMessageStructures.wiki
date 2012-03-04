@@ -1,6 +1,6 @@
-#summary The format of each of the messages comprising the Mobility-RPC protocol
+#summary The internal structure of Mobility-RPC protocol messages
 
-The format of each of the messages comprising the Mobility-RPC protocol. See MobilityRpcProtocol for an overview of the protocol.
+The internal structure of individual Mobility-RPC protocol messages. See MobilityRpcProtocol for an overview of the protocol.
 
 =Mobility-RPC Protocol Message Definitions=
 
