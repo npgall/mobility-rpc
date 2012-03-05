@@ -5,37 +5,37 @@ The communication protocol used in Mobility-RPC has been designed from the groun
 
 <wiki:toc max_depth="3" />
 
-= The problems with RMI and Java Serialization =
+==The problems with RMI and Java Serialization==
 
-==Efficiency==
+===Efficiency===
 In terms of runtime performance, Java Serialization is _eleven times slower_ than third party serialization libraries for the Java platform, and the serialized data sizes that it outputs are _three times larger_ than third party serialization libraries for the Java platform, according to [http://code.google.com/p/thrift-protobuf-compare/wiki/Benchmarking independent benchmarks].
 
 RMI, the default RPC framework of Java, is tightly coupled with Java Serialization. Therefore any objects transferred to remote machines via RMI will inherit the slow serialization speed of Java Serialization, and will require more data to be transmitted on the network.
 
-==Compatibility==
+===Compatibility===
 Java Serialization actually has poor compatibility with standard Java code. By default, all Java objects are _not_ compatible with Java Serialization. Objects must be explicitly coded to be compatible with Java Serialization, by implementing the interface [http://docs.oracle.com/javase/6/docs/api/java/io/Serializable.html java.io.Serializable].
 
 In non-trivial applications, where functionality might be implemented by various libraries, this non-compatibility by default of Java Serialization with standard objects can cause headaches. If an application tries to assemble an object graph for sending over RMI, and one of the component objects originates from a third-party library which did not implement `java.io.Serializable` on that object, the serialization of that object graph will fail with an exception at runtime.
 
-==Networking Complexity==
+===Networking Complexity===
 The design of RMI's communication protocol seems complex from a network interactions point of view. RMI requires objects which are to be made accessible over the network to be added to an RMI Registry. The RMI Registry listens on a fixed port, and can be embedded in the remote application, or can be run as a separate process on a different machine. Client machines wishing to access a particular object, connect to this registry, and "look up" the required object by name, which returns another address and port number, the actual address and port of the machine on which this object is listening. Client machines then connect to the object on the identified address and port.
 
 In RMI, remote objects themselves are not bound to fixed ports, but to arbitrary ports. This is not inefficient _per-se_, as the address and port can be cached by the client, and subsequent invocations on the same object can bypass the lookup. However, the involvement of a registry would seem to complicate usage, can act as a single point of failure, and the proliferation of arbitrary ports can cause headaches for administrators wishing to restrict access to certain ports. It would seem simpler if clients could just connect directly to objects, on a fixed port, and without the registry look up round trip.
 
-==Remote Interfaces==
+===Remote Interfaces===
 RMI requires all objects which are to be invoked across the network, to implement an interface declaring the methods which can be invoked in advance. This interface must also be deployed with the client application. This means that adding the ability to invoke a new method, requires code changes to both local and remote applications, and a redeploy of both. Mobility-RPC would not require code changes on the remote application, and would not require any interfaces to be implemented.
 
-==Multi-threaded Clients==
+===Multi-threaded Clients===
 RMI can restrict performance in multi-threaded clients. The [http://download.oracle.com/javase/6/docs/platform/rmi/spec/rmiTOC.html Java RMI Specification] states that the RMI runtime makes [http://docs.oracle.com/javase/6/docs/platform/rmi/spec/rmi-arch3.html no guarantees] on how concurrent requests from multi-threaded clients will be handled server-side, whether those requests will be executed concurrently or serially on the server.
 
-==Synchronous, Half-Duplex Connections==
+===Synchronous, Half-Duplex Connections===
 RMI is a half-duplex protocol. TCP, on top of which RMI runs, is full-duplex, providing incoming and outgoing byte streams which operate independently of each other. When a method invocation is performed over an RMI connection, RMI sends an invocation request to the remote machine via the outgoing stream, and then waits for a response via the incoming stream. As such, RMI uses only one direction in a TCP connection at a time, limiting connections to half-duplex operation.
 
 This also means that RMI connections are synchronous: while one invocation is ongoing on a connection, the connection is occupied until the entire invocation returns, which is the latency in sending the request, plus the server's latency in processing it, plus the latency in the response returning to the client.
 
 Any _concurrent_ requests to the same destination cause RMI to establish additional connections. RMI, as implemented in Oracle/OpenJDK 6 and 7, mitigates the overhead of establishing multiple connections by using a connection pool. However high concurrency client applications would require many connections to be established, and if the server was serving many similar clients, overhead at the server would increase faster than at the clients.
 
-=The problems with Synchronous Protocols=
+==The problems with Synchronous Protocols==
 
 RMI is not alone as a synchronous half-duplex protocol, which establishes multiple TCP connections, each one dedicated to an individual request-response interaction.
 
@@ -61,13 +61,13 @@ Therefore for items 1 & 2, precedents have been set which indicate that these ar
 
 For items 3 and 4, it appears that the inherent order-of-transmission, stream-oriented nature of TCP itself is more a liability than a benefit for many applications, and that in fact these can be valid reasons to establish multiple connections.
 
-==SCTP and Message-Oriented Transports==
+===SCTP and Message-Oriented Transports===
 
 It can be observed that many application-layer protocols which run atop TCP support the exchange of finite-length requests and responses, and thus are more message-oriented than stream-oriented. These protocols might benefit from implementation atop a message-oriented underlying transport, rather than the stream-oriented TCP protocol.
 
 [http://tools.ietf.org/html/rfc3257 Stream Control Transmission Protocol] (SCTP) is a transport layer protocol at the same level in the Internet Protocol stack as TCP and UDP. SCTP is message-oriented like UDP, but provides reliable delivery like TCP. SCTP supports ordering of messages, but does not mandate it, such that applications which do not require strict ordering can choose to process messages in the order they are received rather than the order in which they were sent. This would eliminate Head-Of-Line blocking at transport layer (reason 3) and stream monopolisation (reason 4), thus would eliminate the two remaining reasons to establish multiple simultaneous connections.
 
-=Mobility-RPC Protocol Overview=
+==Mobility-RPC Protocol Overview==
 
 SCTP would offer significant benefits to the Mobility-RPC library, versus TCP, however support for SCTP is not widespread as yet, having only become supported in [http://java.sun.com/developer/technicalArticles/javase/jdk7-sctp/ Java 7].
 
@@ -81,7 +81,7 @@ The Mobility-RPC protocol has therefore been designed with the following charact
  * *Sessions.* In addition to simple RPC-style interactions, the protocol (while itself stateless) supports stateful interactions between applications. _!SessionIdentifiers_ are encoded (also UUIDs) into request messages, and where applications use the same session ids, those applications will also be able to access the same classes and static state on remote machines
  * *`RETURN_RESPONSE` and `FIRE_AND_FORGET`.* The protocol supports requesting these two modes of remote code execution, and the relevant mode is encoded into execution request messages. The former allows the implementation of synchronous (blocking) invocations atop the asynchronous protocol (in the session layer). The latter mode allows applications to explicitly state that a response is not required from the server, eliminating unnecessary round trips
 
-==Support for Multiple TCP Connections==
+===Support for Multiple TCP Connections===
 
 As discussed above, establishing a single multiplexed TCP connection between pairs of machines is likely to be more efficient than establishing many, however there are some valid reasons to establish multiple TCP connections. The implementation of the Mobility-RPC protocol atop TCP is therefore as follows:
 
