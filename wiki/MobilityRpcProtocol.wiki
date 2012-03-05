@@ -89,6 +89,6 @@ As discussed above, establishing a single multiplexed TCP connection between pai
  * The library also allows applications to send requests via additional _auxiliary_ connections
  * The library routes responses via the same connection from which it receives a request, effectively allowing applications to open multiple _channels_ to a destination when, and only when necessary
 
-=Mobility-RPC Protocol Message Definitions=
+==Mobility-RPC Protocol Message Definitions==
 
 The structure of individual protocol messages can be found in ProtocolMessageStructures.
