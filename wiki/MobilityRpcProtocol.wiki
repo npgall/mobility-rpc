@@ -1,9 +1,9 @@
 #summary Overview of Mobility-RPC's communication and serialization protocols
 #labels Featured
 
-<wiki:toc max_depth="3" />
-
 The communication protocol used in Mobility-RPC has been designed from the ground up to be as efficient as possible. To achieve this, it does not rely on the serialization support built into Java, and it does not rely on RMI, the default RPC framework of Java.
+
+<wiki:toc max_depth="3" />
 
 ==The problems with RMI and Java Serialization==
 
