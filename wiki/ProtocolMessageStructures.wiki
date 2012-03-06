@@ -100,7 +100,7 @@ message ResourceRequest {
 
 The `ResourceRequest` message is sent by a remote machine to a local machine, when it requires the local machine to upload a class definition or some resource file from the classpath.
 
-Typically this will be sent when a mobile object is transferred to a remote machine for _the first time_, and so the remote machine needs the class definitions from the local machine so it can deserialize the object. Subsequently the remote machine will cache classes and resources in the class loader for the session on the remote machine. Objects of the same type sent subsequently would be deserialized from cached classes. Also it should be noted that classes which are already deployed to the remote machine, will never be requested.
+Typically this will be sent when a mobile object is transferred to a remote machine _for the first time_, and so the remote machine needs the class definitions from the local machine so it can deserialize the object. Subsequently the remote machine will cache classes and resources in the class loader for the session on the remote machine. Objects of the same type sent subsequently would be deserialized from cached classes. Also it should be noted that classes which are already deployed to the remote machine, will never be requested.
 
 The `ResourceRequest` message encapsulates:
  * A `RequestIdentifier`, which the server will copy into its response to this request, to allow the library to unblock the thread waiting for requested classes to arrive
