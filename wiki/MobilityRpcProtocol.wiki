@@ -83,7 +83,7 @@ The Mobility-RPC protocol has therefore been designed with the following charact
    * Client applications using different session ids, will have their mobile objects loaded by _separate_ session class loaders on remote machines, and as such will be isolated from each other. Even if the applications happen to use the same classes, the sessions they access on remote machines will each load their own copy of those classes, and as such data stored in static fields in those classes will not be shared between sessions
    * The isolation of mobility sessions from each other, is therefore similar to the [http://tomcat.apache.org/tomcat-7.0-doc/class-loader-howto.html class loader isolation] of deployed applications from each other in most Java web servers and application servers. This applies to classes loaded from client machines only; classes belonging to the host application and those on its classpath are shared with all sessions
  * *`RETURN_RESPONSE` and `FIRE_AND_FORGET`.* The protocol supports requesting these two modes of remote code execution, and the relevant mode is encoded into execution request messages
-    * `RETURN_RESPONSE` enables synchronous (blocking) invocations atop the asynchronous protocol (in the session layer), where the local thread will block until a response is received
+    * `RETURN_RESPONSE` enables synchronous (blocking) invocations atop the asynchronous protocol, where the local thread will block until a response is received
     * `FIRE_AND_FORGET` allows applications to explicitly state that a response is not required from the server, eliminating unnecessary round trips
 
 ===Support for Multiple TCP Connections===
