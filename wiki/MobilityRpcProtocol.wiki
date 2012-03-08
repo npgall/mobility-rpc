@@ -69,11 +69,11 @@ It can be observed that many application-layer protocols which run atop TCP supp
 
 ==Mobility-RPC Protocol Overview==
 
-SCTP would offer significant benefits to the Mobility-RPC library, versus TCP, however support for SCTP is not widespread as yet, having only become supported in [http://java.sun.com/developer/technicalArticles/javase/jdk7-sctp/ Java 7].
+===Protocol Characteristics===
 
-The Mobility-RPC protocol is designed to be compatible with SCTP. However because SCTP is not yet widely available, the library implements this protocol atop TCP.
+The Mobility-RPC protocol is intentionally not coupled with underlying transport protocols, and is designed such that it could be implemented atop various transports, for example TCP, UDP, SCTP or others.
 
-The Mobility-RPC protocol has therefore been designed with the following characteristics:
+The protocol therefore has the following characteristics:
  * *Message-oriented.* The formats of discrete messages which can be exchanged are predefined, and inside these (variable-length) messages, serialized objects, bytecode etc. are encapsulated
  * *Stateless, connectionless.* Connections may be established ad-hoc, may be maintained persistently, or may not to be established at all (where the underlying transport is connectionless). In any case the protocol does not require any synchronization or setup sequences before actual messages can be sent
  * *Asynchronous, non-blocking.* Machines at either end of a connection can both send any type of message to each other at any time in full-duplex. If a machine transmits a request, it will not expect an immediate response, and the transport layer will not block waiting for such a response
@@ -86,7 +86,11 @@ The Mobility-RPC protocol has therefore been designed with the following charact
     * `RETURN_RESPONSE` enables synchronous (blocking) invocations atop the asynchronous protocol, where the local thread will block until a response is received
     * `FIRE_AND_FORGET` allows applications to explicitly state that a response is not required from the server, eliminating unnecessary round trips
 
-===Support for Multiple TCP Connections===
+===TCP Implementation===
+
+Although the protocol is intentionally compatible with SCTP, for practical reasons - because SCTP is not yet widely available, having only become supported in [http://java.sun.com/developer/technicalArticles/javase/jdk7-sctp/ Java 7] - the protocol is currently implemented atop TCP.
+
+*Support for Multiple TCP Connections*
 
 As discussed above, establishing a single multiplexed TCP connection between pairs of machines is likely to be more efficient than establishing many, however there are some valid reasons to establish multiple TCP connections. The implementation of the Mobility-RPC protocol atop TCP is therefore as follows:
 
@@ -94,6 +98,6 @@ As discussed above, establishing a single multiplexed TCP connection between pai
  * The library also allows applications to send requests via additional _auxiliary_ connections
  * The library routes responses via the same connection from which it receives a request, effectively allowing applications to open multiple _channels_ to a destination when, and only when necessary
 
-==Mobility-RPC Protocol Message Definitions==
+===Protocol Message Definitions===
 
-The structure of individual protocol messages can be found in ProtocolMessageStructures.
+The structure of individual Mobility-RPC protocol messages can be found in ProtocolMessageStructures.
