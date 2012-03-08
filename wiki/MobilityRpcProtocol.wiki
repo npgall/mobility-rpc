@@ -69,9 +69,9 @@ It can be observed that many application-layer protocols which run atop TCP supp
 
 ==Mobility-RPC Protocol Overview==
 
-===Protocol Characteristics===
-
 The Mobility-RPC protocol is intentionally not coupled with underlying transport protocols, and is designed such that it could be implemented atop various transports, for example TCP, UDP, SCTP or others.
+
+===Protocol Characteristics===
 
 The protocol therefore has the following characteristics:
  * *Message-oriented.* The formats of discrete messages which can be exchanged are predefined, and inside these (variable-length) messages, serialized objects, bytecode etc. are encapsulated
