@@ -54,3 +54,6 @@ sleep 10 || die "SVN commit cancelled"
 echo "Committing new JavaDocs to SVN"
 svn ci apidocs/ -m "Updating JavaDocs [Step 2]" || die "Could not commit new JavaDocs to SVN"
 
+
+cd "$WORKING_DIR" || die "Could not change back to working directory"
+
