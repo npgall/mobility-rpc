@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.mobilityrpc</groupId>
     <artifactId>mobility-rpc</artifactId>
-    <version>0.5.4</version>
+    <version>0.5.5-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Mobility-RPC</name>
     <description>A high performance and easy to use library for Code Mobility and RPC on the Java platform.</description>
@@ -20,9 +20,9 @@
         </license>
     </licenses>
     <scm>
-        <url>http://mobility-rpc.googlecode.com/svn/mobility-rpc/tags/0.5.4</url>
-        <connection>scm:svn:http://mobility-rpc.googlecode.com/svn/mobility-rpc/tags/0.5.4</connection>
-        <developerConnection>scm:svn:https://mobility-rpc.googlecode.com/svn/mobility-rpc/tags/0.5.4</developerConnection>
+        <url>http://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</url>
+        <connection>scm:svn:http://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</connection>
+        <developerConnection>scm:svn:https://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</developerConnection>
         <!--
             Note: When performing a release for the first time, run the following
             and and choose to permanently accept Google's server certificate:
