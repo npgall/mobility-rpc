@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.mobilityrpc</groupId>
     <artifactId>mobility-rpc</artifactId>
-    <version>0.5.3-SNAPSHOT</version>
+    <version>0.5.3</version>
     <packaging>jar</packaging>
     <name>Mobility-RPC</name>
     <description>A high performance and easy to use library for Code Mobility and RPC on the Java platform.</description>
@@ -21,9 +20,9 @@
         </license>
     </licenses>
     <scm>
-        <url>http://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</url>
-        <connection>scm:svn:http://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</connection>
-        <developerConnection>scm:svn:https://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</developerConnection>
+        <url>http://mobility-rpc.googlecode.com/svn/mobility-rpc/tags/0.5.3</url>
+        <connection>scm:svn:http://mobility-rpc.googlecode.com/svn/mobility-rpc/tags/0.5.3</connection>
+        <developerConnection>scm:svn:https://mobility-rpc.googlecode.com/svn/mobility-rpc/tags/0.5.3</developerConnection>
         <!--
             Note: When performing a release for the first time, run the following
             and and choose to permanently accept Google's server certificate:
@@ -119,7 +118,7 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <tasks>
-                                <mkdir dir="target/generated-sources/protoc"/>
+                                <mkdir dir="target/generated-sources/protoc" />
                                 <path id="proto.path">
                                     <fileset dir="src/main/proto">
                                         <include name="**/*.proto" />
