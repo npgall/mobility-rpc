@@ -24,6 +24,11 @@
         <url>http://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</url>
         <connection>scm:svn:http://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</connection>
         <developerConnection>scm:svn:https://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</developerConnection>
+        <!--
+            Note: When performing a release for the first time, run the following
+            and and choose to permanently accept Google's server certificate:
+                svn log -v https://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/
+        -->
     </scm>
     <developers>
         <developer>
