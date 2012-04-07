@@ -1,0 +1,7 @@
+package com.googlecode.mobilityrpc.protocol.protobuf;
+
+enum SerializationFormat {
+    JAVA = 0;
+    KRYO = 1;
+    JBOSS_MARSHALLING = 2;
+}
