@@ -1,6 +1,10 @@
 #summary Release notes for official releases of the Mobility-RPC library
 #labels Featured
 
+===Version 0.5.4 - 2012-04-06===
+ * Updated the project's `pom.xml` with additional metadata required for deploying to Maven Central
+ * GPG-signed and deployed version 0.5.4 to Sonatype public repo, and requested sync with Maven Central
+
 ===Version 0.5.2 - 2012-03-03===
  * Added support to the protocol for transferring arbitrary classpath resources. Objects sent to remote machines can now load properties/configuration files etc. via usual methods (e.g. `this.getClass().getResourceAsStream(String name)`) and these will be uploaded transparently
  * Added `MobilitySession.execute(String, Runnable)` and `execute(String, Callable)`, convenience methods to send objects to a `String` machine name using default port
