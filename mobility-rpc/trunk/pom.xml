@@ -3,16 +3,49 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.mobilityrpc</groupId>
     <artifactId>mobility-rpc</artifactId>
-    <version>0.5.2</version>
+    <version>0.5.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Mobility-RPC</name>
-    <url>http://maven.apache.org</url>
+    <description>A high performance and easy to use library for Code Mobility and RPC on the Java platform.</description>
+    <url>http://code.google.com/p/mobility-rpc/</url>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>http://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</url>
+        <connection>scm:svn:http://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</connection>
+        <developerConnection>scm:svn:https://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <id>npgall</id>
+            <name>Niall Gallagher</name>
+            <email>niall@npgall.com</email>
+            <url>http://www.npgall.com</url>
+            <roles>
+                <role>owner</role>
+            </roles>
+        </developer>
+    </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <build>
         <plugins>
             <plugin>
+                <!--
+                    Configure javac compiler for Java 6 compatibility.
+                    Note that actually the library might also be compatible with Java 5, but this has not been tested.
+                -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
@@ -22,35 +55,63 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!-- Deploy a "-sources.jar" along with build -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- Deploy a "-javadoc.jar" along with build -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!--
+                    Run protoc (Google Protocol Buffers compiler) to generate Java classes from .proto files.
+                    See: http://code.google.com/p/protobuf/
+
+                    Ideally we would use maven-protoc-plugin to invoke protoc, but that plugin is not in Maven
+                    Central. We wish to deploy this library to Maven Central, and guidelines for doing so
+                    forbid relying on dependencies which are not also in central:
+                    https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+
+                    Therefore we use maven-antrun-plugin to invoke protoc as a workaround. Note: like
+                    maven-protoc-plugin, this requires protoc to be installed on the machine, and be accessible
+                    via the 'protoc' command.
+
+                    To install protoc (Google Protocol Buffers):
+                    - on Mac: sudo port install protobuf-java  (requires: http://www.macports.org/)
+                    - on Linux: sudo apt-get install protobuf-java  (or similar e.g. yum install ...)
+                    - on Windows: download binaries from http://code.google.com/p/protobuf/ and add to the
+                    operating system's PATH
+
+                    Mac OS issue: After installing protobuf as above on Mac OS, this plugin will work when Maven
+                    is run from the command line, but it will not work if run from IntelliJ IDE. To fix this,
+                    put a symlink to protoc directly into /usr/bin.
+                    From a terminal: sudo ln -s `which protoc` /usr/bin/protoc
+                -->
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>compile-protoc</id>
                         <phase>generate-sources</phase>
-                        <!--
-                            Run protoc (Google Protocol Buffers compiler) to generate Java classes from .proto files.
-                            See: http://code.google.com/p/protobuf/
-                            
-                            Ideally we would use maven-protoc-plugin to invoke protoc, but that plugin is not in Maven
-                            Central. We wish to deploy this library to Maven Central, and guidelines for doing so
-                            forbid relying on dependencies which are not also in central:
-                            https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
-
-                            Therefore we use maven-antrun-plugin to invoke protoc as a workaround. Note: like
-                            maven-protoc-plugin, this requires protoc to be installed on the machine, and be accessible
-                            via the 'protoc' command.
-                            
-                            To install protoc (Google Protocol Buffers):
-                            - on Mac: sudo port install protobuf-java  (requires: http://www.macports.org/)
-                            - on Linux: sudo apt-get install protobuf-java  (or similar e.g. yum install ...)
-                            - on Windows: download binaries from http://code.google.com/p/protobuf/ and add to the
-                            operating system's PATH
-
-                            Mac OS issue: After installing protobuf as above on Mac OS, this plugin will work when Maven
-                            is run from the command line, but it will not work if run from IntelliJ IDE. To fix this,
-                            put a symlink to protoc directly into /usr/bin.
-                            From a terminal: sudo ln -s `which protoc` /usr/bin/protoc
-                        -->
                         <configuration>
                             <tasks>
                                 <mkdir dir="target/generated-sources/protoc"/>
@@ -67,7 +128,7 @@
                                     <arg line="${proto.files}" />
                                 </exec>
                             </tasks>
-                            <sourceRoot>target/generated-sources</sourceRoot>
+                            <sourceRoot>target/generated-sources/protoc</sourceRoot>
                         </configuration>
                         <goals>
                             <goal>run</goal>
@@ -76,6 +137,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <!-- Add a "Main-Class" entry to manifest in the jar to run StandaloneMobilityServer -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.3.1</version>
@@ -150,6 +212,30 @@
             </plugin>
             <plugin>
                 <!--
+                    Plugin to PGP-sign all artifacts automatically when running mvn deploy,
+                    as required for deployment to the Sonatype/Maven Central repo.
+
+                    This requires GnuPG (aka GPG) to be installed and configured on the machine on which this is run,
+                    and for the public key to be uploaded to key servers (e.g. pool.sks-keyservers.net).
+
+                    See: https://docs.sonatype.org/display/Repository/How+To+Generate+PGP+Signatures+With+Maven
+                 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <!--suppress MavenModelInspection -->
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!--
                     Plugin to check that all source files have the appropriate open source license header.
                     
                     This will fail the build if any source files don't have the open source license header.
@@ -202,7 +288,6 @@
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>2.4.1</version>
-            <optional>false</optional>
         </dependency>
     </dependencies>
 </project>
