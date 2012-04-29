@@ -7,7 +7,7 @@ The internal structure of Mobility-RPC protocol messages. See MobilityRpcProtoco
 
 =Mobility-RPC Protocol Message Definitions=
 
-Mobility-RPC uses [http://code.google.com/apis/protocolbuffers/ Google Protocol Buffers] (protobuf) to encode messages for sending "on the wire".
+Mobility-RPC uses [http://code.google.com/apis/protocolbuffers/ Google Protocol Buffers] (protobuf) to encode messages for sending _on the wire_.
 
 Protocol messages are defined using protobuf syntax, each message defined in a .proto file in the `src/main/proto` directory.
 
