@@ -63,6 +63,9 @@ public class StandaloneMobilityServer {
     }
 
     static void addSystemTrayIconIfSupported() {
+        // For Mac OS only, set application name correctly in the menu bar. Need to do this before even querying AWT...
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Mobility-RPC");
+        // Check if we can add a system tray icon, and if supported add one...
         if (!GraphicsEnvironment.isHeadless() && SystemTray.isSupported()) {
             EventQueue.invokeLater(new Runnable() {
                 @Override
