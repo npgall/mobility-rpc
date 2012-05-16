@@ -71,6 +71,9 @@ public class StandaloneMobilityServer {
                 @Override
                 public void run() {
                     try {
+                        // Set system look and feel...
+                        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
                         // Prepare message which will be displayed when tray icon is clicked...
                         final StringBuilder infoMessage = new StringBuilder();
                         infoMessage.append("Mobility-RPC Standalone Server is running\n\n");
