@@ -17,10 +17,17 @@ package com.googlecode.mobilityrpc.quickstart;
 
 import com.googlecode.mobilityrpc.quickstart.util.LoggingUtil;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.logging.*;
 
 /**
  * Starts EmbeddedMobilityServer as a standalone application, listening on port 5739 on all network interfaces by default.
+ * <p/>
+ * Adds a system tray icon which displays information about the addresses on which the library is listening, and which
+ * allows the library to be shut down, if the host machine is not headless and supports system tray icons.
  * <p/>
  * Supply system property "-Ddebug=true" on the command line to enable debug logging.
  *
@@ -52,6 +59,78 @@ public class StandaloneMobilityServer {
                 System.out.println("\nMobility-RPC Server stopped");
             }
         });
+        addSystemTrayIconIfSupported();
     }
 
+    static void addSystemTrayIconIfSupported() {
+        if (!GraphicsEnvironment.isHeadless() && SystemTray.isSupported()) {
+            EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // Prepare message which will be displayed when tray icon is clicked...
+                        final StringBuilder infoMessage = new StringBuilder();
+                        infoMessage.append("Mobility-RPC Standalone Server is running\n\n");
+                        infoMessage.append("Listening on port ").append(EmbeddedMobilityServer.DEFAULT_PORT).append(" on the following addresses:\n");
+                        for (String networkAddress : EmbeddedMobilityServer.getAddresses()) {
+                            infoMessage.append(networkAddress).append("\n");
+                        }
+                        infoMessage.append("\nTo shut down Mobility-RPC, select the Exit option from this menu");
+
+                        // Prepare graphic for the icon which will be added to system tray...
+                        BufferedImage graphic;
+                        {
+                            final String uiResourceName = "OptionPane.informationIcon";
+                            Icon icon = UIManager.getIcon(uiResourceName);
+                            if (icon == null) {
+                                throw new IllegalStateException("Unable to load graphic for system tray icon using resource name: " + uiResourceName);
+                            }
+                            int w = icon.getIconWidth();
+                            int h = icon.getIconHeight();
+                            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                            GraphicsDevice gd = ge.getDefaultScreenDevice();
+                            GraphicsConfiguration gc = gd.getDefaultConfiguration();
+                            BufferedImage image = gc.createCompatibleImage(w, h, Transparency.TRANSLUCENT);
+                            Graphics2D g = image.createGraphics();
+                            icon.paintIcon(null, g, 0, 0);
+                            g.dispose();
+                            graphic = image;
+                        }
+
+                        // Prepare popup menu for tray icon when clicked, with a menu item to Exit Mobility-RPC...
+                        PopupMenu popup = new PopupMenu();
+                        MenuItem exitItem = new MenuItem("Exit Mobility-RPC");
+                        popup.add(exitItem);
+
+                        // Prepare system tray icon and add the popup menu to it.
+                        // Also display the info message as a tooltip if the mouse hovers on the tray icon...
+                        final TrayIcon trayIcon = new TrayIcon(graphic, "Mobility-RPC Standalone Server is running", popup);
+                        trayIcon.setImageAutoSize(true);
+
+                        // When the tray icon is clicked, display the information message...
+                        trayIcon.addMouseListener(new MouseAdapter() {
+                            public void mouseClicked(MouseEvent e) {
+                                trayIcon.displayMessage("Mobility-RPC Running", infoMessage.toString(), TrayIcon.MessageType.INFO);
+                            }
+                        });
+                        // When "Exit Mobility-RPC" is selected, exit the JVM (this will invoke the shutdown hook)...
+                        exitItem.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                System.exit(0);
+                            }
+                        });
+                        // Add the icon to the system tray...
+                        SystemTray.getSystemTray().add(trayIcon);
+
+                        // Explicitly display the info message right after the tray icon is added...
+                        trayIcon.displayMessage("Mobility-RPC Running", infoMessage.toString(), TrayIcon.MessageType.INFO);
+                    }
+                    catch (Exception e) {
+                        System.err.println("Exception adding system tray icon");
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
 }
