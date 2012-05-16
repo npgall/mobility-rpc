@@ -22,8 +22,8 @@ public class Envelope {
     public enum  MessageType {
         EXECUTION_REQUEST,
         EXECUTION_RESPONSE,
-        BYTE_CODE_REQUEST,
-        BYTE_CODE_RESPONSE,
+        RESOURCE_REQUEST,
+        RESOURCE_RESPONSE,
         PING,
         PONG
     }

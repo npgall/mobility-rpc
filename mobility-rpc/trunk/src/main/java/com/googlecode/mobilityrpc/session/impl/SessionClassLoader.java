@@ -39,9 +39,9 @@ public class SessionClassLoader extends ClassLoader {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     /**
-     * How long in millis threads waiting for bytecode to arrive should wait before giving up.
+     * How long in millis threads waiting for bytecode or classpath resources to arrive should wait before giving up.
      */
-    private static final long BYTE_CODE_REQUEST_TIMEOUT_MILLIS = 10000;
+    private static final long RESOURCE_REQUEST_TIMEOUT_MILLIS = 10000;
 
     private final MobilityControllerInternal mobilityController;
     private final UUID sessionId;
@@ -119,7 +119,7 @@ public class SessionClassLoader extends ClassLoader {
             FutureResourceResponse futureResponse = sendResourceRequest(requiredClasses);
 
             // Block here until the response arrives, or we time out...
-            ResourceResponse resourceResponse = futureResponse.getResponse(BYTE_CODE_REQUEST_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+            ResourceResponse resourceResponse = futureResponse.getResponse(RESOURCE_REQUEST_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 
             // Search the potentially multiple classes returned for the class we need.
             // Note: again, the protocol supports returning multiple classes,
