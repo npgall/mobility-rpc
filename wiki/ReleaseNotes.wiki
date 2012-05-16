@@ -1,6 +1,10 @@
 #summary Release notes for official releases of the Mobility-RPC library
 #labels Featured
 
+===Version 0.5.5 - 2012-05-16===
+ * Fixed backward/forward compatibility issue in protocol
+ * Updated pom.xml maven-license-plugin to validate open source licenses in deploy phase rather than verify phase, to allow "mvn install" to run and install locally for testing or experimental builds
+
 ===Version 0.5.4 - 2012-04-06===
  * Updated the project's `pom.xml` with additional metadata required for deploying to Maven Central
  * GPG-signed and deployed version 0.5.4 to Sonatype public repo, and requested sync with Maven Central
