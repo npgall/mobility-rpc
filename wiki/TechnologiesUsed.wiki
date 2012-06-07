@@ -11,4 +11,4 @@
  * [http://code.google.com/p/protobuf/ Google Protocol Buffers] - Used to serialize framework-internal Java objects representing protocol messages to binary, for sending over the network. Very efficient and allows protocol messages to be defined clearly in .proto files.
 
 ==Build tools==
- * [http://maven.apache.org/ Maven] - Software project build and dependency management tool
+ * [http://maven.apache.org/ Maven] - Software project build and dependency management tool.
