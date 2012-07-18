@@ -155,7 +155,7 @@
             </plugin>
             <plugin>
                 <!--
-                    Build an jar containing all dependencies, by copying classes from all dependency jars directly into
+                    Build a jar containing all dependencies, by copying classes from all dependency jars directly into
                     the main jar.
 
                     The resulting jar can be used as a library in other applications (without requiring any transitive
