@@ -2,7 +2,7 @@
 
 =How does mobility-rpc differ from conventional RPC?=
 
-==RPC Approach==
+==Conventional RPC Approach==
 
 Conventional RPC is usually implemented using remote interfaces and proxy objects (or “stubs”).
 
