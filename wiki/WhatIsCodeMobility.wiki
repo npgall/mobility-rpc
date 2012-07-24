@@ -3,7 +3,7 @@
 =What is Code Mobility?=
 Code Mobility is the ability to transfer objects _and the classes on which they are based_, statefully, from one application or machine to another, at runtime.
 
-==Objects as First Class Citizens==
+==Object Migration==
 
 The destination application does not need to contain the classes on which objects it receives are based. When objects arrive in a remote application, they are treated no differently than objects which are already in that application, and they can interact with the application, calling its methods, reading variables etc. 
 
