@@ -1,0 +1,23 @@
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_serialization_format.proto";
+import "component_request_identifier.proto";
+
+message ExecutionRequest {
+    enum ExecutionMode {
+        RETURN_RESPONSE = 0;
+        FIRE_AND_FORGET = 1;
+    }
+
+    // A serialized Runnable or Callable object
+    required bytes serialized_executable_object = 1;
+
+    // The serialized format of the executable object e.g. whether Kryo or Java serialization was used
+    required SerializationFormat serialization_format = 2;
+
+    // Whether the remote host needs to return a response to the client when the execution completes
+    required ExecutionMode execution_mode = 3 [default = RETURN_RESPONSE];
+
+    // Request identifier, indicates relevant session and identifies the relevant request to the client when
+    // response messages are returned
+    required RequestIdentifier request_identifier = 4;
+}
