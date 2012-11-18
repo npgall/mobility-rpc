@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Niall Gallagher
+ * Copyright 2011, 2012 Niall Gallagher
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ import java.util.logging.*;
  * Adds a system tray icon which displays information about the addresses on which the library is listening, and which
  * allows the library to be shut down, if the host machine is not headless and supports system tray icons.
  * <p/>
- * Supply system property "-Ddebug=true" on the command line to enable debug logging.
+ * Supply system property "-Ddebug=true" on the command line to enable debug logging.<br/>
+ * Supply system property "-Dcom.googlecode.mobilityrpc.headless=true" to explicitly disable system tray support.
  *
  * @author Niall Gallagher
  */
@@ -66,7 +67,7 @@ public class StandaloneMobilityServer {
         // For Mac OS only, set application name correctly in the menu bar. Need to do this before even querying AWT...
         System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Mobility-RPC");
         // Check if we can add a system tray icon, and if supported add one...
-        if (!GraphicsEnvironment.isHeadless() && SystemTray.isSupported()) {
+        if (!GraphicsEnvironment.isHeadless() && SystemTray.isSupported() && !Boolean.getBoolean("com.googlecode.mobilityrpc.headless")) {
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -76,12 +77,12 @@ public class StandaloneMobilityServer {
 
                         // Prepare message which will be displayed when tray icon is clicked...
                         final StringBuilder infoMessage = new StringBuilder();
-                        infoMessage.append("Mobility-RPC Standalone Server is running\n\n");
+                        infoMessage.append("Mobility-RPC Standalone Server is running.\n\n");
                         infoMessage.append("Listening on port ").append(EmbeddedMobilityServer.DEFAULT_PORT).append(" on the following addresses:\n");
                         for (String networkAddress : EmbeddedMobilityServer.getAddresses()) {
                             infoMessage.append(networkAddress).append("\n");
                         }
-                        infoMessage.append("\nTo shut down Mobility-RPC, select the Exit option from this menu");
+                        infoMessage.append("\nTo shut down Mobility-RPC, select the Exit option from this menu.");
 
                         // Prepare graphic for the icon which will be added to system tray...
                         BufferedImage graphic;
