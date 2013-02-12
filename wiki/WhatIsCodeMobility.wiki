@@ -1,7 +1,7 @@
 #summary What is Code Mobility?
 
 =What is Code Mobility?=
-Code Mobility is the ability to transfer objects and the supporting bytecode, dynamically and statefully from one machine or application to another, at runtime.
+Code Mobility is the ability to transfer objects _and the supporting bytecode_, dynamically and statefully from one machine or application to another, at runtime.
 
 ==Object Migration==
 
