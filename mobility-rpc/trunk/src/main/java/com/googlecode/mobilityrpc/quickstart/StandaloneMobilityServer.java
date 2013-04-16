@@ -21,6 +21,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.util.logging.*;
 
 /**
@@ -87,11 +88,13 @@ public class StandaloneMobilityServer {
                         // Prepare graphic for the icon which will be added to system tray...
                         BufferedImage graphic;
                         {
-                            final String uiResourceName = "OptionPane.informationIcon";
-                            Icon icon = UIManager.getIcon(uiResourceName);
-                            if (icon == null) {
-                                throw new IllegalStateException("Unable to load graphic for system tray icon using resource name: " + uiResourceName);
+                            final String uiResourceName = "/tray-icon.png";
+                            URL iconUrl = getClass().getResource(uiResourceName);
+                            if (iconUrl == null) {
+                                throw new IllegalStateException("Unable to locate graphic for system tray icon using resource name: " + uiResourceName);
                             }
+                            Icon icon =  new ImageIcon(iconUrl, "Mobility-RPC");
+                            
                             int w = icon.getIconWidth();
                             int h = icon.getIconHeight();
                             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
