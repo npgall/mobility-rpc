@@ -22,11 +22,12 @@ import com.googlecode.mobilityrpc.protocol.pojo.ResourceResponse;
 import com.googlecode.mobilityrpc.protocol.pojo.RequestIdentifier;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -103,13 +104,32 @@ public class SessionClassLoader extends ClassLoader {
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         try {
-            final ConnectionId threadLocalConnectionId = threadLocalConnectionIds.get();
-            if (threadLocalConnectionId == null) {
-                throw new ClassNotFoundException("No thread-local connection id is registered for the thread requesting class: " + name);
-            }
-
             // Convert class name to resource name...
             String resourceName = name.replace('.', '/') + ".class";
+
+            // Retrieve resource from cache...
+            byte[] requiredResourceData = resourceDataCache.get(resourceName);
+            if (requiredResourceData != null) {
+                return defineClass(name, requiredResourceData, 0, requiredResourceData.length);
+            }
+
+            // Not cached.
+
+            // Check if we are executing code from a client and so if we should request resource from the client...
+            final ConnectionId threadLocalConnectionId = threadLocalConnectionIds.get();
+            if (threadLocalConnectionId == null) {
+                // Connection id is null, therefore we are not executing/deserializing code from a client.
+                // Therefore this method must have been called called by ResourceRequestMessageProcessor, or by other
+                // code/thread in the local application. Therefore we keep the search local to this machine...
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.log(Level.FINE, "No bytecode cached for class: " + name);
+                }
+                throw new ClassNotFoundException("No bytecode previously cached for this class");
+            }
+
+            // We have a connection, therefore we are executing/deserializing code from a client.
+            // Request the resource from the client...
+
             // Wrap our required class in a singleton list.
             // Note the protocol intentionally supports requesting a list of classes at once as an optimization,
             // however this optimization has not yet been implemented.
@@ -124,7 +144,6 @@ public class SessionClassLoader extends ClassLoader {
             // Search the potentially multiple classes returned for the class we need.
             // Note: again, the protocol supports returning multiple classes,
             // however implementing this optimization is reserved for future work.
-            byte[] requiredResourceData = null;
             for (ResourceResponse.ResourceData resourceData : resourceResponse.getResourceDataResponses()) {
                 if (resourceName.equals(resourceData.getResourceName())) {
                     requiredResourceData = resourceData.getResourceData();
@@ -145,15 +164,140 @@ public class SessionClassLoader extends ClassLoader {
         }
     }
 
-    
-
+    /**
+     * Tries to find resources by requesting requesting from remote machines. This method will be called by the
+     * superclass implementation of {@link #getResource(String)} when the parent class loader cannot locate the required
+     * resource according to the parent delegation model of class loading.
+     * <p/>
+     * This method caches all resources loaded from client machines, and will serve from this cache whenever possible.
+     * <p/>
+     * The {@link java.net.URL#openStream()} method of the URL returned, will provide the resource data.
+     * <p/>
+     * The <code>toString</code> representation of the URL will resemble the following:<br/>
+     * <code>﻿mobility-rpc://[192.168.56.1:52671:0]/5f088ec8-4f71-4fae-a89b-56a0b408dcbe/test-resource.txt</code>
+     * (when referencing a remote machine)<br/>
+     * <code>﻿mobility-rpc://[local-cache:0:0]/5f088ec8-4f71-4fae-a89b-56a0b408dcbe/test-resource.txt</code>
+     * (when subsequently cached locally)<br/>
+     * Note that the string representation is for debugging purposes only.
+     * The JVM will not be able to parse the URL from this string. The URL <i>object</i> returned however, is able to
+     * provide the binary content of the resource.
+     *
+     * @param name The name of the resource required
+     * @return A URL whose {@link java.net.URL#openStream()} method provides content for the given resource. Returns
+     * <code>null</code> if the resource could not be found
+     */
     @Override
-    public InputStream getResourceAsStream(String name) {
-        byte[] cachedResourceData = resourceDataCache.get(name);
-        if (cachedResourceData != null) {
-            return new ByteArrayInputStream(cachedResourceData);
+    protected URL findResource(String name) {
+        try {
+            // Retrieve resource from cache...
+            byte[] requiredResourceData = resourceDataCache.get(name);
+            if (requiredResourceData != null) {
+                return wrapAsUrl("local-cache:0:0", sessionId.toString(), name, requiredResourceData);
+            }
+
+            // Not cached.
+
+            // Check if we are executing code from a client and so if we should request resource from the client...
+            final ConnectionId threadLocalConnectionId = threadLocalConnectionIds.get();
+            if (threadLocalConnectionId == null) {
+                // Connection id is null, therefore we are not executing/deserializing code from a client.
+                // Therefore this method must have been called called by ResourceRequestMessageProcessor, or by other
+                // code/thread in the local application. Therefore we keep the search local to this machine...
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.log(Level.FINE, "No content cached for resource: " + name);
+                }
+                return null;
+            }
+
+            // We have a connection, therefore we are executing/deserializing code from a client.
+            // Request the resource from the client...
+
+            // Wrap our required resource in a singleton list.
+            // Note the protocol intentionally supports requesting a list of resources at once as an optimization,
+            // however this optimization has not yet been implemented.
+            List<String> requiredResources = Collections.singletonList(name);
+
+            // Send a request to the remote machine for the required resource(s)...
+            FutureResourceResponse futureResponse = sendResourceRequest(requiredResources);
+
+            // Block here until the response arrives, or we time out...
+            ResourceResponse resourceResponse = futureResponse.getResponse(RESOURCE_REQUEST_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+
+            // Search the potentially multiple resources returned for the resource we need...
+            for (ResourceResponse.ResourceData resourceData : resourceResponse.getResourceDataResponses()) {
+                if (name.equals(resourceData.getResourceName())) {
+                    requiredResourceData = resourceData.getResourceData();
+                    resourceDataCache.put(name, requiredResourceData);
+                    break;
+                }
+            }
+
+            if (requiredResourceData == null) {
+                // The remote machine returned a response but it did not include the required resource...
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.log(Level.FINE, "The remote machine could not locate the requested resource: " + name);
+                }
+                return null;
+            }
+            return wrapAsUrl(threadLocalConnectionId.toString(), sessionId.toString(), name, requiredResourceData);
         }
-        return super.getResourceAsStream(name);
+        catch (Throwable t) {
+            throw new IllegalStateException("Unexpected exception locating the requested resource: " + name, t);
+        }
+    }
+
+    /**
+     * Finds resources with the given name which are loadable by this session class loader.
+     * <p/>
+     * This will return either one URL or zero URLs. This method delegates to {@link #findResource(String)}.
+     *
+     * @param name The name of the resource
+     * @return either one URL or zero URLs providing access to a resource with the given name
+     */
+    @Override
+    protected Enumeration<URL> findResources(String name) {
+        URL resourceUrl = findResource(name);
+        return resourceUrl == null
+                ? Collections.enumeration(Collections.<URL>emptySet())
+                : Collections.enumeration(Collections.<URL>singleton(resourceUrl));
+    }
+
+    /**
+     * Returns a URL which provides the given resource data as a stream.
+     *
+     * @param connectionId The connection from which the resource originated
+     * @param sessionId id of the session on this machine and the client machine
+     * @param resourceName The name of the resource on the classpath
+     * @param resourceData The resource data to wrap
+     * @return a URL which provides the given resource data as a stream
+     */
+    static URL wrapAsUrl(String connectionId, String sessionId, String resourceName, final byte[] resourceData) {
+        try {
+            return new URL("mobility-rpc", connectionId, -1, "/" + sessionId + "/" + resourceName, new URLStreamHandler() {
+                @Override
+                protected URLConnection openConnection(URL u) throws IOException {
+                    return new URLConnection(u) {
+                        @Override
+                        public void connect() throws IOException {
+                            // No op
+                        }
+
+                        @Override
+                        public Object getContent() throws IOException {
+                            return getInputStream();
+                        }
+
+                        @Override
+                        public InputStream getInputStream() throws IOException {
+                            return new ByteArrayInputStream(resourceData);
+                        }
+                    };
+                }
+            });
+        }
+        catch (Exception e) {
+            throw new IllegalStateException("Failed to wrap resource as URL: connection: " + connectionId + ", session: " + sessionId + ", resource: "  + resourceName, e);
+        }
     }
 
     /**
