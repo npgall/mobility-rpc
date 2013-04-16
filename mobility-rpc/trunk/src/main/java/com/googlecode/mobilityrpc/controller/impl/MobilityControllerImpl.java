@@ -70,6 +70,9 @@ public class MobilityControllerImpl implements MobilityControllerInternal {
     @Override
     public void sendOutgoingMessage(ConnectionId identifier, Object message) {
         // TODO: offload serialization to the queue/background thread?..
+        if (logger.isLoggable(Level.FINE)) {
+            logger.log(Level.FINE, "Serializing and submitting outgoing message to '" + identifier + "': " + message);
+        }
         byte[] messageDataInEnvelope = masterMessageConverter.convertToProtobuf(message);
         connectionManager.getConnection(identifier).enqueueOutgoingMessage(messageDataInEnvelope);
     }
@@ -120,12 +123,12 @@ public class MobilityControllerImpl implements MobilityControllerInternal {
                 T message = messageConverter.convertFromProtobuf(envelope.getMessage());
 
                 if (logger.isLoggable(Level.FINE)) {
-                    logger.log(Level.FINE, "Received message and submitting for processing, " + messageData.length + " bytes from " + connectionId + ": " + message);
+                    logger.log(Level.FINE, "Received message and submitting for processing, " + messageData.length + " bytes from '" + connectionId + "': " + message);
                 }
                 deserializedMessageProcessor.process(MobilityControllerImpl.this, connectionManager, connectionId, message);
             }
             catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to process incoming message: " + messageData.length + " bytes from " + connectionId, e);
+                logger.log(Level.WARNING, "Failed to process incoming message: " + messageData.length + " bytes from: " + connectionId, e);
             }
         }
 

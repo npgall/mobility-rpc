@@ -65,7 +65,7 @@ public class IncomingByteStreamReader extends Thread {
 
     @Override
     public void run() {
-        logger.log(Level.FINE, "IncomingByteStreamReader started for {0}", connectionId);
+        logger.log(Level.FINER, "IncomingByteStreamReader started for {0}", connectionId);
         while (!shutdown) {
             try {
                 logger.log(Level.FINER, "Waiting for incoming messages for {0}", connectionId);
@@ -96,7 +96,7 @@ public class IncomingByteStreamReader extends Thread {
         }
         this.shutdown = true;
         IOUtil.closeQuietly(inputStream);
-        logger.log(Level.FINE, "IncomingByteStreamReader stopped for {0}", connectionId);
+        logger.log(Level.FINER, "IncomingByteStreamReader stopped for {0}", connectionId);
     }
 
     /**

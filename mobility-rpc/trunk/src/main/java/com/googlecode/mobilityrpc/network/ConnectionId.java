@@ -114,10 +114,7 @@ public class ConnectionId {
 
     @Override
     public String toString() {
-        return "ConnectionId{" +
-                "address='" + address + '\'' +
-                ", port=" + port +
-                ", auxiliaryConnectionId=" + auxiliaryConnectionId +
-                '}';
+        return address + ":" + port + ":" + auxiliaryConnectionId;
+
     }
 }
