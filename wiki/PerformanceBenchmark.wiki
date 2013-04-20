@@ -45,7 +45,7 @@ Results show that Mobility-RPC outperforms RMI by wide margins both under high l
 =Performance as request size is increased=
 
  * When request size is small (one object in the collection), Mobility-RPC achieves 9% higher throughput (requests per second) than RMI and its latency per request is 8% lower than RMI
- * As request is increased to 100 objects in the collection, the gap widens such that Mobility-RPC achieves 76% higher throughput than RMI, and its latency per request is 43% lower than RMI
+ * As request size is increased to 100 objects in the collection, the gap widens such that Mobility-RPC achieves 76% higher throughput than RMI, and its latency per request is 43% lower than RMI
 
 <table>
 <tr><td><img src="http://mobility-rpc.googlecode.com/svn/wiki/images/Throughput_varying_concurrency.png"/></td><td><img src="http://mobility-rpc.googlecode.com/svn/wiki/images/Latency_varying_concurrency.png"/></td></tr>
