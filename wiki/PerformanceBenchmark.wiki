@@ -2,7 +2,9 @@
 
 In addition to code mobility, Mobility-RPC can also be used as a general purpose RPC framework, providing the same (and more) functionality than RMI.
 
-=Benchmark Overview=
+<wiki:toc max_depth="1" />
+
+=Overview=
 
 The following benchmark compares the performance of Mobility-RPC versus RMI, when it is required to invoke methods across a network. The benchmark requires both Mobility-RPC and RMI to invoke a method in a remote JVM, supplying a collection of objects as a parameter. The method in the remote JVM simply repackages those objects into a new collection, and returns the new collection back to the client.
 
@@ -12,7 +14,7 @@ These aspects are measured independently, such that when testing handling of dif
 
 Results show that Mobility-RPC outperforms RMI by wide margins both under high levels of concurrency and with larger request sizes, and that the gap in performance between the two widens as stress is increased in either dimension.
 
-=Performance under increasing levels of concurrency=
+=Performance as concurrency is increased=
 
  * When only one thread is making requests, Mobility-RPC achieves 9% higher throughput (requests per second) than RMI and its latency per request is 8% lower than RMI
  * As concurrency is increased to 16 threads, the gap widens such that Mobility-RPC achieves 75% higher throughput than RMI, and its latency per request is 43% lower than RMI
