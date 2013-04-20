@@ -101,7 +101,7 @@ Collection<T> result = session.execute(connectionId, ExecutionMode.RETURN_RESPON
 );
 }}}
 
-Note that Mobility-RPC only needs to be running on the remote machine. The `ServerBusinessLogic` class does not need to be deployed to the remote machine, it will be uploaded by the library automatically. It should also be noted however, that if the class was deployed to the remote machine, as would be the case for RMI, it would not be transferred by the code mobility library.
+Note that Mobility-RPC only needs to be running on the remote machine. The `ServerBusinessLogic` class does not need to be deployed to the remote machine, it will be uploaded by the library automatically. It should also be noted, that if the class was deployed to the remote machine, as would be the case for RMI, it would not be transferred by the library.
 
 Both client and server-side components of the benchmark were run on the same machine. This was intentional, because both RMI and Mobility systems have both client-side and server-side components, and this benchmark is an end-to-end evaluation.
 
