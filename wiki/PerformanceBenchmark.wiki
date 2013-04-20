@@ -75,10 +75,10 @@ Results show that Mobility-RPC outperforms RMI by wide margins both under high l
 The following is the method that both systems were required to invoke on the server. The method accepts a `Collection` of objects, and it repackages those objects into a new `Collection` (an `ArrayList`) which it then returns.
 {{{
 public class ServerBusinessLogic {
-     public static <T extends Comparable<T>> Collection<T> processRequest(Collection<T>
- collection) {
-         return new ArrayList<T>(collection);
-} }
+    public static <T extends Comparable<T>> Collection<T> processRequest(Collection<T> collection) {
+        return new ArrayList<T>(collection);
+    }
+}
 }}}
 
 
