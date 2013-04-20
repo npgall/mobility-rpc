@@ -1,6 +1,6 @@
 #summary Performance evaluation of Mobility-RPC versus Java RMI
 
-In addition to code mobility, Mobility-RPC can also be used as a general purpose RPC framework, providing the same (and more) functionality than RMI.
+In addition to code mobility, Mobility-RPC can be used as a general purpose RPC framework, providing the same (and more) functionality than RMI.
 
 =Overview=
 
