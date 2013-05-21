@@ -1,0 +1,22 @@
+#summary Maven coordinates and download statistics
+
+== Download for Maven Projects ==
+
+Mobility-RPC is in Maven Central, and can be added to a Maven project as follows:
+{{{
+<dependency>
+    <groupId>com.googlecode.mobilityrpc</groupId>
+    <artifactId>mobility-rpc</artifactId>
+    <version>1.0.0</version>
+</dependency>
+}}}
+
+==Usage in non-Maven projects==
+
+The library has some dependencies of it's own (see TechnologiesUsed), which, above, Maven would take care of automatically.
+
+For non-Maven projects, a special build of the library is also provided, built with maven-shade-plugin, which contains the library and all of the library's own dependencies embedded within a single jar file (ending "-all"). This build can be downloaded directly from [http://code.google.com/p/mobility-rpc/downloads/list here].
+
+==Download statistics, as of April 2013==
+
+503 downloads to-date (369 Maven, 134 non-Maven).
