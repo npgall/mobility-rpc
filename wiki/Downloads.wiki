@@ -11,7 +11,7 @@ Mobility-RPC is in Maven Central, and can be added to a Maven project as follows
 </dependency>
 }}}
 
-==Usage in non-Maven projects==
+== Download for non-Maven projects ==
 
 The library has some dependencies of it's own (see TechnologiesUsed), which, above, Maven would take care of automatically.
 
