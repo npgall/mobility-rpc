@@ -253,6 +253,7 @@
                     <header>src/etc/header.txt</header>
                     <excludes>
                         <exclude>src/main/proto/*</exclude>
+                        <exclude>src/test/resources/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
