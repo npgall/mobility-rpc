@@ -1,0 +1,17 @@
+package com.googlecode.mobilityrpc.protocol.protobuf;
+
+// Encapsulates protobuf data and indicates the type of message which has been
+// serialized, so that the relevant protobuf class can be chosen to deserialize it
+message Envelope {
+    enum MessageType {
+        EXECUTION_REQUEST = 1;
+        EXECUTION_RESPONSE = 2;
+        RESOURCE_REQUEST = 3;
+        RESOURCE_RESPONSE = 4;
+        PING = 5;
+        PONG = 6;
+    }
+
+  required MessageType message_type = 1;
+  required bytes message_bytes = 2;
+}
