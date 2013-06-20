@@ -1,0 +1,298 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.googlecode.mobilityrpc</groupId>
+    <artifactId>mobility-rpc</artifactId>
+    <version>1.1.0</version>
+    <packaging>jar</packaging>
+    <name>Mobility-RPC</name>
+    <description>A high performance and easy to use library for Code Mobility and RPC on the Java platform.</description>
+    <url>http://code.google.com/p/mobility-rpc/</url>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>http://mobility-rpc.googlecode.com/svn/mobility-rpc/tags/1.1.0</url>
+        <connection>scm:svn:http://mobility-rpc.googlecode.com/svn/mobility-rpc/tags/1.1.0</connection>
+        <developerConnection>scm:svn:https://mobility-rpc.googlecode.com/svn/mobility-rpc/tags/1.1.0</developerConnection>
+        <!--
+            Note: When performing a release for the first time, run the following
+            and and choose to permanently accept Google's server certificate:
+                svn log -v https://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/
+        -->
+    </scm>
+    <developers>
+        <developer>
+            <id>npgall</id>
+            <name>Niall Gallagher</name>
+            <email>niall@npgall.com</email>
+            <url>http://www.npgall.com</url>
+            <roles>
+                <role>owner</role>
+            </roles>
+        </developer>
+    </developers>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <!--
+                    Configure javac compiler for Java 6 compatibility.
+                    Note that actually the library might also be compatible with Java 5, but this has not been tested.
+                -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- Deploy a "-sources.jar" along with build -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- Deploy a "-javadoc.jar" along with build -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!--
+                    Run protoc (Google Protocol Buffers compiler) to generate Java classes from .proto files.
+                    See: http://code.google.com/p/protobuf/
+
+                    Ideally we would use maven-protoc-plugin to invoke protoc, but that plugin is not in Maven
+                    Central. We wish to deploy this library to Maven Central, and guidelines for doing so
+                    forbid relying on dependencies which are not also in central:
+                    https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+
+                    Therefore we use maven-antrun-plugin to invoke protoc as a workaround. Note: like
+                    maven-protoc-plugin, this requires protoc to be installed on the machine, and be accessible
+                    via the 'protoc' command.
+
+                    To install protoc (Google Protocol Buffers):
+                    - on Mac: sudo port install protobuf-java  (requires: http://www.macports.org/)
+                    - on Linux: sudo apt-get install protobuf-java  (or similar e.g. yum install ...)
+                    - on Windows: download binaries from http://code.google.com/p/protobuf/ and add to the
+                    operating system's PATH
+
+                    Mac OS issue: After installing protobuf as above on Mac OS, this plugin will work when Maven
+                    is run from the command line, but it will not work if run from IntelliJ IDE. To fix this,
+                    put a symlink to protoc directly into /usr/bin.
+                    From a terminal: sudo ln -s `which protoc` /usr/bin/protoc
+                -->
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>compile-protoc</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="target/generated-sources/protoc" />
+                                <path id="proto.path">
+                                    <fileset dir="src/main/proto">
+                                        <include name="**/*.proto" />
+                                    </fileset>
+                                </path>
+                                <pathconvert pathsep=" " property="proto.files" refid="proto.path" />
+                                <exec executable="protoc" failonerror="true">
+                                    <arg value="--proto_path=${project.basedir}/src/main/proto" />
+                                    <arg value="--java_out=${project.basedir}/target/generated-sources/protoc" />
+                                    <!--suppress MavenModelInspection -->
+                                    <arg line="${proto.files}" />
+                                </exec>
+                            </tasks>
+                            <sourceRoot>target/generated-sources/protoc</sourceRoot>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- Add a "Main-Class" entry to manifest in the jar to run StandaloneMobilityServer -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.googlecode.mobilityrpc.quickstart.StandaloneMobilityServer</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!--
+                    Build a jar containing all dependencies, by copying classes from all dependency jars directly into
+                    the main jar.
+
+                    The resulting jar can be used as a library in other applications (without requiring any transitive
+                    dependencies of its own), or it can be run as a standalone mobility-rpc server from the command line
+                    (launches StandaloneMobilityServer).
+
+                    If used as a library in another application, in case the other application also shares any of the
+                    same dependencies, to avoid duplicate class issues resulting from copying dependency classes into
+                    this jar, we relocate classes which are dependencies of this library into a new package within this
+                    jar: com.googlecode.mobilityrpc.lib.*. We then update the bytecode in all classes in this jar to
+                    refer to dependency classes in their new package.
+
+                    Also we configure some transformers to merge open source licences present in any of the jars.
+                 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.5</version>
+                <configuration>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <shadedClassifierName>all</shadedClassifierName>
+                    <relocations>
+                        <relocation>
+                            <pattern>de</pattern>
+                            <shadedPattern>com.googlecode.mobilityrpc.lib.de</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org</pattern>
+                            <shadedPattern>com.googlecode.mobilityrpc.lib.org</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.google.protobuf</pattern>
+                            <shadedPattern>com.googlecode.mobilityrpc.lib.com.google.protobuf</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.esotericsoftware</pattern>
+                            <shadedPattern>com.googlecode.mobilityrpc.lib.com.esotericsoftware</shadedPattern>
+                        </relocation>
+                    </relocations>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                            <addHeader>false</addHeader>
+                        </transformer>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <manifestEntries>
+                                <Main-Class>com.googlecode.mobilityrpc.quickstart.StandaloneMobilityServer</Main-Class>
+                            </manifestEntries>
+                        </transformer>
+                    </transformers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!--
+                    Plugin to PGP-sign all artifacts automatically when running mvn deploy,
+                    as required for deployment to the Sonatype/Maven Central repo.
+
+                    This requires GnuPG (aka GPG) to be installed and configured on the machine on which this is run,
+                    and for the public key to be uploaded to key servers (e.g. pool.sks-keyservers.net).
+
+                    See: https://docs.sonatype.org/display/Repository/How+To+Generate+PGP+Signatures+With+Maven
+                 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <!--suppress MavenModelInspection -->
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!--
+                    Plugin to check that all source files have the appropriate open source license header.
+                    
+                    This will fail the build if any source files don't have the open source license header.
+
+                    To actually apply the header to new source files, run: mvn license:format
+                -->
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.10.b1</version>
+                <configuration>
+                    <header>src/etc/header.txt</header>
+                    <excludes>
+                        <exclude>src/main/proto/*</exclude>
+                        <exclude>src/test/resources/*</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode</groupId>
+            <artifactId>kryo</artifactId>
+            <version>1.04</version>
+        </dependency>
+        <dependency>
+            <groupId>de.javakaffee</groupId>
+            <artifactId>kryo-serializers</artifactId>
+            <version>0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>2.4.1</version>
+        </dependency>
+    </dependencies>
+</project>
