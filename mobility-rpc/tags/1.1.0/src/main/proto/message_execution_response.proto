@@ -1,0 +1,26 @@
+package com.googlecode.mobilityrpc.protocol.protobuf;
+import "component_serialization_format.proto";
+import "component_request_identifier.proto";
+
+message ExecutionResponse {
+    enum ExecutionOutcome {
+        VOID_RETURNED = 0;
+        VALUE_RETURNED = 1;
+        FAILURE = 2;
+    }
+
+    // An enum value which indicates whether the execution returned a response object or not, or whether execution failed
+    required ExecutionOutcome execution_outcome = 1;
+
+    // A serialized object whose type depends on the ExecutionOutcome:
+    // if VOID_RETURNED - serialized_return_object will be zero bytes
+    // if VALUE_RETURNED - serialized_return_object will be a serialized object returned by the Callable object
+    // if FAILURE - a serialized RuntimeException wrapping whatever exception caused execution to fail
+    required bytes serialized_return_object = 2;
+
+    // The serialized format of the return object e.g. whether Kryo or Java serialization was used
+    required SerializationFormat serialization_format = 3;
+
+    // The request identifier, copied from the corresponding execution request originally sent by the client
+    required RequestIdentifier request_identifier = 4;
+}
