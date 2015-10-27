@@ -1,4 +1,4 @@
-The internal structure of Mobility-RPC protocol messages. See MobilityRpcProtocol for an overview of the protocol.
+The internal structure of Mobility-RPC protocol messages. See [MobilityRpcProtocol](MobilityRpcProtocol.md) for an overview of the protocol.
 
 
 

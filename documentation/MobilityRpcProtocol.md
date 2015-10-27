@@ -1,8 +1,11 @@
-The communication protocol used in Mobility-RPC has been designed from the ground up to be as efficient as possible. To achieve this, it does not rely on the serialization support built into Java, and it does not rely on RMI, the default RPC framework of Java.
+# Mobility-RPC Network Protocol #
+
+The communication protocol used in Mobility-RPC has been designed from the ground up to be as efficient as possible.
+
+To achieve this, it does not rely on the serialization support built into Java, and it does not rely on RMI, the default RPC framework of Java.
 
 
-
-## The problems with RMI and Java Serialization ##
+## Background: The problems with RMI and Java Serialization ##
 
 ### Efficiency ###
 In terms of runtime performance, Java Serialization is _eleven times slower_ than third party serialization libraries for the Java platform, and the serialized data sizes that it outputs are _three times larger_ than third party serialization libraries for the Java platform, according to [independent benchmarks](http://code.google.com/p/thrift-protobuf-compare/wiki/Benchmarking).
