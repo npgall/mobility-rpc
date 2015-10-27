@@ -1,8 +1,10 @@
-The internal structure of Mobility-RPC protocol messages. See [MobilityRpcProtocol](MobilityRpcProtocol.md) for an overview of the protocol.
+# Mobility-RPC Protocol Messages #
 
+This page discusses the internal structure of messages which instances of the Mobility-RPC library exchange with each
+other over the network.
+For background on this design, see [MobilityRpcProtocol](MobilityRpcProtocol.md).
 
-
-# Mobility-RPC Protocol Message Definitions #
+# Protocol Message Definitions #
 
 Mobility-RPC uses [Google Protocol Buffers](http://code.google.com/apis/protocolbuffers/) (protobuf) to encode messages for sending _on the wire_.
 

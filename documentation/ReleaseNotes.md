@@ -1,3 +1,5 @@
+# Mobility-RPC Release Notes #
+
 ### Version 1.1.0 - 2013-06-20 ###
   * Added ClassLoader.getResource() support to access resources on a remote machine, which are located on the classpath of the client machine. Allows configuration files etc. to be uploaded automatically ([issue 8](https://code.google.com/p/mobility-rpc/issues/detail?id=8))
   * Minor fixes to system tray icon support on Linux
