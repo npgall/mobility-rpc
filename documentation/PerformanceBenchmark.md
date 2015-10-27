@@ -19,7 +19,7 @@ Results show that Mobility-RPC outperforms RMI by wide margins both under high l
 <tr><td><img src='https://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/images/Throughput_varying_concurrency.png' /></td><td><img src='https://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/images/Latency_varying_concurrency.png' /></td></tr>
 <tr><td>
 <table cellpadding='4' border='1' cellspacing='0' width='100%'>
-<tr><td>Throughput (requests per sec) (request size 1)</td></tr>
+<tr><td colspan="4">Throughput (requests per sec) (request size 1)</td></tr>
 <tr><td>Client Threads</td><td>RMI</td><td>Mobility</td><td>Difference %</td></tr>
 <tr><td>1</td><td>6316.8656016094</td><td>6881.2487759979</td><td>9%</td></tr>
 <tr><td>2</td><td>4964.4404576678</td><td>5110.203062095</td><td>3%</td></tr>
@@ -29,7 +29,7 @@ Results show that Mobility-RPC outperforms RMI by wide margins both under high l
 </table>
 </td><td>
 <table cellpadding='4' border='1' cellspacing='0' width='100%'>
-<tr><td>Latency per request (ns) (request size 1)</td></tr>
+<tr><td colspan="4">Latency per request (ns) (request size 1)</td></tr>
 <tr><td>Client Threads</td><td>RMI</td><td>Mobility</td><td>Difference %</td></tr>
 <tr><td>1</td><td>158306.36</td><td>145322.46</td><td>-8%</td></tr>
 <tr><td>2</td><td>201432.57</td><td>195686.94</td><td>-3%</td></tr>
@@ -49,7 +49,7 @@ Results show that Mobility-RPC outperforms RMI by wide margins both under high l
 <tr><td><img src='https://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/images/Throughput_varying_request_sizes.png' /></td><td><img src='https://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/images/Latency_varying_request_sizes.png' /></td></tr>
 <tr><td>
 <table cellpadding='4' border='1' cellspacing='0' width='100%'>
-<tr><td>Throughput (requests per sec) (1 client thread)</td></tr>
+<tr><td colspan="4">Throughput (requests per sec) (1 client thread)</td></tr>
 <tr><td>Request Size</td><td>RMI</td><td>Mobility</td><td>Difference %</td></tr>
 <tr><td>1</td><td>6316.8656016094</td><td>6881.2487759979</td><td>9%</td></tr>
 <tr><td>10</td><td>3857.7698880383</td><td>5423.7491112509</td><td>41%</td></tr>
@@ -58,7 +58,7 @@ Results show that Mobility-RPC outperforms RMI by wide margins both under high l
 </table>
 </td><td>
 <table cellpadding='4' border='1' cellspacing='0' width='100%'>
-<tr><td>Latency per request (ns)  (1 client thread)</td></tr>
+<tr><td colspan="4">Latency per request (ns)  (1 client thread)</td></tr>
 <tr><td>Request Size</td><td>RMI</td><td>Mobility</td><td>Difference %</td></tr>
 <tr><td>1</td><td>158306.36</td><td>145322.46</td><td>-8%</td></tr>
 <tr><td>10</td><td>259217.12</td><td>184374.31</td><td>-29%</td></tr>
