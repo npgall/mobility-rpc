@@ -100,4 +100,4 @@ As discussed above, establishing a single multiplexed TCP connection between pai
 
 ### Protocol Message Definitions ###
 
-The structure of individual Mobility-RPC protocol messages can be found in ProtocolMessageStructures.
+The structure of individual Mobility-RPC protocol messages can be found in [ProtocolMessageStructures](ProtocolMessageStructures.md).
