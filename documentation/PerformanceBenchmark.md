@@ -16,7 +16,7 @@ Results show that Mobility-RPC outperforms RMI by wide margins both under high l
   * As concurrency is increased to 16 threads, the gap widens such that Mobility-RPC achieves 75% higher throughput than RMI, and its latency per request is 43% lower than RMI
 
 <table>
-<tr><td><img src='http://mobility-rpc.googlecode.com/svn/wiki/images/Throughput_varying_concurrency.png' /></td><td><img src='http://mobility-rpc.googlecode.com/svn/wiki/images/Latency_varying_concurrency.png' /></td></tr>
+<tr><td><img src='http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/images/Throughput_varying_concurrency.png' /></td><td><img src='http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/images/Latency_varying_concurrency.png' /></td></tr>
 <tr><td>
 <table cellpadding='4' border='1' cellspacing='0' width='100%'>
 <tr><td>Throughput (requests per sec) (request size 1)</td></tr>
@@ -46,7 +46,7 @@ Results show that Mobility-RPC outperforms RMI by wide margins both under high l
   * As request size is increased to 100 objects in the collection, the gap widens such that Mobility-RPC achieves 76% higher throughput than RMI, and its latency per request is 43% lower than RMI
 
 <table>
-<tr><td><img src='http://mobility-rpc.googlecode.com/svn/wiki/images/Throughput_varying_request_sizes.png' /></td><td><img src='http://mobility-rpc.googlecode.com/svn/wiki/images/Latency_varying_request_sizes.png' /></td></tr>
+<tr><td><img src='http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/images/Throughput_varying_request_sizes.png' /></td><td><img src='http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/images/Latency_varying_request_sizes.png' /></td></tr>
 <tr><td>
 <table cellpadding='4' border='1' cellspacing='0' width='100%'>
 <tr><td>Throughput (requests per sec) (1 client thread)</td></tr>
