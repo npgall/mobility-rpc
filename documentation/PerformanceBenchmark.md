@@ -80,7 +80,7 @@ public class ServerBusinessLogic {
 ```
 
 
-The following is the code to invoke the method across the network via Mobility-RPC. The design patterns for creating RMI server and client applications are well defined, so these are not shown but can be viewed in the benchmark source code [here](http://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/src/test/java/com/googlecode/mobilityrpc/benchmarks/rmi/).
+The following is the code to invoke the method across the network via Mobility-RPC. The design patterns for creating RMI server and client applications are well defined, so these are not shown but can be viewed in the benchmark source code [here](../code/src/test/java/com/googlecode/mobilityrpc/benchmarks/rmi/).
 ￼
 ```
 // One-off initialisation...
@@ -117,4 +117,4 @@ Time taken client-side for the benchmark to create collections of Person objects
 
 The benchmark was then run with varying numbers of request threads and various request sizes. When testing varying numbers of threads, the request size was fixed at 1 for those sessions (1 Person object to be sent in the Collection to the server). Similarly when testing varying request sizes, the number of threads at was fixed at 1.
 
-Full source code of the benchmark can be found [here](http://mobility-rpc.googlecode.com/svn/mobility-rpc/trunk/src/test/java/com/googlecode/mobilityrpc/benchmarks/rmi/).
+Full source code of the benchmark can be found [here](../code/src/test/java/com/googlecode/mobilityrpc/benchmarks/rmi/).

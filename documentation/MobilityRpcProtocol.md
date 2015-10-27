@@ -85,7 +85,7 @@ The protocol therefore has the following characteristics:
 
 ### TCP Implementation ###
 
-Although the protocol is intentionally compatible with SCTP, for practical reasons - because SCTP is not yet widely available, having only recently become [supported in Java 7](http://java.sun.com/developer/technicalArticles/javase/jdk7-sctp/) - the protocol is currently implemented atop TCP. See [ConnectionManagerImpl](http://mobility-rpc.googlecode.com/svn/mobility-rpc/javadoc/apidocs/com/googlecode/mobilityrpc/network/impl/ConnectionManagerImpl.html) and [TCP support](http://mobility-rpc.googlecode.com/svn/mobility-rpc/javadoc/apidocs/com/googlecode/mobilityrpc/network/impl/tcp/package-summary.html).
+Although the protocol is intentionally compatible with SCTP, for practical reasons - because SCTP is not yet widely available, having only recently become [supported in Java 7](http://java.sun.com/developer/technicalArticles/javase/jdk7-sctp/) - the protocol is currently implemented atop TCP. See [ConnectionManagerImpl](http://htmlpreview.github.io/?http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/javadoc/apidocs/com/googlecode/mobilityrpc/network/impl/ConnectionManagerImpl.html) and [TCP support](http://htmlpreview.github.io/?http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/javadoc/apidocs/com/googlecode/mobilityrpc/network/impl/tcp/package-summary.html).
 
 **Support for Multiple TCP Connections**
 
