@@ -19,7 +19,7 @@ First, some _shared components_ of protocol messages, which are reused in severa
 ### UUID Component ###
 
 `component_uuid.proto`
-```
+```protobuf
 package com.googlecode.mobilityrpc.protocol.protobuf;
 
 // A 128-bit id, transferred as two 64-bit longs
@@ -33,7 +33,7 @@ This defines a signed 128-bit number, which is transmitted as two signed 64-bit 
 ### SerializationFormat Component ###
 
 `component_serialization_format.proto`
-```
+```protobuf
 package com.googlecode.mobilityrpc.protocol.protobuf;
 
 enum SerializationFormat {
@@ -47,7 +47,7 @@ Whenever a serialized object is transmitted, the `SerializationFormat` is includ
 ### RequestIdentifier Component ###
 
 `component_request_identifier.proto`
-```
+```protobuf
 package com.googlecode.mobilityrpc.protocol.protobuf;
 import "component_uuid.proto";
 
@@ -80,7 +80,7 @@ The following are the formats of the actual protocol messages, which reuse some 
 ### ResourceRequest Message ###
 
 `message_resource_request.proto`
-```
+```protobuf
 package com.googlecode.mobilityrpc.protocol.protobuf;
 import "component_request_identifier.proto";
 
@@ -114,7 +114,7 @@ The `ResourceRequest` message encapsulates:
 ### ResourceResponse Message ###
 
 `message_resource_response.proto`
-```
+```protobuf
 package com.googlecode.mobilityrpc.protocol.protobuf;
 import "component_request_identifier.proto";
 
@@ -146,7 +146,7 @@ The `ResourceResponse` message encapsulates:
 ### Ping Message ###
 
 `message_ping.proto`
-```
+```protobuf
 package com.googlecode.mobilityrpc.protocol.protobuf;
 import "component_uuid.proto";
 
@@ -171,7 +171,7 @@ The Ping message encapsulates:
 ### Pong Message ###
 
 `message_pong.proto`
-```
+```protobuf
 package com.googlecode.mobilityrpc.protocol.protobuf;
 import "component_uuid.proto";
 
@@ -194,7 +194,7 @@ The Pong message encapsulates:
 ### ExecutionRequest Message ###
 
 `message_execution_request.proto`
-```
+```protobuf
 package com.googlecode.mobilityrpc.protocol.protobuf;
 import "component_serialization_format.proto";
 import "component_request_identifier.proto";
@@ -243,7 +243,7 @@ The `ExecutionRequest` message is comprised of:
 ### ExecutionResponse Message ###
 
 `message_execution_response.proto`
-```
+```protobuf
 package com.googlecode.mobilityrpc.protocol.protobuf;
 import "component_serialization_format.proto";
 import "component_request_identifier.proto";
@@ -283,7 +283,7 @@ The `ExecutionResponse` message is comprised of:
 ### Envelope Message ###
 
 `message_envelope.proto`
-```
+```protobuf
 package com.googlecode.mobilityrpc.protocol.protobuf;
 
 // Encapsulates protobuf data and indicates the type of message which has been

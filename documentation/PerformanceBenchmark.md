@@ -75,7 +75,7 @@ Results show that Mobility-RPC outperforms RMI by wide margins both under high l
 # Benchmark Methodology #
 
 The following is the method that both systems were required to invoke on the server. The method accepts a `Collection` of objects, and it repackages those objects into a new `Collection` (an `ArrayList`) which it then returns.
-```
+```java
 public class ServerBusinessLogic {
     public static <T extends Comparable<T>> Collection<T> processRequest(Collection<T> collection) {
         return new ArrayList<T>(collection);
@@ -86,7 +86,7 @@ public class ServerBusinessLogic {
 
 The following is the code to invoke the method across the network via Mobility-RPC. The design patterns for creating RMI server and client applications are well defined, so these are not shown but can be viewed in the benchmark source code [here](../code/src/test/java/com/googlecode/mobilityrpc/benchmarks/rmi/).
 ￼
-```
+```java
 // One-off initialisation...
 MobilityController mobilityController = MobilityRPC.newController();
 MobilitySession session = mobilityController.getSession(UUID.randomUUID());

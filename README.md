@@ -35,7 +35,7 @@ Print "Hello World" to the console on a remote machine called "bob".
 
 The line of code `System.out.println("Hello World")` is actually moved to the remote machine and executed there
 automatically, even though it was not deployed there in advance.
-```
+```java
 public class HelloWorld {
 
     public static void main(String[] args) {
@@ -53,7 +53,7 @@ public class HelloWorld {
 ### Retrieve Data ###
 Retrieve system properties from the remote machine and print to the console on the local machine.
 
-```
+```java
 public class RetrieveData {
 
     public static void main(String[] args) {
@@ -77,7 +77,7 @@ value it produced (a `Properties` object) is transported back to the local machi
 The Boomerang Pattern - a `Callable` object which returns itself.
 
 Send a Callable object to a remote machine, where it gathers some data, and then returns itself back to the local machine. The data is printed to the console on the local machine.
-```
+```java
 public class BoomerangPattern {
 
     static class BoomerangObject implements Callable<BoomerangObject> {
@@ -108,7 +108,7 @@ public class BoomerangPattern {
 Transfer a regular object to a remote machine. The object is not special in any way and does not implement any particular interfaces.
 
 Send the object, and call its `printDetails()` method on the remote machine.
-```
+```java
 public class RegularObjectMigration {
 
     static class RegularObject {
@@ -144,7 +144,7 @@ From _bob_ the object transfers itself to _alice_, which is the next machine on 
 
 From _alice_ the object transfers itself back to _bob_ again, where it prints "Hello World" and an incremented hop number, 3, but then it finds that it has run out of machines to visit, so it prints "Ran out of machines to visit".
 
-```
+```java
 public class MobileAgentPattern {
 
     static class MobileAgent implements Runnable {
@@ -206,7 +206,7 @@ You can run Mobility-RPC as a library inside your application on remote machine(
 
 #### Run as a library: receive incoming objects in your application ####
 Add the Maven dependency to your application, and have your application call the following method.
-```
+```java
 EmbeddedMobilityServer.start();
 ```
 Your application can then receive objects from client machines and those objects can interact with your application.
