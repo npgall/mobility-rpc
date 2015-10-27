@@ -252,7 +252,7 @@ You can launch the server on multiple remote machines, to build more sophisticat
 
 
 ## API ##
-The examples above mostly use the [QuickTask](http://htmlpreview.github.io/?http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/javadoc/apidocs/com/googlecode/mobilityrpc/quickstart/package-summary.html) class, in the [quickstart](http://htmlpreview.github.io/?http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/javadoc/apidocs/com/googlecode/mobilityrpc/quickstart/package-summary.html) package - a simplified API to the library, wrapping the main APIs, tailored for specific use cases and for getting started with the library quickly.
+The examples above mostly use the [QuickTask](http://htmlpreview.github.io/?http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/javadoc/apidocs/com/googlecode/mobilityrpc/quickstart/QuickTask.html) class, in the [quickstart](http://htmlpreview.github.io/?http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/javadoc/apidocs/com/googlecode/mobilityrpc/quickstart/package-summary.html) package - a simplified API to the library, wrapping the main APIs, tailored for specific use cases and for getting started with the library quickly.
 
 The main APIs of the library are marked `[`public api`]` in the [API JavaDocs](http://htmlpreview.github.io/?http://raw.githubusercontent.com/npgall/mobility-rpc/master/documentation/javadoc/apidocs/index.html), but essentially the main API is as follows:
 
