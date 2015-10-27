@@ -1,0 +1,16 @@
+# What is Code Mobility? #
+Code Mobility is the ability to transfer objects _and the supporting bytecode_, dynamically and statefully from one machine or application to another, at runtime.
+
+## Object Migration ##
+
+The destination application does not need to contain the classes on which objects it receives are based. When objects arrive in a remote application, they are treated no differently than objects which are already in that application, and they can interact with the application, calling its methods, reading variables etc.
+
+Mobile objects additionally can fetch objects from the remote application and return them back to the local application. Similarly, the local application does not need to contain the classes on which those objects are based.
+
+## Serialization, Bytecode transfer, Sessions ##
+
+In the Mobility-RPC library, serialization, bytecode transfer and caching is handled transparently, using a communication protocol designed and optimized specifically for this purpose. The approach to serialization is based on [Kryo](http://code.google.com/p/kryo/), and as such is much better than Java's built-in serialization - for example there is no need to implement `java.io.Serializable`, and therefore most standard Java objects are inherently compatible with the library without modification.
+
+The combination of the serialization approach and communication protocol in Mobility-RPC, is significantly more efficient than RMI, the de-facto RPC framework of the Java platform. As such, in RPC scenarios, the library will typically outperform RMI by a wide margin, especially so under load.
+
+The main benefit of Code Mobility however, is the new classes of distributed application architectures that it enables, as compared with conventional approaches such as RPC.
