@@ -11,16 +11,15 @@ Read more: [What is Code Mobility?](documentation/WhatIsCodeMobility.md) and [Ho
 
 **Trivially easy to use**
   * Move regular, unmodified Java code and objects between machines as easily as moving them around within a single application - without deploying code to the remote machines in advance
-  * Write objects which can transfer themselves and their code between machines seamlessly, and statefully
-  * Compatible with third-party code (even third-party objects can be migrated)
-  * Invoke arbitrary methods or third-party libraries cross-network seamlessly, even if they were never designed for RPC
+  * Write objects which can move themselves around the network seamlessly, and statefully
+  * Invoke arbitrary methods or third-party libraries remotely, even if they were never designed for RPC
   
 **Powerful Design Patterns**
-  * Take advantage of design patterns for network interactions which are not possible with conventional RPC
-  * Supports: remote evaluation, code on demand, mobile agents (see [Wikipedia](http://en.wikipedia.org/wiki/Code_mobility) for an explanation of these things)
+  * Take advantage of design patterns which are not possible with conventional RPC
+  * Levarage all code mobility paradigms and more: remote evaluation, code on demand, mobile agents (see [Wikipedia](http://en.wikipedia.org/wiki/Code_mobility))
   
 **High performance**
-  * An efficient network protocol designed specifically for code mobility, outperforms and more scalable than RMI (see [Performance Benchmark](documentation/PerformanceBenchmark.md))
+  * More flexible, outperforms, and is more scalable than RMI (see [Performance Benchmark](documentation/PerformanceBenchmark.md))
 
 ## Example Usage ##
 These examples send objects to fictitious machines named [alice and bob](http://en.wikipedia.org/wiki/Alice_and_Bob).
