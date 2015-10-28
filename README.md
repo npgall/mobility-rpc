@@ -16,7 +16,7 @@ Read more: [What is Code Mobility?](documentation/WhatIsCodeMobility.md) and [Ho
   
 **Powerful Design Patterns**
   * Take advantage of design patterns which are not possible with conventional RPC
-  * Levarage all code mobility paradigms and more: remote evaluation, code on demand, mobile agents (see [Wikipedia](http://en.wikipedia.org/wiki/Code_mobility))
+  * As well as the classic code mobility paradigms: remote evaluation, code on demand, mobile agents (see [Wikipedia](http://en.wikipedia.org/wiki/Code_mobility))
   
 **High performance**
   * More flexible, outperforms, and is more scalable than RMI (see [Performance Benchmark](documentation/PerformanceBenchmark.md))
