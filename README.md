@@ -7,20 +7,19 @@ Move objects or tasks, execution state, **and the underlying code**, seamlessly 
 
 ## Overview of Mobility-RPC ##
 
-Read more: [What is Code Mobility?](documentation/WhatIsCodeMobility.md) and [How does Mobility-RPC differ from conventional RPC?](documentation/ConventionalRpcComparison.md)
-
 **Trivially easy to use**
   * Move regular, unmodified Java code and objects between machines as easily as moving them around within a single application - without deploying code to the remote machines in advance
-  * Write objects which can transfer themselves and their code between machines seamlessly, and statefully
-  * Compatible with third-party code (even third-party objects can be migrated)
-  * Invoke arbitrary methods or third-party libraries cross-network seamlessly, even if they were never designed for RPC
+  * Write objects which can move themselves around the network seamlessly, and statefully
+  * Invoke arbitrary methods or third-party libraries remotely, even if they were never designed for RPC
   
 **Powerful Design Patterns**
-  * Take advantage of design patterns for network interactions which are not possible with conventional RPC
-  * Supports: remote evaluation, code on demand, mobile agents (see [Wikipedia](http://en.wikipedia.org/wiki/Code_mobility) for an explanation of these things)
+  * Take advantage of application architectures which are not possible with conventional RPC
+  * As well as the classic code mobility paradigms: remote evaluation, code on demand, mobile agents (see [Wikipedia](http://en.wikipedia.org/wiki/Code_mobility))
   
 **High performance**
-  * An efficient network protocol designed specifically for code mobility, outperforms and more scalable than RMI (see [Performance Benchmark](documentation/PerformanceBenchmark.md))
+  * More flexible, outperforms, and is more scalable than RMI (see [Performance Benchmark](documentation/PerformanceBenchmark.md))
+
+Read more: [What is Code Mobility?](documentation/WhatIsCodeMobility.md) and [How does Mobility-RPC differ from conventional RPC?](documentation/ConventionalRpcComparison.md)
 
 ## Example Usage ##
 These examples send objects to fictitious machines named [alice and bob](http://en.wikipedia.org/wiki/Alice_and_Bob).
@@ -269,7 +268,8 @@ Note that Mobility-RPC was compiled with Protobuf 2.4.1. If you will compile it 
 For more documentation, see the [documentation](documentation) directory.
 
 ## Project Status ##
-Mobility-RPC is in Maven Central. See [ReleaseNotes](documentation/ReleaseNotes.md) for changes.
+Mobility-RPC is in Maven Central (see above), and is largely feature-complete.
 
 Report any bugs/feature requests in the [Issues](http://github.com/npgall/mobility-rpc/issues) tab.
+
 For support please use the [Discussion Group](http://groups.google.com/forum/?fromgroups#!forum/mobility-rpc-discuss), not direct email to the developers.
