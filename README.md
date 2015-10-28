@@ -268,7 +268,7 @@ Note that Mobility-RPC was compiled with Protobuf 2.4.1. If you will compile it 
 For more documentation, see the [documentation](documentation) directory.
 
 ## Project Status ##
-Mobility-RPC is in Maven Central, and is largely feature-complete.
+Mobility-RPC is in Maven Central (see above), and is largely feature-complete.
 
 Report any bugs/feature requests in the [Issues](http://github.com/npgall/mobility-rpc/issues) tab.
 
