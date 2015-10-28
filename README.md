@@ -15,7 +15,7 @@ Read more: [What is Code Mobility?](documentation/WhatIsCodeMobility.md) and [Ho
   * Invoke arbitrary methods or third-party libraries remotely, even if they were never designed for RPC
   
 **Powerful Design Patterns**
-  * Take advantage of design patterns which are not possible with conventional RPC
+  * Take advantage of application architectures which are not possible with conventional RPC
   * As well as the classic code mobility paradigms: remote evaluation, code on demand, mobile agents (see [Wikipedia](http://en.wikipedia.org/wiki/Code_mobility))
   
 **High performance**
