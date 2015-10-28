@@ -7,8 +7,6 @@ Move objects or tasks, execution state, **and the underlying code**, seamlessly 
 
 ## Overview of Mobility-RPC ##
 
-Read more: [What is Code Mobility?](documentation/WhatIsCodeMobility.md) and [How does Mobility-RPC differ from conventional RPC?](documentation/ConventionalRpcComparison.md)
-
 **Trivially easy to use**
   * Move regular, unmodified Java code and objects between machines as easily as moving them around within a single application - without deploying code to the remote machines in advance
   * Write objects which can move themselves around the network seamlessly, and statefully
@@ -20,6 +18,8 @@ Read more: [What is Code Mobility?](documentation/WhatIsCodeMobility.md) and [Ho
   
 **High performance**
   * More flexible, outperforms, and is more scalable than RMI (see [Performance Benchmark](documentation/PerformanceBenchmark.md))
+
+Read more: [What is Code Mobility?](documentation/WhatIsCodeMobility.md) and [How does Mobility-RPC differ from conventional RPC?](documentation/ConventionalRpcComparison.md)
 
 ## Example Usage ##
 These examples send objects to fictitious machines named [alice and bob](http://en.wikipedia.org/wiki/Alice_and_Bob).
