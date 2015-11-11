@@ -1,3 +1,4 @@
+syntax = "proto2";
 package com.googlecode.mobilityrpc.protocol.protobuf;
 import "component_serialization_format.proto";
 import "component_request_identifier.proto";

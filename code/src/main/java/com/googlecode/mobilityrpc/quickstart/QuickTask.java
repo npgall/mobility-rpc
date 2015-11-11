@@ -17,6 +17,7 @@ package com.googlecode.mobilityrpc.quickstart;
 
 import com.googlecode.mobilityrpc.MobilityRPC;
 import com.googlecode.mobilityrpc.network.ConnectionId;
+import com.googlecode.mobilityrpc.protocol.pojo.ExecutionMode;
 import com.googlecode.mobilityrpc.session.MobilityContext;
 import com.googlecode.mobilityrpc.session.MobilitySession;
 
@@ -47,6 +48,20 @@ public class QuickTask {
     /**
      * Transfers the given <code>Runnable</code> object, and any objects it references, to the given remote machine,
      * and executes it (calls the {@link Runnable#run()} method) on the remote machine.
+     * <p/>
+     * Connects to the remote machine on the default port 5739.
+     *
+     * @param address The address (ip or name) of the remote machine
+     * @param executionResponseTimeoutMs The timeout in milliseconds to wait for a response
+     * @param runnable The object to send and execute on the remote machine
+     */
+    public static void execute(String address, long executionResponseTimeoutMs, Runnable runnable) {
+        execute(new ConnectionId(address, EmbeddedMobilityServer.DEFAULT_PORT), executionResponseTimeoutMs, runnable);
+    }
+
+    /**
+     * Transfers the given <code>Runnable</code> object, and any objects it references, to the given remote machine,
+     * and executes it (calls the {@link Runnable#run()} method) on the remote machine.
      *
      * @param connectionId The address/port of the remote machine
      * @param runnable The object to send and execute on the remote machine
@@ -55,6 +70,24 @@ public class QuickTask {
         MobilitySession session = MobilityRPC.newController().newSession();
         try {
             session.execute(connectionId, new SessionReleasingRunnable(runnable));
+        }
+        finally {
+            session.getMobilityController().destroy();
+        }
+    }
+
+    /**
+     * Transfers the given <code>Runnable</code> object, and any objects it references, to the given remote machine,
+     * and executes it (calls the {@link Runnable#run()} method) on the remote machine.
+     *
+     * @param connectionId The address/port of the remote machine
+     * @param executionResponseTimeoutMs The timeout in milliseconds to wait for a response
+     * @param runnable The object to send and execute on the remote machine
+     */
+    public static void execute(ConnectionId connectionId, long executionResponseTimeoutMs, Runnable runnable) {
+        MobilitySession session = MobilityRPC.newController().newSession();
+        try {
+            session.execute(connectionId, ExecutionMode.RETURN_RESPONSE, executionResponseTimeoutMs, new SessionReleasingRunnable(runnable));
         }
         finally {
             session.getMobilityController().destroy();
@@ -85,6 +118,25 @@ public class QuickTask {
      * <p/>
      * Transfers the object returned by the <code>call</code> method on the remote machine, and any objects it
      * references, back to the local application.
+     * <p/>
+     * Connects to the remote machine on the default port 5739.
+     *
+     * @param address The address (ip or name) of the remote machine
+     * @param executionResponseTimeoutMs The timeout in milliseconds to wait for a response
+     * @param callable The object to send to the remote machine
+     * @return The object returned by the {@link Callable#call()} method on the remote machine (transferred back to
+     * this machine)
+     */
+    public static <T> T execute(String address, long executionResponseTimeoutMs, Callable<T> callable) {
+        return execute(new ConnectionId(address, EmbeddedMobilityServer.DEFAULT_PORT), executionResponseTimeoutMs, callable);
+    }
+
+    /**
+     * Transfers the given <code>Callable</code> object, and any objects it references, to the given remote machine,
+     * and executes it (calls the {@link Callable#call()} method) on the remote machine.
+     * <p/>
+     * Transfers the object returned by the <code>call</code> method on the remote machine, and any objects it
+     * references, back to the local application.
      *
      * @param connectionId The address/port of the remote machine
      * @param callable The object to send to the remote machine
@@ -95,6 +147,29 @@ public class QuickTask {
         MobilitySession session = MobilityRPC.newController().newSession();
         try {
             return session.execute(connectionId, new SessionReleasingCallable<T>(callable));
+        }
+        finally {
+            session.getMobilityController().destroy();
+        }
+    }
+
+    /**
+     * Transfers the given <code>Callable</code> object, and any objects it references, to the given remote machine,
+     * and executes it (calls the {@link Callable#call()} method) on the remote machine.
+     * <p/>
+     * Transfers the object returned by the <code>call</code> method on the remote machine, and any objects it
+     * references, back to the local application.
+     *
+     * @param connectionId The address/port of the remote machine
+     * @param executionResponseTimeoutMs The timeout in milliseconds to wait for a response
+     * @param callable The object to send to the remote machine
+     * @return The object returned by the {@link Callable#call()} method on the remote machine (transferred back to
+     * this machine)
+     */
+    public static <T> T execute(ConnectionId connectionId, long executionResponseTimeoutMs, Callable<T> callable) {
+        MobilitySession session = MobilityRPC.newController().newSession();
+        try {
+            return session.execute(connectionId, ExecutionMode.RETURN_RESPONSE, executionResponseTimeoutMs, new SessionReleasingCallable<T>(callable));
         }
         finally {
             session.getMobilityController().destroy();

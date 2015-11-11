@@ -1,3 +1,4 @@
+syntax = "proto2";
 package com.googlecode.mobilityrpc.protocol.protobuf;
 
 // A 128-bit id, transferred as two 64-bit longs

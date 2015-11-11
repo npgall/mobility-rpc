@@ -37,7 +37,7 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
     /**
      * How long in millis threads waiting for an execution response to arrive should wait before giving up.
      */
-    private static final long EXECUTION_RESPONSE_TIMEOUT_MILLIS = 60000;
+    private static final long DEFAULT_EXECUTION_RESPONSE_TIMEOUT_MILLIS = 60000;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -71,12 +71,22 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
     }
 
     @Override
+    public void execute(String address, long executionResponseTimeoutMs, Runnable runnable) {
+        execute(new ConnectionId(address, EmbeddedMobilityServer.DEFAULT_PORT), ExecutionMode.RETURN_RESPONSE, executionResponseTimeoutMs, runnable);
+    }
+
+    @Override
     public void execute(ConnectionId connectionId, Runnable runnable) {
         execute(connectionId, ExecutionMode.RETURN_RESPONSE, runnable);
     }
 
     @Override
     public void execute(ConnectionId connectionId, ExecutionMode executionMode, Runnable runnable) {
+        execute(connectionId, executionMode, DEFAULT_EXECUTION_RESPONSE_TIMEOUT_MILLIS, runnable);
+    }
+
+    @Override
+    public void execute(ConnectionId connectionId, ExecutionMode executionMode, long executionResponseTimeoutMs, Runnable runnable) {
         // Serialize the object...
         final byte[] serializedExecutableObject = serialize(runnable, defaultSerializationFormat);
 
@@ -115,7 +125,7 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                     mobilityController.sendOutgoingMessage(connectionId, outgoingRequest);
 
                     // Now block this thread until we get a response, or we time out...
-                    executionResponse = futureExecutionResponse.getResponse(EXECUTION_RESPONSE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+                    executionResponse = futureExecutionResponse.getResponse(executionResponseTimeoutMs, TimeUnit.MILLISECONDS);
                 }
                 catch (Exception e) {
                     throw new IllegalStateException("Failed to receive response for execution request sent to remote machine in RETURN_RESPONSE mode for request identifier: " + requestIdentifier + ", connection id: " + connectionId, e);
@@ -165,12 +175,22 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
     }
 
     @Override
+    public <T> T execute(String address, long executionResponseTimeoutMs, Callable<T> callable) {
+        return execute(new ConnectionId(address, EmbeddedMobilityServer.DEFAULT_PORT), ExecutionMode.RETURN_RESPONSE, executionResponseTimeoutMs, callable);
+    }
+
+    @Override
     public <T> T execute(ConnectionId connectionId, Callable<T> callable) {
         return execute(connectionId, ExecutionMode.RETURN_RESPONSE, callable);
     }
 
     @Override
     public <T> T execute(ConnectionId connectionId, ExecutionMode executionMode, Callable<T> callable) {
+        return execute(connectionId, executionMode, DEFAULT_EXECUTION_RESPONSE_TIMEOUT_MILLIS, callable);
+    }
+
+    @Override
+    public <T> T execute(ConnectionId connectionId, ExecutionMode executionMode, long executionResponseTimeoutMs, Callable<T> callable) {
         // Serialize the object...
         final byte[] serializedExecutableObject = serialize(callable, defaultSerializationFormat);
 
@@ -209,7 +229,7 @@ public class MobilitySessionImpl implements MobilitySessionInternal {
                     mobilityController.sendOutgoingMessage(connectionId, outgoingRequest);
 
                     // Now block this thread until we get a response, or we time out...
-                    executionResponse = futureExecutionResponse.getResponse(EXECUTION_RESPONSE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+                    executionResponse = futureExecutionResponse.getResponse(executionResponseTimeoutMs, TimeUnit.MILLISECONDS);
                 }
                 catch (Exception e) {
                     throw new IllegalStateException("Failed to receive response for execution request sent to remote machine in RETURN_RESPONSE mode for request identifier: " + requestIdentifier + ", connection id: " + connectionId, e);

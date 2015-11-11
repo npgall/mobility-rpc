@@ -123,6 +123,19 @@ public interface MobilitySession {
      * @param runnable The object to send and execute on the remote machine
      */
     void execute(String address, Runnable runnable);
+
+    /**
+     * Transfers the given <code>Runnable</code> object, and any objects it references, to the given remote machine,
+     * and executes it (calls the {@link Runnable#run()} method) on the remote machine.
+     * <p/>
+     * This is a convenience method for calling {@link #execute(ConnectionId, ExecutionMode, long, Runnable)}
+     * with {@link ExecutionMode#RETURN_RESPONSE} and default port 5739 in the connection id.
+     *
+     * @param address The address (ip or name) of the remote machine
+     * @param executionResponseTimeoutMs The timeout in milliseconds to wait for a response
+     * @param runnable The object to send and execute on the remote machine
+     */
+    void execute(String address, long executionResponseTimeoutMs, Runnable runnable);
     
     /**
      * Transfers the given <code>Runnable</code> object, and any objects it references, to the given remote machine,
@@ -148,12 +161,25 @@ public interface MobilitySession {
     void execute(ConnectionId connectionId, ExecutionMode executionMode, Runnable runnable);
 
     /**
+     * Transfers the given <code>Runnable</code> object, and any objects it references, to the given remote machine,
+     * and executes it (calls the {@link Runnable#run()} method) on the remote machine.
+     *
+     * @param connectionId The address/port of the remote machine
+     * @param executionMode Either of the following, see: {@link ExecutionMode#RETURN_RESPONSE} or
+     * {@link ExecutionMode#FIRE_AND_FORGET}
+     * @param executionResponseTimeoutMs The timeout in milliseconds to wait for a response, which is applied unless
+     *                                   executionMode {@link ExecutionMode#FIRE_AND_FORGET} was specified
+     * @param runnable The object to send to the remote machine
+     */
+    void execute(ConnectionId connectionId, ExecutionMode executionMode, long executionResponseTimeoutMs, Runnable runnable);
+
+    /**
      * Transfers the given <code>Callable</code> object, and any objects it references, to the given remote machine,
      * and executes it (calls the {@link Callable#call()} method) on the remote machine. Transfers the object returned
      * by the <code>call</code> method on the remote machine, and any objects it references, back to the local
      * application.
      * <p/>
-     * This is a convenience method for calling {@link #execute(ConnectionId, ExecutionMode, Runnable)}
+     * This is a convenience method for calling {@link #execute(ConnectionId, ExecutionMode, Callable)}
      * with {@link ExecutionMode#RETURN_RESPONSE} and default port 5739 in the connection id.
      *
      * @param address The address (ip or name) of the remote machine
@@ -162,14 +188,31 @@ public interface MobilitySession {
      * this machine)
      */
     <T> T execute(String address, Callable<T> callable);
-    
+
     /**
      * Transfers the given <code>Callable</code> object, and any objects it references, to the given remote machine,
      * and executes it (calls the {@link Callable#call()} method) on the remote machine. Transfers the object returned
      * by the <code>call</code> method on the remote machine, and any objects it references, back to the local
      * application.
      * <p/>
-     * This is a convenience method for calling {@link #execute(ConnectionId, ExecutionMode, Runnable)}
+     * This is a convenience method for calling {@link #execute(ConnectionId, ExecutionMode, long, Callable)}
+     * with {@link ExecutionMode#RETURN_RESPONSE} and default port 5739 in the connection id.
+     *
+     * @param address The address (ip or name) of the remote machine
+     * @param executionResponseTimeoutMs The timeout in milliseconds to wait for a response
+     * @param callable The object to send to the remote machine
+     * @return The object returned by the {@link Callable#call()} method on the remote machine (transferred back to
+     * this machine)
+     */
+    <T> T execute(String address, long executionResponseTimeoutMs, Callable<T> callable);
+
+    /**
+     * Transfers the given <code>Callable</code> object, and any objects it references, to the given remote machine,
+     * and executes it (calls the {@link Callable#call()} method) on the remote machine. Transfers the object returned
+     * by the <code>call</code> method on the remote machine, and any objects it references, back to the local
+     * application.
+     * <p/>
+     * This is a convenience method for calling {@link #execute(ConnectionId, ExecutionMode, Callable)}
      * with {@link ExecutionMode#RETURN_RESPONSE}.
      *
      * @param connectionId The address/port of the remote machine
@@ -193,6 +236,23 @@ public interface MobilitySession {
      * this machine)
      */
     <T> T execute(ConnectionId connectionId, ExecutionMode executionMode, Callable<T> callable);
+
+    /**
+     * Transfers the given <code>Callable</code> object, and any objects it references, to the given remote machine,
+     * and executes it (calls the {@link Callable#call()} method) on the remote machine. Transfers the object returned
+     * by the <code>call</code> method on the remote machine, and any objects it references, back to the local
+     * application.
+     *
+     * @param connectionId The address/port of the remote machine
+     * @param executionMode Either of the following, see: {@link ExecutionMode#RETURN_RESPONSE} or
+     * {@link ExecutionMode#FIRE_AND_FORGET}
+     * @param executionResponseTimeoutMs The timeout in milliseconds to wait for a response, which is applied unless
+     *                                   executionMode {@link ExecutionMode#FIRE_AND_FORGET} was specified
+     * @param callable The object to send to the remote machine
+     * @return The object returned by the {@link Callable#call()} method on the remote machine (transferred back to
+     * this machine)
+     */
+    <T> T execute(ConnectionId connectionId, ExecutionMode executionMode, long executionResponseTimeoutMs, Callable<T> callable);
 
     /**
      * Returns the class loader associated with this session.

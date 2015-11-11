@@ -1,3 +1,4 @@
+syntax = "proto2";
 package com.googlecode.mobilityrpc.protocol.protobuf;
 
 enum SerializationFormat {

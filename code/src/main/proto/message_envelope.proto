@@ -1,3 +1,4 @@
+syntax = "proto2";
 package com.googlecode.mobilityrpc.protocol.protobuf;
 
 // Encapsulates protobuf data and indicates the type of message which has been
