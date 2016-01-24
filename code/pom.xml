@@ -264,7 +264,7 @@
                             <goal>perform</goal>
                         </goals>
                         <configuration>
-                            <pomFileName>subdir/pom.xml</pomFileName>
+                            <pomFileName>code/pom.xml</pomFileName>
                         </configuration>
                     </execution>
                 </executions>
