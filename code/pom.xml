@@ -108,7 +108,7 @@
                                 <mkdir dir="target/generated-sources/protoc" />
                                 <path id="proto.path">
                                     <fileset dir="src/main/proto">
-                                        <include name="**/*.proto" />
+                                        <include name="*.proto" />
                                     </fileset>
                                 </path>
                                 <pathconvert pathsep=" " property="proto.files" refid="proto.path" />
@@ -249,6 +249,22 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>perform</goal>
+                        </goals>
+                        <configuration>
+                            <pomFileName>subdir/pom.xml</pomFileName>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
