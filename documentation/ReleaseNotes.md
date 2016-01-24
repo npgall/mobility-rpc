@@ -1,5 +1,10 @@
 # Mobility-RPC Release Notes #
 
+### Version 1.2.0 - 2016-01-24 ###
+ * Added support to supply the execution response timeout to MobilitySession and QuickTask explicitly.
+ * Updated to latest version of Protobuf 3.0.0.
+ * Updated to latest version of Kryo 3.0.3.
+
 ### Version 1.1.0 - 2013-06-20 ###
   * Added ClassLoader.getResource() support to access resources on a remote machine, which are located on the classpath of the client machine. Allows configuration files etc. to be uploaded automatically ([issue 8](https://code.google.com/p/mobility-rpc/issues/detail?id=8))
   * Minor fixes to system tray icon support on Linux
