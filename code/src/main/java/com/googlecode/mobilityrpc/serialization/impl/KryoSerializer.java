@@ -58,8 +58,10 @@ public class KryoSerializer implements Serializer {
                 return fieldSerializer;
             }
         });
-        // Instantiate objects without calling their constructor...
-        kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
+        // Instantiate objects by calling a no-arg constructor by default,
+        // but if the object does not have a no-arg constructor
+        // fall back to instantiating via the objenesis library without calling a constructor...
+        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
 
         // Configure Kryo to use our session class loader to load byte code from remote machines...
         kryo.setClassLoader(classLoader);
