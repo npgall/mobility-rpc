@@ -193,7 +193,7 @@ Mobility-RPC is in Maven Central, and can be added to a Maven project as follows
 <dependency>
     <groupId>com.googlecode.mobilityrpc</groupId>
     <artifactId>mobility-rpc</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -268,7 +268,7 @@ Note that Mobility-RPC was compiled with Protobuf 2.4.1. If you will compile it 
 For more documentation, see the [documentation](documentation) directory.
 
 ## Project Status ##
-Mobility-RPC is in Maven Central (see above), and is largely feature-complete.
+Mobility-RPC is in Maven Central (see above), and is largely feature-complete. See [ReleaseNotes](documentation/ReleaseNotes.md) for version details.
 
 Report any bugs/feature requests in the [Issues](http://github.com/npgall/mobility-rpc/issues) tab.
 
