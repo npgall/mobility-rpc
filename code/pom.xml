@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.mobilityrpc</groupId>
     <artifactId>mobility-rpc</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
     <name>Mobility-RPC</name>
     <description>A high performance and easy to use library for Code Mobility and RPC on the Java platform.</description>
@@ -23,7 +23,7 @@
         <url>https://github.com/npgall/${project.artifactId}.git</url>
         <connection>scm:git:https://github.com/npgall/${project.artifactId}.git</connection>
         <developerConnection>scm:git:git@github.com:npgall/${project.artifactId}.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>1.2.1</tag>
   </scm>
     <developers>
         <developer>
