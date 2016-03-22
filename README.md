@@ -188,12 +188,12 @@ Hello World, this is hop number: 2 in MobilitySession{sessionId=836d7e5f-42ca-44
 
 ### Usage in Maven and Non-Maven Projects ###
 
-Mobility-RPC is in Maven Central, and can be added to a Maven project as follows:
+Mobility-RPC is in Maven Central, and can be added to a Maven project as follows. See [ReleaseNotes](documentation/ReleaseNotes.md) for the latest version number.
 ```
 <dependency>
     <groupId>com.googlecode.mobilityrpc</groupId>
     <artifactId>mobility-rpc</artifactId>
-    <version>1.2.0</version>
+    <version>x.x.x</version>
 </dependency>
 ```
 
