@@ -1,5 +1,8 @@
 # Mobility-RPC Release Notes #
 
+### Version 1.2.1 - 2016-03-2 ###
+ * Added a workaround to avoid triggering a bug in the Kryo 3.0.3 serialization library, which caused it to fail to serialize ArrayLists which were created by supplying another collection to their constructor.
+
 ### Version 1.2.0 - 2016-01-24 ###
  * Added support to supply the execution response timeout to MobilitySession and QuickTask explicitly.
  * Updated to latest version of Protobuf 3.0.0.
